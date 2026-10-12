@@ -24,5 +24,7 @@ const { purchasesRouter, receivingsRouter } = require('./modules/purchases/purch
 router.use('/purchases', purchasesRouter);
 router.use('/purchase-receivings', receivingsRouter);
 router.use('/supplier-payments', require('./modules/supplierPayments/supplierPayments.routes'));
+router.use('/sales', require('./modules/sales/sales.routes'));
+router.use('/refunds', require('./modules/refunds/refunds.routes'));
 
 module.exports = router;
