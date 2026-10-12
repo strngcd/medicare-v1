@@ -32,7 +32,7 @@ export function useListState(defaults = {}) {
     }, { replace: true });
   }, [setParams]);
 
-  const filterKeys = Object.keys(state).filter((k) => !['page', 'limit', 'sortBy', 'sortOrder'].includes(k) && state[k] !== defaults[k]);
+  const filterKeys = Object.keys(state).filter((k) => !['page', 'limit', 'sortBy', 'sortOrder', 'tab'].includes(k) && state[k] !== defaults[k]);
   const clear = useCallback(() => setParams(new URLSearchParams(), { replace: true }), [setParams]);
 
   return { state, update, clear, hasFilters: filterKeys.length > 0 };
