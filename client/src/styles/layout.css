@@ -318,3 +318,10 @@
   .receipt { border: none; width: 80mm; }
   .print-area-only body * { visibility: hidden; }
 }
+
+/* Printing only the receipt dialog */
+@media print {
+  body.printing-receipt .app-shell { display: none !important; }
+  body.printing-receipt .modal-backdrop { position: static; padding: 0; background: none; }
+  body.printing-receipt .modal-body > :not(.receipt) { display: none !important; }
+}
