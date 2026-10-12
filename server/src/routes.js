@@ -36,4 +36,14 @@ const { reportsRouter, analyticsRouter } = require('./modules/reports/reports.ro
 router.use('/reports', reportsRouter);
 router.use('/analytics', analyticsRouter);
 
+const { auditRouter, loginHistoryRouter } = require('./modules/audit/audit.routes');
+router.use('/audit-logs', auditRouter);
+router.use('/login-history', loginHistoryRouter);
+
+const { settingsRouter, systemRouter } = require('./modules/settings/settings.routes');
+router.use('/settings', settingsRouter);
+router.use('/system', systemRouter);
+router.use('/help', require('./modules/help/help.routes'));
+router.use('/search', require('./modules/search/search.routes'));
+
 module.exports = router;

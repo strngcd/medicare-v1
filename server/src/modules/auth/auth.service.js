@@ -27,9 +27,10 @@ function selectInitialBranch(auth, branches) {
 
 /** The session payload returned by login and GET /auth/me. */
 async function buildSessionPayload(auth) {
-  const [profile, branches] = await Promise.all([
+  const [profile, branches, settings] = await Promise.all([
     repo.findProfile(auth.userId),
     repo.listActiveBranchesForUser(auth.userId, auth.isOwner),
+    repo.findPublicSettings(),
   ]);
   return {
     user: {
@@ -50,6 +51,18 @@ async function buildSessionPayload(auth) {
       theme: profile.theme,
       pageSize: profile.page_size,
       uiDensity: profile.ui_density,
+    },
+    pharmacy: {
+      name: settings.pharmacy_name,
+      logoUrl: settings.logo_url,
+      currencyCode: settings.currency_code,
+      expiryWarningDays: settings.expiry_warning_days,
+      tax: {
+        enabled: settings.tax_enabled,
+        name: settings.tax_name,
+        rate: settings.tax_rate,
+        mode: settings.tax_mode,
+      },
     },
   };
 }
