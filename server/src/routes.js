@@ -1,9 +1,11 @@
 const express = require('express');
 const requireJson = require('./middleware/requireJson');
+const { invalidateOnWrite } = require('./utils/cache');
 
 const router = express.Router();
 
 router.use(requireJson);
+router.use(invalidateOnWrite);
 
 router.get('/health', (req, res) => {
   res.json({ success: true, data: { status: 'ok' }, message: 'Service is healthy.' });
@@ -29,5 +31,9 @@ router.use('/refunds', require('./modules/refunds/refunds.routes'));
 router.use('/transfers', require('./modules/transfers/transfers.routes'));
 router.use('/alerts', require('./modules/alerts/alerts.routes'));
 router.use('/notifications', require('./modules/notifications/notifications.routes'));
+
+const { reportsRouter, analyticsRouter } = require('./modules/reports/reports.routes');
+router.use('/reports', reportsRouter);
+router.use('/analytics', analyticsRouter);
 
 module.exports = router;

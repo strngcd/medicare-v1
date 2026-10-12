@@ -9,10 +9,14 @@ const COST_FIELDS = new Set([
   'inventoryValue',
   'totalCost',
   'costValue',
+  'expiredValue',
+  'expiringSoonValue',
 ]);
 
 // Fields that reveal cost of goods sold, profit or margins.
-const PROFIT_FIELDS = new Set(['cogs', 'grossProfit', 'profit', 'grossMargin', 'marginPercent', 'refundedCogs', 'netCogs']);
+const PROFIT_FIELDS = new Set([
+  'cogs', 'grossProfit', 'profit', 'grossMargin', 'marginPercent', 'refundedCogs', 'netCogs', 'salesCogs',
+]);
 
 /**
  * Returns a deep copy of `data` with protected financial fields removed
@@ -40,6 +44,21 @@ function filterFinancialFields(data, auth) {
   return walk(data);
 }
 
+/** Removes the given keys at any depth (Dates and primitives are kept as-is). */
+function omitFields(data, fields) {
+  const blocked = new Set(fields);
+  const walk = (value) => {
+    if (Array.isArray(value)) return value.map(walk);
+    if (value && typeof value === 'object' && !(value instanceof Date)) {
+      const out = {};
+      for (const [key, inner] of Object.entries(value)) if (!blocked.has(key)) out[key] = walk(inner);
+      return out;
+    }
+    return value;
+  };
+  return walk(data);
+}
+
 function canViewCost(auth) {
   return auth.permissions.has(P.FINANCIAL_VIEW_PURCHASE_COST);
 }
@@ -48,4 +67,4 @@ function canViewProfit(auth) {
   return auth.permissions.has(P.FINANCIAL_VIEW_PROFIT);
 }
 
-module.exports = { filterFinancialFields, canViewCost, canViewProfit, COST_FIELDS, PROFIT_FIELDS };
+module.exports = { filterFinancialFields, omitFields, canViewCost, canViewProfit, COST_FIELDS, PROFIT_FIELDS };
