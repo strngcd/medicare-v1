@@ -145,7 +145,19 @@ async function updatePasswordHash(client, userId, passwordHash) {
   await query('UPDATE users SET password_hash = $2 WHERE id = $1', [userId, passwordHash], client);
 }
 
+/** Operational settings every signed-in user needs (POS totals, branding). */
+async function findPublicSettings(client) {
+  const { rows } = await query(
+    `SELECT pharmacy_name, logo_url, currency_code, expiry_warning_days, tax_enabled, tax_name, tax_rate, tax_mode
+       FROM system_settings WHERE id = 1`,
+    [],
+    client,
+  );
+  return rows[0];
+}
+
 module.exports = {
+  findPublicSettings,
   findUserForLogin,
   findUserPasswordHash,
   countRecentFailures,
