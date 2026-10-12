@@ -1,0 +1,23 @@
+{
+  "name": "medicar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-branch internal pharmacy management system",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace server",
+    "dev:client": "npm run dev --workspace client",
+    "migrate": "npm run migrate --workspace server",
+    "seed": "npm run seed --workspace server",
+    "create-owner": "npm run create-owner --workspace server",
+    "test": "npm test --workspace server && npm test --workspace client",
+    "build": "npm run build --workspace client",
+    "start": "npm start --workspace server"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
