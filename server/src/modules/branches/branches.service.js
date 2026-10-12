@@ -40,10 +40,16 @@ async function getBranchContext(auth) {
     offset: 0,
     orderBy: 'b.status ASC, b.name ASC',
   });
-  return {
+  const context = {
     canAccessAllBranches: auth.isOwner,
     branches: rows.map((r) => ({ id: r.id, name: r.name, code: r.code, status: r.status })),
   };
+  // Transfer creators may send stock to any active branch, so they need its name (nothing else).
+  if (auth.permissions.has('INVENTORY_TRANSFER_CREATE')) {
+    const all = await repo.list({ branchIds: null, status: 'ACTIVE', limit: 1000, offset: 0, orderBy: 'b.name ASC' });
+    context.transferDestinations = all.rows.map((r) => ({ id: r.id, name: r.name, code: r.code }));
+  }
+  return context;
 }
 
 async function assertValidManager(client, managerUserId, branchId) {
