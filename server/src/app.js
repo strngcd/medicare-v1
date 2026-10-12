@@ -18,7 +18,14 @@ function createApp() {
   // so repeated or nested query keys cannot be smuggled into filters.
   app.set('query parser', 'simple');
 
-  app.use(helmet());
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        // Allow the configurable pharmacy logo to be an https image.
+        'img-src': ["'self'", 'data:', 'https:'],
+      },
+    },
+  }));
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
   app.use(requestContext);

@@ -10,6 +10,7 @@
     "migrate:down": "node scripts/migrate.js down",
     "migrate:create": "node-pg-migrate create --migration-file-language sql --migrations-dir migrations",
     "seed": "node scripts/seed.js",
+    "seed:demo": "node scripts/seed-demo.js",
     "create-owner": "node scripts/create-owner.js",
     "test": "jest --runInBand",
     "test:unit": "jest --runInBand tests/unit",

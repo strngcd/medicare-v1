@@ -71,4 +71,10 @@ async function getSystemInfo() {
   };
 }
 
-module.exports = { getSettings, updateSettings, getSystemInfo };
+/** Public branding for signed-out pages: name and logo only. */
+async function getBranding() {
+  const settings = await repo.get();
+  return { pharmacyName: settings.pharmacy_name, logoUrl: settings.logo_url };
+}
+
+module.exports = { getSettings, updateSettings, getSystemInfo, getBranding };

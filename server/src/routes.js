@@ -11,6 +11,9 @@ router.get('/health', (req, res) => {
   res.json({ success: true, data: { status: 'ok' }, message: 'Service is healthy.' });
 });
 
+// Public: the sign-in page shows the pharmacy name and logo (nothing else).
+router.get('/branding', require('./modules/settings/settings.controller').branding);
+
 router.use('/auth', require('./modules/auth/auth.routes'));
 router.use('/users', require('./modules/users/users.routes'));
 router.use('/branches', require('./modules/branches/branches.routes'));

@@ -128,6 +128,13 @@ describe('transfer lifecycle', () => {
 });
 
 describe('validation and authorization', () => {
+  test('transfer creators can see every active branch as a destination (names only)', async () => {
+    const res = await destAdmin.get('/api/v1/branches/context');
+    expect(res.body.data.branches.map((b) => b.code)).toEqual(['PIASSA']);
+    expect(res.body.data.transferDestinations.map((b) => b.code).sort()).toEqual(['BOLE', 'PIASSA']);
+    expect(Object.keys(res.body.data.transferDestinations[0]).sort()).toEqual(['code', 'id', 'name']);
+  });
+
   test('source and destination must differ; requested quantity must be available', async () => {
     const same = await sourceAdmin.post('/api/v1/transfers').send({
       sourceBranchId: source.id, destinationBranchId: source.id, items: [{ batchId: batch.id, requestedQuantity: 1 }],
