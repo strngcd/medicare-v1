@@ -24,3 +24,11 @@ function sendPage(res, { rows, total, page, limit }, extra = {}) {
 }
 
 module.exports = { sendData, sendCreated, sendPage };
+
+/** Sends the result of runIdempotent, flagging replays with a response header. */
+function sendIdempotent(res, result, message) {
+  if (result.replayed) res.set('Idempotent-Replayed', 'true');
+  return res.status(result.status).json({ success: true, data: result.body, message });
+}
+
+module.exports.sendIdempotent = sendIdempotent;

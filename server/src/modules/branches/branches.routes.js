@@ -5,6 +5,7 @@ const { requirePermission, requireAnyPermission } = require('../../middleware/au
 const { PERMISSIONS: P } = require('../../permissions/catalog');
 const { idParam } = require('../../validators/common');
 const controller = require('./branches.controller');
+const inventoryController = require('../inventory/inventory.controller');
 const v = require('./branches.validators');
 
 const router = express.Router();
@@ -20,6 +21,12 @@ router.patch('/:id', requirePermission(P.BRANCH_EDIT), validate({ params: idPara
 router.post('/:id/deactivate', requirePermission(P.BRANCH_DEACTIVATE), validate({ params: idParam }), controller.deactivate);
 router.post('/:id/reactivate', requirePermission(P.BRANCH_REACTIVATE), validate({ params: idParam }), controller.reactivate);
 router.get('/:id/users', requirePermission(P.BRANCH_VIEW, P.STAFF_VIEW), validate({ params: idParam }), controller.users);
+router.get(
+  '/:id/inventory-summary',
+  requirePermission(P.INVENTORY_VIEW),
+  validate({ params: idParam }),
+  inventoryController.branchSummary,
+);
 router.get(
   '/:id/settings',
   requireAnyPermission(P.SETTINGS_VIEW, P.BRANCH_EDIT),

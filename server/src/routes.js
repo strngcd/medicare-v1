@@ -16,4 +16,8 @@ router.use('/medicine-categories', require('./modules/categories/categories.rout
 router.use('/medicines', require('./modules/medicines/medicines.routes'));
 router.use('/suppliers', require('./modules/suppliers/suppliers.routes'));
 
+const { inventoryRouter, batchesRouter } = require('./modules/inventory/inventory.routes');
+router.use('/inventory', inventoryRouter);
+router.use('/batches', batchesRouter);
+
 module.exports = router;

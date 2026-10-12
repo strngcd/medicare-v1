@@ -5,6 +5,7 @@ const { requirePermission } = require('../../middleware/authorize');
 const { PERMISSIONS: P } = require('../../permissions/catalog');
 const { z, idParam, uuid } = require('../../validators/common');
 const controller = require('./medicines.controller');
+const inventoryController = require('../inventory/inventory.controller');
 const v = require('./medicines.validators');
 
 const router = express.Router();
@@ -33,5 +34,18 @@ router.patch(
 );
 router.post('/:id/archive', requirePermission(P.MEDICINE_ARCHIVE), validate({ params: idParam }), controller.archive);
 router.post('/:id/restore', requirePermission(P.MEDICINE_RESTORE), validate({ params: idParam }), controller.restore);
+
+router.get(
+  '/:id/batches',
+  requirePermission(P.INVENTORY_VIEW_BATCHES),
+  validate({ params: idParam, query: z.object({ branchId: uuid.optional() }) }),
+  inventoryController.medicineBatches,
+);
+router.get(
+  '/:id/inventory',
+  requirePermission(P.INVENTORY_VIEW),
+  validate({ params: idParam, query: z.object({ branchId: uuid.optional() }) }),
+  inventoryController.medicineInventory,
+);
 
 module.exports = router;
