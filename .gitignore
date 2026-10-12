@@ -40,3 +40,6 @@ Thumbs.db
 # Local scratch
 tmp/
 .tmp/
+
+# Local demo credentials
+DEMO_USERS.md
