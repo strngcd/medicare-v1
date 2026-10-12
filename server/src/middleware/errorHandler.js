@@ -1,6 +1,5 @@
 const { ZodError } = require('zod');
 const AppError = require('../errors/AppError');
-const config = require('../config');
 
 // PostgreSQL error codes we translate into safe, stable API errors.
 const PG_UNIQUE_VIOLATION = '23505';
@@ -57,9 +56,8 @@ function errorHandler(err, req, res, next) {
   const appError = toAppError(err);
 
   if (!appError) {
-    if (!config.isTest) {
-      console.error(`[${new Date().toISOString()}] Unhandled error on ${req.method} ${req.originalUrl}`, err);
-    }
+    // Always logged (tests included): a 500 is never an expected outcome.
+    console.error(`[${new Date().toISOString()}] Unhandled error on ${req.method} ${req.originalUrl}`, err);
     return res.status(500).json({
       success: false,
       error: {
