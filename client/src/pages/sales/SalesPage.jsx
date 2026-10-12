@@ -5,7 +5,7 @@ import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useCategories, toOptions } from '../../hooks/useLookups.js';
-import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Tabs, Button } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Tabs, Button, FilterToolbar } from '../../components/ui/index.js';
 import { formatDateTime, formatMoney, formatNumber, humanize } from '../../utils/format.js';
 
 export default function SalesPage() {
@@ -26,7 +26,7 @@ export default function SalesPage() {
         actions={can('SALES_CREATE') && <Button onClick={() => navigate('/pos')}>Open POS</Button>} />
       <Panel flush>
         {canHistory && <Tabs tabs={[{ value: 'all', label: 'All sales' }, { value: 'mine', label: 'My sales' }]} active={view} onChange={(v) => update({ view: v })} />}
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Receipt number</span>
             <input className="input" type="search" placeholder="SAL-…" defaultValue={state.receiptNumber || ''} onChange={(e) => update({ receiptNumber: e.target.value })} aria-label="Receipt number" />
@@ -41,7 +41,7 @@ export default function SalesPage() {
           )}
           <div className="field" style={{ minWidth: 100, maxWidth: 120 }}><span className="field-label">Min amount</span><input className="input" inputMode="decimal" defaultValue={state.minAmount || ''} onChange={(e) => update({ minAmount: e.target.value })} /></div>
           <div className="field" style={{ minWidth: 100, maxWidth: 120 }}><span className="field-label">Max amount</span><input className="input" inputMode="decimal" defaultValue={state.maxAmount || ''} onChange={(e) => update({ maxAmount: e.target.value })} /></div>
-        </div>
+        </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} onClearFilters={() => { clear(); }}
           onRowClick={(s) => navigate(`/sales/${s.id}`)}

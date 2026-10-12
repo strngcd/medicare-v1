@@ -6,7 +6,7 @@ import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useCategories, toOptions } from '../../hooks/useLookups.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Tabs, Dropdown, IconButton, LearnHow } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Tabs, Dropdown, IconButton, LearnHow, FilterToolbar } from '../../components/ui/index.js';
 import { AdjustStockModal } from '../../components/inventory/AdjustStockModal.jsx';
 import { InventorySettingModal } from '../../components/inventory/InventorySettingModal.jsx';
 import { formatDate, formatDateTime, formatMoney, formatNumber, humanize } from '../../utils/format.js';
@@ -49,7 +49,7 @@ function StockTab({ state, update, clear, hasFilters }) {
 
   return (
     <>
-      <div className="toolbar">
+      <FilterToolbar>
         <div className="field search-field">
           <span className="field-label">Search</span>
           <div className="input-with-icon">
@@ -59,7 +59,7 @@ function StockTab({ state, update, clear, hasFilters }) {
         </div>
         <SelectInput label="Category" value={state.categoryId || ''} placeholder="All categories" options={toOptions(categories.data)} onChange={(e) => update({ categoryId: e.target.value })} />
         <SelectInput label="Status" value={state.status || ''} placeholder="All statuses" options={STATUSES} onChange={(e) => update({ status: e.target.value })} />
-      </div>
+      </FilterToolbar>
       <DataTable columns={columns} rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
         sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
         onRowClick={(r) => navigate(`/medicines/${r.medicineId}`)}
@@ -100,11 +100,11 @@ function MovementsTab({ state, update, clear, hasFilters }) {
   const list = useApi(() => api.get('/inventory/movements', params), [JSON.stringify(params)]);
   return (
     <>
-      <div className="toolbar">
+      <FilterToolbar>
         <SelectInput label="Type" value={state.movementType || ''} placeholder="All types" options={MOVEMENT_TYPES} onChange={(e) => update({ movementType: e.target.value })} />
         <div className="field"><span className="field-label">From</span><input className="input" type="date" value={state.dateFrom || ''} onChange={(e) => update({ dateFrom: e.target.value })} /></div>
         <div className="field"><span className="field-label">To</span><input className="input" type="date" value={state.dateTo || ''} onChange={(e) => update({ dateTo: e.target.value })} /></div>
-      </div>
+      </FilterToolbar>
       <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
         sort={state} onSort={update} filtered={hasFilters} onClearFilters={clear}
         columns={[

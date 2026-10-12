@@ -6,3 +6,4 @@ export * from './States.jsx';
 export * from './Modal.jsx';
 export * from './DataTable.jsx';
 export * from './Dropdown.jsx';
+export * from './FilterToolbar.jsx';

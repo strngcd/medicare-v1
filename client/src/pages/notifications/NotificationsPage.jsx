@@ -4,7 +4,7 @@ import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useToast } from '../../context/ToastContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, Button, EmptyState, IconButton, Checkbox } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, Button, EmptyState, IconButton, Checkbox, FilterToolbar } from '../../components/ui/index.js';
 import { formatDateTime, humanize } from '../../utils/format.js';
 
 const ROUTES = { PURCHASE: '/purchases/', TRANSFER: '/transfers/' };
@@ -58,9 +58,9 @@ export default function NotificationsPage() {
         actions={<Button variant="secondary" icon={CheckCheck} onClick={() => act(() => api.patch('/notifications/read-all'), 'All marked as read.')}>Mark all read</Button>}
       />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <Checkbox label="Unread only" checked={state.unreadOnly === 'true'} onChange={(e) => update({ unreadOnly: e.target.checked ? 'true' : '' })} />
-        </div>
+        </FilterToolbar>
         <DataTable
           columns={columns}
           rows={list.data && list.data.data}

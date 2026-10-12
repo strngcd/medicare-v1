@@ -4,7 +4,7 @@ import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, EmptyState, SelectInput, Modal, Details } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, EmptyState, SelectInput, Modal, Details, FilterToolbar } from '../../components/ui/index.js';
 import { formatDateTime, humanize } from '../../utils/format.js';
 
 function ValuesTable({ values }) {
@@ -26,7 +26,7 @@ export default function AuditLogPage() {
     <div className="stack">
       <PageHeader title="Audit log" description="Append-only record of important actions. Entries cannot be edited or deleted." />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Search</span>
             <input className="input" type="search" placeholder="Description" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search audit log" />
@@ -35,7 +35,7 @@ export default function AuditLogPage() {
           <SelectInput label="Branch" value={state.branchId || ''} placeholder="All" options={activeBranches.map((b) => ({ value: b.id, label: b.name }))} onChange={(e) => update({ branchId: e.target.value })} />
           <div className="field"><span className="field-label">From</span><input className="input" type="date" value={state.dateFrom || ''} onChange={(e) => update({ dateFrom: e.target.value })} /></div>
           <div className="field"><span className="field-label">To</span><input className="input" type="date" value={state.dateTo || ''} onChange={(e) => update({ dateTo: e.target.value })} /></div>
-        </div>
+        </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear} onRowClick={setOpen}
           columns={[

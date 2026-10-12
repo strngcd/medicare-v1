@@ -5,7 +5,7 @@ import { api } from '../../api/client.js';
 import { useApi, useDebouncedValue } from '../../hooks/useApi.js';
 import { useAction } from '../../hooks/useAction.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, Button, SelectInput, TextArea, DataTable, EmptyState, IconButton, InlineAlert, LearnHow } from '../../components/ui/index.js';
+import { PageHeader, Panel, Button, SelectInput, TextArea, DataTable, EmptyState, IconButton, InlineAlert, LearnHow, FilterToolbar } from '../../components/ui/index.js';
 import { formatDate, formatNumber } from '../../utils/format.js';
 
 export default function TransferCreatePage() {
@@ -56,14 +56,14 @@ export default function TransferCreatePage() {
 
       {sourceBranchId && (
         <Panel title="Available batches at source" flush>
-          <div className="toolbar">
+          <FilterToolbar>
             <div className="field search-field">
               <span className="field-label">Search</span>
               <div className="input-with-icon"><Search aria-hidden="true" />
                 <input className="input" type="search" placeholder="Medicine or batch" value={term} onChange={(e) => setTerm(e.target.value)} />
               </div>
             </div>
-          </div>
+          </FilterToolbar>
           <DataTable rows={stock.data ? sellable : null} loading={stock.loading} error={stock.error} onRetry={stock.reload}
             rowKey="id"
             onRowClick={(r) => setItems((list) => [...list, { batchId: r.batchId, medicineName: r.medicineName, batchNumber: r.batchNumber, expiryDate: r.expiryDate, available: r.quantity, requestedQuantity: '' }])}

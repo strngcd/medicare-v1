@@ -5,7 +5,7 @@ import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
-import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput, FilterToolbar } from '../../components/ui/index.js';
 import { formatDateTime, formatNumber, humanize } from '../../utils/format.js';
 
 const STATUSES = ['DRAFT', 'REQUESTED', 'APPROVED', 'IN_TRANSIT', 'RECEIVED', 'CANCELLED'].map((s) => ({ value: s, label: humanize(s) }));
@@ -21,13 +21,13 @@ export default function TransfersPage() {
       <PageHeader title="Transfers" description="Move stock between branches: request, approve, ship and receive."
         actions={<Can permission="INVENTORY_TRANSFER_CREATE"><Button icon={Plus} onClick={() => navigate('/transfers/new')}>New transfer</Button></Can>} />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Search</span>
             <input className="input" type="search" placeholder="TRF-…" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search transfers" />
           </div>
           <SelectInput label="Status" value={state.status || ''} placeholder="All" options={STATUSES} onChange={(e) => update({ status: e.target.value })} />
-        </div>
+        </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
           onRowClick={(t) => navigate(`/transfers/${t.id}`)}

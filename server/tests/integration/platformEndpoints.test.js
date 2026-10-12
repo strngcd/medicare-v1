@@ -102,6 +102,14 @@ describe('settings', () => {
   });
 });
 
+describe('public branding', () => {
+  test('exposes only the pharmacy name and logo without a session', async () => {
+    const res = await request(app).get('/api/v1/branding');
+    expect(res.status).toBe(200);
+    expect(Object.keys(res.body.data).sort()).toEqual(['logoUrl', 'pharmacyName']);
+  });
+});
+
 describe('help center', () => {
   test('lists published articles by category, searches and opens by slug', async () => {
     const list = await cashier.get('/api/v1/help');

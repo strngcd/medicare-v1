@@ -182,7 +182,7 @@
 
 .kpi-label { font-size: 12.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
 .kpi-label svg { width: 15px; height: 15px; }
-.kpi-value { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.kpi-value { font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kpi-note { font-size: 12px; color: var(--text-subtle); }
 .kpi.is-link { cursor: pointer; transition: border-color var(--transition); }
 .kpi.is-link:hover { border-color: var(--primary); }
@@ -495,3 +495,11 @@
 .prose { display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
 .prose h2 { font-size: 15px; margin-top: 10px; }
 .prose ul, .prose ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+
+.filter-toggle { display: none; }
+
+@media (max-width: 640px) {
+  .toolbar.collapsible:not(.expanded) > .field:not(.search-field) { display: none; }
+  .toolbar.collapsible:not(.expanded) > .checkbox { display: none; }
+  .toolbar.collapsible .filter-toggle { display: inline-flex; }
+}

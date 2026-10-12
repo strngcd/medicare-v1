@@ -4,7 +4,7 @@ import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Kpi, InlineAlert } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Kpi, InlineAlert, FilterToolbar } from '../../components/ui/index.js';
 import { formatDate, formatNumber } from '../../utils/format.js';
 
 const TYPES = [
@@ -43,12 +43,12 @@ export default function AlertsPage() {
         ))}
       </div>
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <SelectInput label="Type" value={state.type || ''} placeholder="All types" options={TYPES} onChange={(e) => update({ type: e.target.value })} />
           <SelectInput label="Severity" value={state.severity || ''} placeholder="All severities"
             options={[{ value: 'CRITICAL', label: 'Critical' }, { value: 'HIGH', label: 'High' }, { value: 'WARNING', label: 'Warning' }]}
             onChange={(e) => update({ severity: e.target.value })} />
-        </div>
+        </FilterToolbar>
         <DataTable
           columns={columns}
           rows={list.data && list.data.data}

@@ -9,6 +9,9 @@ module.exports = {
   async update(req, res) {
     sendData(res, await service.updateSettings(req.auth, actorFromRequest(req), req.valid.body), { message: 'Settings saved.' });
   },
+  async branding(req, res) {
+    sendData(res, await service.getBranding());
+  },
   async systemInfo(req, res) {
     sendData(res, await service.getSystemInfo());
   },

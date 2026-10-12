@@ -4,7 +4,7 @@ import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, EmptyState, SelectInput, Modal, Details, SkeletonRows, ErrorState } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, EmptyState, SelectInput, Modal, Details, SkeletonRows, ErrorState, FilterToolbar } from '../../components/ui/index.js';
 import { formatDateTime, formatMoney, humanize } from '../../utils/format.js';
 import { Link } from 'react-router-dom';
 
@@ -52,7 +52,7 @@ export default function RefundsPage() {
     <div className="stack">
       <PageHeader title="Refunds" description="Refunds are created from a sale. Each one returns stock to the original batches." />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Search</span>
             <input className="input" type="search" placeholder="Refund or receipt number" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search refunds" />
@@ -60,7 +60,7 @@ export default function RefundsPage() {
           <SelectInput label="Reason" value={state.reason || ''} placeholder="All" options={REASONS} onChange={(e) => update({ reason: e.target.value })} />
           <div className="field"><span className="field-label">From</span><input className="input" type="date" value={state.dateFrom || ''} onChange={(e) => update({ dateFrom: e.target.value })} /></div>
           <div className="field"><span className="field-label">To</span><input className="input" type="date" value={state.dateTo || ''} onChange={(e) => update({ dateTo: e.target.value })} /></div>
-        </div>
+        </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
           onRowClick={(r) => setOpen(r.id)}

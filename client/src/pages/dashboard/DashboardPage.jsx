@@ -112,7 +112,7 @@ export default function DashboardPage() {
             <Kpi icon={Calculator} label="Average transaction" value={d && formatMoney(d.sales.averageTransactionValue)} loading={loading} />
           </div>
 
-          <div className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
+          <div className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))' }}>
             <Kpi icon={Pill} label="Active medicines" value={d && formatNumber(d.inventory.totalMedicines)} loading={loading} onClick={() => navigate('/medicines?status=ACTIVE')} />
             <Kpi icon={TrendingDown} label="Low stock" value={d && formatNumber(d.inventory.lowStock)} tone={d && d.inventory.lowStock ? 'warning' : undefined} loading={loading} onClick={() => navigate('/alerts?type=LOW_STOCK')} />
             <Kpi icon={PackageX} label="Out of stock" value={d && formatNumber(d.inventory.outOfStock)} tone={d && d.inventory.outOfStock ? 'danger' : undefined} loading={loading} onClick={() => navigate('/alerts?type=OUT_OF_STOCK')} />
@@ -121,7 +121,7 @@ export default function DashboardPage() {
           </div>
 
           {f && Object.keys(f).length > 0 && (
-            <div className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
+            <div className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))' }}>
               {f.revenue !== undefined && <Kpi icon={Wallet} label="Revenue (excl. tax)" value={formatMoney(f.revenue)} note="Net of refunds" />}
               {f.netSales !== undefined && <Kpi icon={Coins} label="Net sales" value={formatMoney(f.netSales)} note={`Refunds ${formatMoney(f.refunds)}`} />}
               {f.discounts !== undefined && <Kpi icon={Percent} label="Discounts" value={formatMoney(f.discounts)} />}

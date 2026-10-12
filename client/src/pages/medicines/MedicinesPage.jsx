@@ -6,7 +6,7 @@ import { useListState } from '../../hooks/useListState.js';
 import { useCategories, toOptions } from '../../hooks/useLookups.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
-import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, Badge, EmptyState, SelectInput } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, Badge, EmptyState, SelectInput, FilterToolbar } from '../../components/ui/index.js';
 import { formatNumber } from '../../utils/format.js';
 
 export default function MedicinesPage() {
@@ -51,7 +51,7 @@ export default function MedicinesPage() {
         actions={<Can permission="MEDICINE_CREATE"><Button icon={Plus} onClick={() => navigate('/medicines/new')}>Add medicine</Button></Can>}
       />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Search</span>
             <div className="input-with-icon">
@@ -67,7 +67,7 @@ export default function MedicinesPage() {
           <SelectInput label="Prescription" value={state.prescriptionRequired || ''} placeholder="Any"
             options={[{ value: 'true', label: 'Prescription only' }, { value: 'false', label: 'Over the counter' }]}
             onChange={(e) => update({ prescriptionRequired: e.target.value })} />
-        </div>
+        </FilterToolbar>
         <DataTable
           columns={columns}
           rows={list.data && list.data.data}

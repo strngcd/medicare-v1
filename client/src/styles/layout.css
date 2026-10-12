@@ -325,3 +325,6 @@
   body.printing-receipt .modal-backdrop { position: static; padding: 0; background: none; }
   body.printing-receipt .modal-body > :not(.receipt) { display: none !important; }
 }
+
+.profile-meta .name,
+.profile-meta .role { white-space: nowrap; }

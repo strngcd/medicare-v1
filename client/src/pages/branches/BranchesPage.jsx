@@ -6,7 +6,7 @@ import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
-import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput, FilterToolbar } from '../../components/ui/index.js';
 import { BranchModal } from './BranchModal.jsx';
 
 export default function BranchesPage() {
@@ -19,13 +19,13 @@ export default function BranchesPage() {
     <div className="stack">
       <PageHeader title="Branches" actions={<Can permission="BRANCH_CREATE"><Button icon={Plus} onClick={() => setCreating(true)}>New branch</Button></Can>} />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Search</span>
             <input className="input" type="search" placeholder="Name, code or city" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search branches" />
           </div>
           <SelectInput label="Status" value={state.status || ''} placeholder="All" options={[{ value: 'ACTIVE', label: 'Active' }, { value: 'INACTIVE', label: 'Inactive' }]} onChange={(e) => update({ status: e.target.value })} />
-        </div>
+        </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
           onRowClick={(b) => navigate(`/branches/${b.id}`)}

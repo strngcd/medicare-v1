@@ -6,7 +6,7 @@ import { useAction } from '../../hooks/useAction.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
-import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, Modal, TextInput, TextArea, SelectInput, IconButton } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, Modal, TextInput, TextArea, SelectInput, IconButton, FilterToolbar } from '../../components/ui/index.js';
 import { formatNumber } from '../../utils/format.js';
 
 function CategoryModal({ category, onClose, onSaved }) {
@@ -62,13 +62,13 @@ export default function CategoriesPage() {
       <PageHeader title="Medicine categories" description="Archived categories stay on existing medicines but cannot be assigned to new ones."
         actions={<Can permission="CATEGORY_CREATE"><Button icon={Plus} onClick={() => setModal({})}>New category</Button></Can>} />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Search</span>
             <input className="input" type="search" placeholder="Category name" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search categories" />
           </div>
           <SelectInput label="Status" value={state.status || ''} placeholder="All" options={[{ value: 'ACTIVE', label: 'Active' }, { value: 'ARCHIVED', label: 'Archived' }]} onChange={(e) => update({ status: e.target.value })} />
-        </div>
+        </FilterToolbar>
         <DataTable columns={columns} rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
           empty={<EmptyState icon={FolderTree} title="No categories" action={<Can permission="CATEGORY_CREATE"><Button icon={Plus} onClick={() => setModal({})}>New category</Button></Can>} />} />

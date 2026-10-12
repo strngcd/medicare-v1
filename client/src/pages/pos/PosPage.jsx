@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { useCategories, toOptions } from '../../hooks/useLookups.js';
 import {
-  PageHeader, Panel, Button, Badge, EmptyState, InlineAlert, Modal, TextInput, SelectInput, IconButton, SkeletonRows, ErrorState, LearnHow,
+  PageHeader, Panel, Button, Badge, EmptyState, InlineAlert, Modal, TextInput, SelectInput, IconButton, SkeletonRows, ErrorState, LearnHow, FilterToolbar,
 } from '../../components/ui/index.js';
 import { ReceiptModal } from '../../components/sales/ReceiptModal.jsx';
 import { estimateTotals, toCents, fromCents } from '../../utils/money.js';
@@ -187,7 +187,7 @@ export default function PosPage() {
       <PageHeader title="Point of sale" description={selectedBranch ? selectedBranch.name : ''} actions={<LearnHow slug="using-the-pos" />} />
       <div className="pos">
         <Panel flush>
-          <div className="toolbar">
+          <FilterToolbar>
             <div className="field search-field">
               <span className="field-label">Search or scan</span>
               <div className="input-with-icon">
@@ -197,7 +197,7 @@ export default function PosPage() {
               </div>
             </div>
             <SelectInput label="Category" value={categoryId} placeholder="All categories" options={toOptions(categories.data)} onChange={(e) => setCategoryId(e.target.value)} />
-          </div>
+          </FilterToolbar>
           <div className="pos-results" aria-busy={results.loading || undefined}>
             {results.error && <ErrorState error={results.error} onRetry={results.reload} />}
             {!results.data && !results.error && <SkeletonRows rows={6} columns={3} />}

@@ -5,7 +5,7 @@ import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { Can } from '../../permissions/Can.jsx';
-import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput, FilterToolbar } from '../../components/ui/index.js';
 import { SupplierModal } from './SupplierModal.jsx';
 
 export default function SuppliersPage() {
@@ -19,13 +19,13 @@ export default function SuppliersPage() {
       <PageHeader title="Suppliers" description="Shared across branches. Purchases and payments stay branch-specific."
         actions={<Can permission="SUPPLIER_CREATE"><Button icon={Plus} onClick={() => setCreating(true)}>New supplier</Button></Can>} />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Search</span>
             <input className="input" type="search" placeholder="Company, contact or phone" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search suppliers" />
           </div>
           <SelectInput label="Status" value={state.status || ''} placeholder="All" options={[{ value: 'ACTIVE', label: 'Active' }, { value: 'ARCHIVED', label: 'Archived' }]} onChange={(e) => update({ status: e.target.value })} />
-        </div>
+        </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
           onRowClick={(s) => navigate(`/suppliers/${s.id}`)}

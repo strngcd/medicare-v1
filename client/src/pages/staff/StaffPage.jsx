@@ -8,7 +8,7 @@ import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
-import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput, Modal, TextInput, Checkbox, InlineAlert } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput, Modal, TextInput, Checkbox, InlineAlert, FilterToolbar } from '../../components/ui/index.js';
 import { formatDateTime } from '../../utils/format.js';
 
 const ROLES = [
@@ -106,7 +106,7 @@ export default function StaffPage() {
       <PageHeader title="Staff" description="Accounts, roles, branch assignments and permissions."
         actions={<Can permission="STAFF_CREATE"><Button icon={Plus} onClick={() => setCreating(true)}>New staff member</Button></Can>} />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Search</span>
             <input className="input" type="search" placeholder="Name, email or employee ID" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search staff" />
@@ -114,7 +114,7 @@ export default function StaffPage() {
           <SelectInput label="Role" value={state.role || ''} placeholder="All roles" options={ROLES} onChange={(e) => update({ role: e.target.value })} />
           <SelectInput label="Branch" value={state.branchId || ''} placeholder="All branches" options={activeBranches.map((b) => ({ value: b.id, label: b.name }))} onChange={(e) => update({ branchId: e.target.value })} />
           <SelectInput label="Status" value={state.status || ''} placeholder="All" options={[{ value: 'ACTIVE', label: 'Active' }, { value: 'INACTIVE', label: 'Inactive' }]} onChange={(e) => update({ status: e.target.value })} />
-        </div>
+        </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
           onRowClick={(u) => navigate(`/staff/${u.id}`)}

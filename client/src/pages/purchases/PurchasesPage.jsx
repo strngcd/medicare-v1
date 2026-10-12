@@ -6,7 +6,7 @@ import { useListState } from '../../hooks/useListState.js';
 import { useSuppliers, toOptions } from '../../hooks/useLookups.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
-import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput, FilterToolbar } from '../../components/ui/index.js';
 import { formatDate, formatMoney, formatNumber, humanize } from '../../utils/format.js';
 
 const STATUSES = ['DRAFT', 'PENDING', 'PARTIALLY_RECEIVED', 'RECEIVED', 'CANCELLED'].map((s) => ({ value: s, label: humanize(s) }));
@@ -26,7 +26,7 @@ export default function PurchasesPage() {
       <PageHeader title="Purchases" description="Orders to suppliers. Stock only changes when items are received."
         actions={<Can permission="PURCHASE_CREATE"><Button icon={Plus} onClick={() => navigate('/purchases/new')}>New purchase</Button></Can>} />
       <Panel flush>
-        <div className="toolbar">
+        <FilterToolbar>
           <div className="field search-field">
             <span className="field-label">Search</span>
             <input className="input" type="search" placeholder="Purchase number or supplier" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search purchases" />
@@ -36,7 +36,7 @@ export default function PurchasesPage() {
           <SelectInput label="Payment" value={state.paymentStatus || ''} placeholder="All" options={PAYMENT} onChange={(e) => update({ paymentStatus: e.target.value })} />
           <div className="field"><span className="field-label">From</span><input className="input" type="date" value={state.dateFrom || ''} onChange={(e) => update({ dateFrom: e.target.value })} /></div>
           <div className="field"><span className="field-label">To</span><input className="input" type="date" value={state.dateTo || ''} onChange={(e) => update({ dateTo: e.target.value })} /></div>
-        </div>
+        </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
           onRowClick={(p) => navigate(`/purchases/${p.id}`)}
