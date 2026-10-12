@@ -44,11 +44,16 @@ async function list({ visibleBranchIds, search, roleCode, branchId, status, limi
   return { rows, total: rows.length ? rows[0].total_count : 0 };
 }
 
+/**
+ * With forUpdate, the user row is locked first and then re-read, so the
+ * embedded branch list reflects changes committed while waiting for the lock.
+ */
 async function findById(id, client, { forUpdate = false } = {}) {
+  if (forUpdate) await query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [id], client);
   const { rows } = await query(
     `SELECT ${USER_COLUMNS}, ${BRANCHES_JSON}
        FROM users u JOIN roles r ON r.id = u.role_id
-      WHERE u.id = $1 ${forUpdate ? 'FOR UPDATE OF u' : ''}`,
+      WHERE u.id = $1`,
     [id],
     client,
   );

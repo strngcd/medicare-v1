@@ -20,4 +20,9 @@ const { inventoryRouter, batchesRouter } = require('./modules/inventory/inventor
 router.use('/inventory', inventoryRouter);
 router.use('/batches', batchesRouter);
 
+const { purchasesRouter, receivingsRouter } = require('./modules/purchases/purchases.routes');
+router.use('/purchases', purchasesRouter);
+router.use('/purchase-receivings', receivingsRouter);
+router.use('/supplier-payments', require('./modules/supplierPayments/supplierPayments.routes'));
+
 module.exports = router;
