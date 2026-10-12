@@ -26,5 +26,6 @@ router.use('/purchase-receivings', receivingsRouter);
 router.use('/supplier-payments', require('./modules/supplierPayments/supplierPayments.routes'));
 router.use('/sales', require('./modules/sales/sales.routes'));
 router.use('/refunds', require('./modules/refunds/refunds.routes'));
+router.use('/transfers', require('./modules/transfers/transfers.routes'));
 
 module.exports = router;
