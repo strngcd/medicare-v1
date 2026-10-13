@@ -16,6 +16,9 @@ reportsRouter.get('/sales', requirePermission(P.REPORT_SALES_VIEW), validate({ q
 reportsRouter.get('/profit', requirePermission(...PROFIT), validate({ query: v.salesReportQuery }), controller.profit);
 reportsRouter.get('/inventory', requirePermission(P.REPORT_INVENTORY_VIEW), validate({ query: v.inventoryReportQuery }), controller.inventory);
 reportsRouter.get('/inventory/movements', requirePermission(P.REPORT_INVENTORY_VIEW), validate({ query: v.movementReportQuery }), controller.movements);
+// Losses are valued at purchase cost.
+const LOSSES = [P.REPORT_INVENTORY_VIEW, P.FINANCIAL_VIEW_PURCHASE_COST];
+reportsRouter.get('/losses', requirePermission(...LOSSES), validate({ query: v.lossReportQuery }), controller.losses);
 reportsRouter.get('/purchases', requirePermission(P.REPORT_PURCHASE_VIEW), validate({ query: v.purchaseReportQuery }), controller.purchases);
 reportsRouter.get('/suppliers', requirePermission(P.REPORT_SUPPLIER_VIEW), validate({ query: v.supplierReportQuery }), controller.suppliers);
 
@@ -25,6 +28,8 @@ reportsRouter.get('/profit/export', requirePermission(P.REPORT_EXPORT, ...PROFIT
   validate({ query: v.salesReportQuery.extend(v.exportFormat) }), controller.exportProfit);
 reportsRouter.get('/inventory/export', requirePermission(P.REPORT_EXPORT, P.REPORT_INVENTORY_VIEW),
   validate({ query: v.inventoryReportQuery.extend(v.exportFormat) }), controller.exportInventory);
+reportsRouter.get('/losses/export', requirePermission(P.REPORT_EXPORT, ...LOSSES),
+  validate({ query: v.lossReportQuery.extend(v.exportFormat) }), controller.exportLosses);
 reportsRouter.get('/purchases/export', requirePermission(P.REPORT_EXPORT, P.REPORT_PURCHASE_VIEW),
   validate({ query: v.purchaseReportQuery.extend(v.exportFormat) }), controller.exportPurchases);
 reportsRouter.get('/suppliers/export', requirePermission(P.REPORT_EXPORT, P.REPORT_SUPPLIER_VIEW),

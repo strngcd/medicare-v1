@@ -149,11 +149,12 @@ async function profitReport(auth, query) {
   const { range, filters } = salesFilters(auth, query);
   const data = await cached(['profit', cacheScope(auth, filters.branchIds), filters], async () => {
     const summary = shapeSalesSummary(await repo.salesSummary(filters));
-    const [byMedicine, byCategory] = await Promise.all([
+    const [byMedicine, byCategory, losses] = await Promise.all([
       repo.medicinePerformance(filters, { orderBy: 'gross_profit', limit: 1000 }),
       repo.categoryPerformance(filters),
+      repo.stockLossSummary(filters),
     ]);
-    return { summary, byMedicine: camelize(byMedicine), byCategory: camelize(byCategory) };
+    return { summary, byMedicine: camelize(byMedicine), byCategory: camelize(byCategory), stockLosses: losses.total_loss_value };
   });
   return restrictColumns(filterFinancialFields({
     title: 'Profit report',
@@ -163,6 +164,8 @@ async function profitReport(auth, query) {
       cogs: data.summary.cogs,
       grossProfit: data.summary.grossProfit,
       grossMargin: data.summary.grossMargin,
+      stockLosses: toMoneyString(data.stockLosses),
+      netProfit: toMoneyString(money(data.summary.grossProfit).minus(data.stockLosses)),
       discounts: data.summary.discounts,
       tax: data.summary.tax,
       refunds: data.summary.refunds,
@@ -243,6 +246,47 @@ async function movementReport(auth, query) {
   }, auth);
 }
 
+/** Stock written off (expired, disposed, damaged, lost), valued at purchase cost. */
+async function lossReport(auth, query, { exportAll = false } = {}) {
+  const range = resolveDateRange({ range: query.range || (query.dateFrom ? 'CUSTOM' : 'MONTH'), ...query });
+  const filters = {
+    timezone: config.businessTimezone,
+    dateFrom: range.dateFrom,
+    dateTo: range.dateTo,
+    branchIds: resolveBranchScope(auth, query.branchId),
+    movementType: query.movementType,
+  };
+  const params = exportAll ? { page: 1, limit: 10000, offset: 0 } : parseListParams(query, { sortable: { d: '1' }, defaultSort: 'd' });
+  const [summary, list] = await Promise.all([
+    repo.stockLossSummary(filters),
+    repo.stockLosses(filters, { limit: params.limit, offset: params.offset }),
+  ]);
+  return restrictColumns(filterFinancialFields({
+    title: 'Stock loss report',
+    period: range,
+    summary: camelize(summary),
+    columns: [
+      { key: 'createdAt', label: 'Date' },
+      { key: 'branchName', label: 'Branch' },
+      { key: 'medicineName', label: 'Medicine' },
+      { key: 'batchNumber', label: 'Batch' },
+      { key: 'expiryDate', label: 'Expiry' },
+      { key: 'movementType', label: 'Type' },
+      { key: 'quantity', label: 'Units' },
+      { key: 'unitCost', label: 'Unit cost' },
+      { key: 'lossValue', label: 'Loss' },
+      { key: 'createdByName', label: 'By' },
+      { key: 'reason', label: 'Reason' },
+    ],
+    rows: list.rows.map((r) => {
+      const dto = camelize(r);
+      delete dto.totalCount;
+      return dto;
+    }),
+    pagination: exportAll ? undefined : { page: params.page, limit: params.limit, total: list.total },
+  }, auth), auth);
+}
+
 async function purchaseReport(auth, query, { exportAll = false } = {}) {
   const range = resolveDateRange({ range: query.range || (query.dateFrom ? 'CUSTOM' : 'MONTH'), ...query });
   const branchIds = resolveBranchScope(auth, query.branchId);
@@ -321,6 +365,7 @@ module.exports = {
   profitReport,
   inventoryReport,
   movementReport,
+  lossReport,
   purchaseReport,
   supplierReport,
   shapeSalesSummary,

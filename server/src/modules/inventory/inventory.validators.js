@@ -3,7 +3,7 @@ const { z, uuid, requiredText, optionalText, isoDate, money, positiveInt, nonNeg
 const INVENTORY_STATUSES = ['AVAILABLE', 'LOW_STOCK', 'OUT_OF_STOCK', 'EXPIRING_SOON', 'EXPIRED'];
 const MOVEMENT_TYPES = [
   'PURCHASE_RECEIVED', 'SALE', 'REFUND', 'ADJUSTMENT', 'TRANSFER_OUT',
-  'TRANSFER_IN', 'EXPIRED', 'DAMAGED', 'LOST', 'CORRECTION',
+  'TRANSFER_IN', 'EXPIRED', 'DAMAGED', 'LOST', 'CORRECTION', 'DISPOSED',
 ];
 
 const listInventoryQuery = listQuery.extend({
@@ -11,6 +11,7 @@ const listInventoryQuery = listQuery.extend({
   medicineId: uuid.optional(),
   categoryId: uuid.optional(),
   status: z.enum(INVENTORY_STATUSES).optional(),
+  archived: queryBoolean.optional(),
 });
 
 const branchScopedQuery = listQuery.extend({ branchId: uuid.optional() });
@@ -60,6 +61,8 @@ const adjustmentFields = {
 const adjustmentPreviewBody = z.object(adjustmentFields).strict();
 const adjustmentBody = z.object({ ...adjustmentFields, expectedQuantityBefore: nonNegativeInt.optional() }).strict();
 
+const disposeBody = z.object({ notes: optionalText(500), archive: z.boolean().optional() }).strict();
+
 const minimumStockBody = z.object({ minimumStock: nonNegativeInt.max(1000000) }).strict();
 const sellingPriceBody = z.object({ sellingPrice: money }).strict();
 
@@ -78,6 +81,7 @@ module.exports = {
   adjustmentPreviewBody,
   adjustmentBody,
   minimumStockBody,
+  disposeBody,
   sellingPriceBody,
   fefoPreviewBody,
 };

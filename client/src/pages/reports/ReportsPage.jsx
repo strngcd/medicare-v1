@@ -16,12 +16,13 @@ const REPORTS = [
   { value: 'profit', label: 'Profit', permission: 'REPORT_PROFIT_VIEW', also: 'FINANCIAL_VIEW_PROFIT', path: '/reports/profit', exportPath: '/reports/profit/export', dated: true },
   { value: 'inventory', label: 'Inventory', permission: 'REPORT_INVENTORY_VIEW', path: '/reports/inventory', exportPath: '/reports/inventory/export' },
   { value: 'movements', label: 'Inventory movements', permission: 'REPORT_INVENTORY_VIEW', path: '/reports/inventory/movements', dated: true },
+  { value: 'losses', label: 'Stock losses', permission: 'REPORT_INVENTORY_VIEW', also: 'FINANCIAL_VIEW_PURCHASE_COST', path: '/reports/losses', exportPath: '/reports/losses/export', dated: true },
   { value: 'purchases', label: 'Purchases', permission: 'REPORT_PURCHASE_VIEW', path: '/reports/purchases', exportPath: '/reports/purchases/export', dated: true },
   { value: 'suppliers', label: 'Suppliers', permission: 'REPORT_SUPPLIER_VIEW', path: '/reports/suppliers', exportPath: '/reports/suppliers/export', dated: true },
 ];
 
-const MONEY_KEYS = /(sales|amount|total|revenue|cogs|profit|discount|tax|refunds|value|paid|outstanding|balance|purchased|price|subtotal)$/i;
-const NON_MONEY = new Set(['transactionCount', 'refundCount', 'voidedCount', 'purchaseCount', 'cancelledCount', 'openCount', 'totalUnits', 'expiredUnits', 'itemsSold', 'itemsRefunded']);
+const MONEY_KEYS = /(sales|amount|total|revenue|cogs|profit|discount|tax|refunds|value|paid|outstanding|balance|purchased|price|subtotal|cost|losses)$/i;
+const NON_MONEY = new Set(['transactionCount', 'refundCount', 'voidedCount', 'purchaseCount', 'cancelledCount', 'openCount', 'totalUnits', 'expiredUnits', 'itemsSold', 'itemsRefunded', 'unitsLost', 'entryCount']);
 
 function formatCell(key, value) {
   if (value === null || value === undefined) return '—';
@@ -78,8 +79,9 @@ function ReportView({ report }) {
   const range = useDateRange(report.value === 'purchases' ? 'MONTH' : report.value === 'suppliers' ? 'YEAR' : 'MONTH');
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
+  const filterParam = report.value === 'losses' ? 'movementType' : 'status';
   const [exporting, setExporting] = useState(null);
-  const params = { ...(report.dated ? range.params : {}), branchId: branchParam, page, ...(status ? { status } : {}) };
+  const params = { ...(report.dated ? range.params : {}), branchId: branchParam, page, ...(status ? { [filterParam]: status } : {}) };
   const data = useApi(() => api.get(report.path, params), [report.value, JSON.stringify(params)]);
 
   const doExport = async (format) => {
@@ -99,6 +101,7 @@ function ReportView({ report }) {
     inventory: ['AVAILABLE', 'LOW_STOCK', 'OUT_OF_STOCK', 'EXPIRING_SOON'],
     purchases: ['DRAFT', 'PENDING', 'PARTIALLY_RECEIVED', 'RECEIVED', 'CANCELLED'],
     sales: ['COMPLETED', 'VOIDED'],
+    losses: ['DISPOSED', 'EXPIRED', 'DAMAGED', 'LOST'],
   }[report.value];
 
   const d = data.data && data.data.data;
@@ -108,8 +111,8 @@ function ReportView({ report }) {
         <div className="row-wrap">
           {report.dated && <DateRangePicker range={{ ...range, setRange: (v) => { setPage(1); range.setRange(v); } }} />}
           {statusOptions && (
-            <select className="select" style={{ width: 180 }} value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} aria-label="Status filter">
-              <option value="">All statuses</option>
+            <select className="select" style={{ width: 180 }} value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} aria-label={filterParam === 'status' ? 'Status filter' : 'Type filter'}>
+              <option value="">{filterParam === 'status' ? 'All statuses' : 'All types'}</option>
               {statusOptions.map((s) => <option key={s} value={s}>{humanize(s)}</option>)}
             </select>
           )}

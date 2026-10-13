@@ -12,24 +12,24 @@ const ALERTS_SQL = `
   alerts AS (
     SELECT 'EXPIRED:' || bi.id AS id, 'EXPIRED' AS type, 'CRITICAL' AS severity, 1 AS severity_rank,
            bi.branch_id, b.medicine_id, b.id AS batch_id, b.batch_number, b.expiry_date,
-           bi.quantity, NULL::int AS minimum_stock
+           bi.quantity, NULL::int AS minimum_stock, bi.id AS inventory_id
       FROM branch_inventory bi JOIN batches b ON b.id = bi.batch_id
      WHERE bi.quantity > 0 AND b.expiry_date < $1::date
     UNION ALL
     SELECT 'EXPIRING_SOON:' || bi.id, 'EXPIRING_SOON', 'WARNING', 3,
-           bi.branch_id, b.medicine_id, b.id, b.batch_number, b.expiry_date, bi.quantity, NULL
+           bi.branch_id, b.medicine_id, b.id, b.batch_number, b.expiry_date, bi.quantity, NULL, bi.id
       FROM branch_inventory bi JOIN batches b ON b.id = bi.batch_id
       JOIN medicines m ON m.id = b.medicine_id
      WHERE bi.quantity > 0 AND m.status <> 'ARCHIVED'
        AND b.expiry_date >= $1::date AND b.expiry_date <= $1::date + $2::int
     UNION ALL
     SELECT 'OUT_OF_STOCK:' || ms.branch_id || ':' || ms.medicine_id, 'OUT_OF_STOCK', 'HIGH', 2,
-           ms.branch_id, ms.medicine_id, NULL, NULL, NULL, ms.sellable_quantity, ms.minimum_stock
+           ms.branch_id, ms.medicine_id, NULL, NULL, NULL, ms.sellable_quantity, ms.minimum_stock, NULL
       FROM medicine_stock ms JOIN medicines m ON m.id = ms.medicine_id
      WHERE m.status = 'ACTIVE' AND ms.sellable_quantity = 0
     UNION ALL
     SELECT 'LOW_STOCK:' || ms.branch_id || ':' || ms.medicine_id, 'LOW_STOCK', 'WARNING', 3,
-           ms.branch_id, ms.medicine_id, NULL, NULL, NULL, ms.sellable_quantity, ms.minimum_stock
+           ms.branch_id, ms.medicine_id, NULL, NULL, NULL, ms.sellable_quantity, ms.minimum_stock, NULL
       FROM medicine_stock ms JOIN medicines m ON m.id = ms.medicine_id
      WHERE m.status = 'ACTIVE' AND ms.sellable_quantity > 0 AND ms.sellable_quantity <= ms.minimum_stock
   )

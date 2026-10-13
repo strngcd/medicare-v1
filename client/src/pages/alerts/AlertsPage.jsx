@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Trash2 } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Kpi, InlineAlert, FilterToolbar } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Kpi, InlineAlert, FilterToolbar, Button } from '../../components/ui/index.js';
 import { formatDate, formatNumber } from '../../utils/format.js';
+import { DisposeStockModal } from '../../components/inventory/DisposeStockModal.jsx';
 
 const TYPES = [
   { value: 'EXPIRED', label: 'Expired' },
@@ -16,7 +18,8 @@ const TYPES = [
 
 export default function AlertsPage() {
   const navigate = useNavigate();
-  const { branchParam } = useAuth();
+  const { branchParam, can } = useAuth();
+  const [disposing, setDisposing] = useState(null);
   const { state, update, clear, hasFilters } = useListState();
   const params = { ...state, branchId: branchParam };
   const list = useApi(() => api.get('/alerts', params), [JSON.stringify(params)]);
@@ -29,7 +32,14 @@ export default function AlertsPage() {
     { key: 'branchName', label: 'Branch' },
     { key: 'detail', label: 'Detail', render: (a) => <span className="small">{a.message}</span> },
     { key: 'expiryDate', label: 'Expiry', render: (a) => (a.expiryDate ? formatDate(a.expiryDate) : '—') },
-  ];
+    can('INVENTORY_DISPOSE') && {
+      key: 'actions',
+      label: '',
+      render: (a) => (a.inventoryId ? (
+        <Button size="sm" variant="secondary" icon={Trash2} onClick={(e) => { e.stopPropagation(); setDisposing(a); }}>Dispose</Button>
+      ) : null),
+    },
+  ].filter(Boolean);
 
   const c = counts.data;
   return (
@@ -62,7 +72,11 @@ export default function AlertsPage() {
         />
         <Pagination pagination={list.data && list.data.pagination} onChange={(page) => update({ page }, { resetPage: false })} />
       </Panel>
-      <InlineAlert tone="info">Expired stock cannot be sold. Use an inventory adjustment with the “Expired” reason to remove it from stock.</InlineAlert>
+      <InlineAlert tone="info">Expired stock cannot be sold. Dispose of expired or expiring batches to remove them from stock; the units are recorded as a loss in the Stock loss report.</InlineAlert>
+      {disposing && (
+        <DisposeStockModal item={disposing} onClose={() => setDisposing(null)}
+          onDone={() => { setDisposing(null); list.reload({ silent: true }); counts.reload({ silent: true }); }} />
+      )}
     </div>
   );
 }

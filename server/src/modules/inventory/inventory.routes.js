@@ -33,6 +33,9 @@ inventoryRouter.post(
   controller.fefoPreview,
 );
 inventoryRouter.get('/:id', requirePermission(P.INVENTORY_VIEW), validate({ params: idParam }), controller.get);
+inventoryRouter.post('/:id/dispose', requirePermission(P.INVENTORY_DISPOSE), validate({ params: idParam, body: v.disposeBody }), controller.dispose);
+inventoryRouter.post('/:id/archive', requirePermission(P.INVENTORY_BATCH_ARCHIVE), validate({ params: idParam }), controller.archive);
+inventoryRouter.post('/:id/restore', requirePermission(P.INVENTORY_BATCH_RESTORE), validate({ params: idParam }), controller.restore);
 inventoryRouter.patch(
   '/:id/minimum-stock',
   requirePermission(P.INVENTORY_ADJUST),
