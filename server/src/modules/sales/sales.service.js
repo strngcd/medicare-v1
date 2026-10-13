@@ -43,6 +43,12 @@ function assertCanSeeSale(auth, sale) {
   throw AppError.notFound('Sale not found.');
 }
 
+/** SALES_VOID covers every sale; SALES_VOID_OWN only the user's own. */
+function mayVoid(auth, sale) {
+  if (auth.permissions.has(P.SALES_VOID)) return true;
+  return auth.permissions.has(P.SALES_VOID_OWN) && sale.sold_by === auth.userId;
+}
+
 async function loadVisibleSale(auth, id) {
   const sale = await repo.findById(id);
   if (!sale) throw AppError.notFound('Sale not found.');
@@ -84,6 +90,7 @@ async function getSale(auth, id) {
       refundableQuantity: sale.status === 'COMPLETED' ? item.quantity - item.refundedQuantity : 0,
     })),
     refunds: camelize(refunds),
+    canVoid: sale.status === 'COMPLETED' && refunds.length === 0 && mayVoid(auth, sale),
     cogs,
     grossProfit: toMoneyString(money(sale.total).minus(sale.tax).minus(cogs)),
   };
@@ -340,6 +347,7 @@ async function voidSale(auth, actor, id, reason, idempotencyKey) {
       const sale = await repo.findById(id, client, { forUpdate: true });
       if (!sale) throw AppError.notFound('Sale not found.');
       assertBranchAccess(auth, sale.branch_id);
+      if (!mayVoid(auth, sale)) throw AppError.forbidden('SALE_NOT_OWN', 'You can only void sales you made yourself.');
       if (sale.status === 'VOIDED') throw AppError.conflict('SALE_ALREADY_VOIDED', 'This sale has already been voided.');
       if ((await repo.countRefunds(client, id)) > 0) {
         throw AppError.conflict('SALE_HAS_REFUNDS', 'A sale with refunds cannot be voided.');

@@ -120,8 +120,9 @@ describe('medicines', () => {
     const edit = await pharmacist.patch(`/api/v1/medicines/${med.id}`).send({ name: 'New' });
     expect(edit.body.error.code).toBe('MEDICINE_ARCHIVED');
 
-    // Pharmacists cannot restore by default; admins can.
-    expect((await pharmacist.post(`/api/v1/medicines/${med.id}/restore`)).status).toBe(403);
+    // Pharmacists can restore what they archive.
+    expect((await pharmacist.post(`/api/v1/medicines/${med.id}/restore`)).body.data.status).toBe('ACTIVE');
+    expect((await pharmacist.post(`/api/v1/medicines/${med.id}/archive`)).body.data.status).toBe('ARCHIVED');
     expect((await admin.post(`/api/v1/medicines/${med.id}/restore`)).body.data.status).toBe('ACTIVE');
   });
 
