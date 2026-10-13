@@ -44,53 +44,56 @@ async function getPayment(auth, id) {
  * concurrent payments cannot together exceed the purchase total.
  */
 async function createPayment(auth, actor, input, idempotencyKey) {
+  const result = await runIdempotent(
+    { userId: auth.userId, scope: 'supplier-payments', key: idempotencyKey, payload: input },
+    (client) => recordPayment(client, auth, actor, input),
+  );
+  return { ...result, body: await getPayment(auth, result.body.id) };
+}
+
+/** The payment itself, inside the caller's transaction. Returns { id }. */
+async function recordPayment(client, auth, actor, input) {
   if (input.paidAt && new Date(input.paidAt) > new Date()) {
     throw AppError.validation('Payment date cannot be in the future.', { fields: { paidAt: 'Cannot be in the future.' } });
   }
-  const result = await runIdempotent(
-    { userId: auth.userId, scope: 'supplier-payments', key: idempotencyKey, payload: input },
-    async (client) => {
-      const purchase = await repo.lockPurchaseForPayment(client, input.purchaseId);
-      if (!purchase) throw AppError.notFound('Purchase not found.');
-      assertBranchAccess(auth, purchase.branch_id);
-      if (['DRAFT', 'CANCELLED'].includes(purchase.status)) {
-        throw AppError.conflict('PURCHASE_NOT_PAYABLE', `A ${purchase.status.toLowerCase()} purchase cannot be paid.`);
-      }
+  const purchase = await repo.lockPurchaseForPayment(client, input.purchaseId);
+  if (!purchase) throw AppError.notFound('Purchase not found.');
+  assertBranchAccess(auth, purchase.branch_id);
+  if (['DRAFT', 'CANCELLED'].includes(purchase.status)) {
+    throw AppError.conflict('PURCHASE_NOT_PAYABLE', `A ${purchase.status.toLowerCase()} purchase cannot be paid.`);
+  }
 
-      const remaining = money(purchase.total).minus(purchase.amount_paid);
-      if (money(input.amount).gt(remaining)) {
-        throw AppError.conflict('OVERPAYMENT_NOT_ALLOWED', 'The payment exceeds the remaining balance of this purchase.', {
-          remaining: toMoneyString(remaining),
-          requested: toMoneyString(input.amount),
-        });
-      }
+  const remaining = money(purchase.total).minus(purchase.amount_paid);
+  if (money(input.amount).gt(remaining)) {
+    throw AppError.conflict('OVERPAYMENT_NOT_ALLOWED', 'The payment exceeds the remaining balance of this purchase.', {
+      remaining: toMoneyString(remaining),
+      requested: toMoneyString(input.amount),
+    });
+  }
 
-      const paymentId = await repo.insert(client, {
-        ...input,
-        amount: toMoneyString(input.amount),
-        supplierId: purchase.supplier_id,
-        branchId: purchase.branch_id,
-        userId: auth.userId,
-      });
-      const newRemaining = remaining.minus(input.amount);
-      await recordAudit(client, actor, {
-        action: 'SUPPLIER_PAYMENT_CREATED',
-        entityType: 'SUPPLIER_PAYMENT',
-        entityId: paymentId,
-        branchId: purchase.branch_id,
-        description: `Payment of ${toMoneyString(input.amount)} recorded for ${purchase.purchase_number}`,
-        previousValues: { amountPaid: toMoneyString(purchase.amount_paid) },
-        newValues: {
-          amount: toMoneyString(input.amount),
-          paymentMethod: input.paymentMethod,
-          amountPaid: toMoneyString(money(purchase.amount_paid).plus(input.amount)),
-          remaining: toMoneyString(newRemaining),
-        },
-      });
-      return { id: paymentId };
+  const paymentId = await repo.insert(client, {
+    ...input,
+    amount: toMoneyString(input.amount),
+    supplierId: purchase.supplier_id,
+    branchId: purchase.branch_id,
+    userId: auth.userId,
+  });
+  const newRemaining = remaining.minus(input.amount);
+  await recordAudit(client, actor, {
+    action: 'SUPPLIER_PAYMENT_CREATED',
+    entityType: 'SUPPLIER_PAYMENT',
+    entityId: paymentId,
+    branchId: purchase.branch_id,
+    description: `Payment of ${toMoneyString(input.amount)} recorded for ${purchase.purchase_number}`,
+    previousValues: { amountPaid: toMoneyString(purchase.amount_paid) },
+    newValues: {
+      amount: toMoneyString(input.amount),
+      paymentMethod: input.paymentMethod,
+      amountPaid: toMoneyString(money(purchase.amount_paid).plus(input.amount)),
+      remaining: toMoneyString(newRemaining),
     },
-  );
-  return { ...result, body: await getPayment(auth, result.body.id) };
+  });
+  return { id: paymentId };
 }
 
 async function supplierBalance(auth, supplierId) {
@@ -100,4 +103,4 @@ async function supplierBalance(auth, supplierId) {
   return { supplierId, companyName: supplier.company_name, ...camelize(balance) };
 }
 
-module.exports = { listPayments, getPayment, createPayment, supplierBalance };
+module.exports = { listPayments, getPayment, createPayment, recordPayment, supplierBalance };

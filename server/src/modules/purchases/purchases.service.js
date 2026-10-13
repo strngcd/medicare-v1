@@ -13,6 +13,7 @@ const { resolveBranchScope, assertBranchAccess, loadAccessibleBranch } = require
 const { canViewCost } = require('../../permissions/financialVisibility');
 const ledger = require('../inventory/inventory.ledger');
 const inventoryRepo = require('../inventory/inventory.repository');
+const { recordPayment } = require('../supplierPayments/supplierPayments.service');
 const repo = require('./purchases.repository');
 
 const SORTABLE = {
@@ -131,6 +132,9 @@ async function listPurchases(auth, query, fixed = {}) {
     dateFrom: query.dateFrom,
     dateTo: query.dateTo,
     search: query.search,
+    // Filtering by amount would reveal cost to users who cannot see it.
+    minAmount: canViewCost(auth) ? query.minAmount : undefined,
+    maxAmount: canViewCost(auth) ? query.maxAmount : undefined,
     ...params,
   });
   return { rows: present(auth, rows.map(toPurchaseDto)), total, page: params.page, limit: params.limit };
@@ -178,6 +182,13 @@ async function getReceiving(auth, id) {
 async function createPurchase(auth, actor, input) {
   const purchaseDate = input.purchaseDate || businessToday();
   assertNotFuture(purchaseDate, 'purchaseDate');
+  if (input.receive && !auth.permissions.has(P.PURCHASE_RECEIVE)) {
+    throw AppError.forbidden('PERMISSION_DENIED', 'You do not have permission to receive stock.');
+  }
+  if (input.payment && !auth.permissions.has(P.SUPPLIER_PAYMENT_CREATE)) {
+    throw AppError.forbidden('PERMISSION_DENIED', 'You do not have permission to record supplier payments.');
+  }
+  const status = input.receive || input.payment ? 'PENDING' : input.status || 'DRAFT';
 
   const id = await withTransaction(async (client) => {
     const branch = await loadAccessibleBranch(auth, input.branchId, { requireActive: true, client });
@@ -190,7 +201,7 @@ async function createPurchase(auth, actor, input) {
       purchaseNumber,
       supplierId: supplier.id,
       branchId: branch.id,
-      status: input.status || 'DRAFT',
+      status,
       purchaseDate,
       expectedDate: input.expectedDate,
       notes: input.notes,
@@ -204,8 +215,24 @@ async function createPurchase(auth, actor, input) {
       entityId: purchaseId,
       branchId: branch.id,
       description: `Purchase ${purchaseNumber} created for ${supplier.company_name}`,
-      newValues: { purchaseNumber, status: input.status || 'DRAFT', supplier: supplier.company_name, itemCount: lines.length, ...totals },
+      newValues: { purchaseNumber, status, supplier: supplier.company_name, itemCount: lines.length, ...totals },
     });
+
+    // Optional same-step receiving and payment: all or nothing with the order.
+    if (input.receive) {
+      const itemIdByMedicine = new Map((await repo.listItems(purchaseId, client)).map((i) => [i.medicine_id, i.id]));
+      const receiveItems = input.receive.items.map(({ medicineId, ...line }, index) => {
+        const purchaseItemId = itemIdByMedicine.get(medicineId);
+        if (!purchaseItemId) {
+          throw AppError.validation('Received medicines must be on the order.', { fields: { [`receive.items.${index}.medicineId`]: 'Not on this order.' } });
+        }
+        return { purchaseItemId, ...line };
+      });
+      await receiveLines(client, auth, actor, purchaseId, { notes: input.receive.notes, items: receiveItems });
+    }
+    if (input.payment) {
+      await recordPayment(client, auth, actor, { purchaseId, ...input.payment });
+    }
     return purchaseId;
   });
   return getPurchase(auth, id);
@@ -277,146 +304,149 @@ async function updatePurchase(auth, actor, id, input) {
  * receiving records -> purchase status -> audit -> notifications.
  */
 async function receivePurchase(auth, actor, id, input, idempotencyKey) {
-  const today = businessToday();
   const result = await runIdempotent(
     { userId: auth.userId, scope: `purchases.receive:${id}`, key: idempotencyKey, payload: input },
-    async (client) => {
-      const purchase = await loadPurchase(auth, id, client, { forUpdate: true });
-      if (purchase.status === 'RECEIVED') {
-        throw AppError.conflict('PURCHASE_ALREADY_RECEIVED', 'This purchase has already been fully received.');
-      }
-      if (!['PENDING', 'PARTIALLY_RECEIVED'].includes(purchase.status)) {
-        throw AppError.conflict('INVALID_STATUS_TRANSITION', `A ${purchase.status.toLowerCase()} purchase cannot be received.`);
-      }
-      const branch = await loadAccessibleBranch(auth, purchase.branch_id, { requireActive: true, client });
-
-      const items = await repo.listItems(id, client, { forUpdate: true });
-      const itemsById = new Map(items.map((i) => [i.id, i]));
-      const receivingNow = new Map();
-
-      // Validate every line before touching stock.
-      input.items.forEach((line, index) => {
-        const item = itemsById.get(line.purchaseItemId);
-        const field = (name) => `items.${index}.${name}`;
-        if (!item) {
-          throw AppError.validation('The item does not belong to this purchase.', { fields: { [field('purchaseItemId')]: 'Unknown item.' } });
-        }
-        if (item.medicine_status !== 'ACTIVE') {
-          throw AppError.conflict('MEDICINE_NOT_ACTIVE', `${item.medicine_name} must be active to receive stock.`, {
-            medicineId: item.medicine_id,
-          });
-        }
-        const already = receivingNow.get(item.id) || 0;
-        if (already + line.quantity > item.remaining_quantity) {
-          throw AppError.conflict('OVER_RECEIVING', `Cannot receive more ${item.medicine_name} than remains on the order.`, {
-            purchaseItemId: item.id,
-            remaining: item.remaining_quantity - already,
-            requested: line.quantity,
-          });
-        }
-        receivingNow.set(item.id, already + line.quantity);
-        if (line.expiryDate < today) {
-          throw AppError.conflict('BATCH_EXPIRED', `Batch ${line.batchNumber} is already expired.`, {
-            fields: { [field('expiryDate')]: 'Expired stock cannot be received.' },
-          });
-        }
-        if (line.manufacturingDate && line.manufacturingDate > today) {
-          throw AppError.validation('Manufacturing date cannot be in the future.', {
-            fields: { [field('manufacturingDate')]: 'Cannot be in the future.' },
-          });
-        }
-      });
-
-      const receiving = await repo.insertReceiving(client, {
-        purchaseId: id,
-        branchId: branch.id,
-        userId: auth.userId,
-        notes: input.notes,
-      });
-
-      const received = [];
-      for (const line of input.items) {
-        const item = itemsById.get(line.purchaseItemId);
-        const purchasePrice = line.purchasePrice ?? item.unit_purchase_price;
-
-        const { batch } = await ledger.findOrCreateBatch(client, {
-          medicineId: item.medicine_id,
-          batchNumber: line.batchNumber,
-          manufacturingDate: line.manufacturingDate,
-          expiryDate: line.expiryDate,
-          purchasePrice,
-          supplierId: purchase.supplier_id,
-          userId: auth.userId,
-        });
-        const { row, created } = await ledger.ensureInventoryRow(client, {
-          branchId: branch.id,
-          batchId: batch.id,
-          sellingPrice: line.sellingPrice,
-        });
-        if (!created && toMoneyString(row.selling_price) !== toMoneyString(line.sellingPrice)) {
-          await inventoryRepo.updateInventoryField(client, row.id, 'selling_price', toMoneyString(line.sellingPrice));
-          await recordAudit(client, actor, {
-            action: 'SELLING_PRICE_CHANGED',
-            entityType: 'INVENTORY',
-            entityId: row.id,
-            branchId: branch.id,
-            description: `Selling price of ${item.medicine_name} batch ${batch.batch_number} changed on receiving ${purchase.purchase_number}`,
-            previousValues: { sellingPrice: row.selling_price },
-            newValues: { sellingPrice: toMoneyString(line.sellingPrice) },
-          });
-        }
-        await ledger.applyMovement(client, {
-          branchId: branch.id,
-          batchId: batch.id,
-          change: line.quantity,
-          movementType: 'PURCHASE_RECEIVED',
-          referenceType: 'PURCHASE_RECEIVING',
-          referenceId: receiving.id,
-          reason: `Received on ${purchase.purchase_number}`,
-          userId: auth.userId,
-        });
-        await repo.insertReceivingItem(client, {
-          receivingId: receiving.id,
-          purchaseItemId: item.id,
-          batchId: batch.id,
-          quantity: line.quantity,
-          purchasePrice: toMoneyString(purchasePrice),
-          sellingPrice: toMoneyString(line.sellingPrice),
-          notes: line.notes,
-        });
-        await repo.incrementReceived(client, item.id, line.quantity);
-        received.push({ medicine: item.medicine_name, batchNumber: batch.batch_number, quantity: line.quantity });
-      }
-
-      const fullyReceived = items.every((i) => i.remaining_quantity - (receivingNow.get(i.id) || 0) === 0);
-      const newStatus = fullyReceived ? 'RECEIVED' : 'PARTIALLY_RECEIVED';
-      await repo.setStatus(client, id, newStatus, auth.userId);
-
-      await recordAudit(client, actor, {
-        action: 'PURCHASE_RECEIVED',
-        entityType: 'PURCHASE',
-        entityId: id,
-        branchId: branch.id,
-        description: `${fullyReceived ? 'Fully' : 'Partially'} received ${purchase.purchase_number}`,
-        previousValues: { status: purchase.status },
-        newValues: { status: newStatus, receivingId: receiving.id, lines: received },
-      });
-
-      const recipients = await findBranchRecipients(client, branch.id, P.PURCHASE_VIEW, auth.userId);
-      await notifyUsers(client, recipients, {
-        type: fullyReceived ? 'PURCHASE_RECEIVED' : 'PURCHASE_PARTIALLY_RECEIVED',
-        title: fullyReceived ? 'Purchase received' : 'Purchase partially received',
-        message: `${purchase.purchase_number} from ${purchase.supplier_name} was ${fullyReceived ? 'fully' : 'partially'} received at ${branch.name}.`,
-        branchId: branch.id,
-        entityType: 'PURCHASE',
-        entityId: id,
-      });
-
-      return { receivingId: receiving.id, purchaseId: id, status: newStatus };
-    },
+    (client) => receiveLines(client, auth, actor, id, input),
   );
-
   return { ...result, body: { ...result.body, purchase: await getPurchase(auth, id) } };
+}
+
+/** The receiving itself, inside the caller's transaction. */
+async function receiveLines(client, auth, actor, id, input) {
+  const today = businessToday();
+  const purchase = await loadPurchase(auth, id, client, { forUpdate: true });
+  if (purchase.status === 'RECEIVED') {
+    throw AppError.conflict('PURCHASE_ALREADY_RECEIVED', 'This purchase has already been fully received.');
+  }
+  if (!['PENDING', 'PARTIALLY_RECEIVED'].includes(purchase.status)) {
+    throw AppError.conflict('INVALID_STATUS_TRANSITION', `A ${purchase.status.toLowerCase()} purchase cannot be received.`);
+  }
+  const branch = await loadAccessibleBranch(auth, purchase.branch_id, { requireActive: true, client });
+
+  const items = await repo.listItems(id, client, { forUpdate: true });
+  const itemsById = new Map(items.map((i) => [i.id, i]));
+  const receivingNow = new Map();
+
+  // Validate every line before touching stock.
+  input.items.forEach((line, index) => {
+    const item = itemsById.get(line.purchaseItemId);
+    const field = (name) => `items.${index}.${name}`;
+    if (!item) {
+      throw AppError.validation('The item does not belong to this purchase.', { fields: { [field('purchaseItemId')]: 'Unknown item.' } });
+    }
+    if (item.medicine_status !== 'ACTIVE') {
+      throw AppError.conflict('MEDICINE_NOT_ACTIVE', `${item.medicine_name} must be active to receive stock.`, {
+        medicineId: item.medicine_id,
+      });
+    }
+    const already = receivingNow.get(item.id) || 0;
+    if (already + line.quantity > item.remaining_quantity) {
+      throw AppError.conflict('OVER_RECEIVING', `Cannot receive more ${item.medicine_name} than remains on the order.`, {
+        purchaseItemId: item.id,
+        remaining: item.remaining_quantity - already,
+        requested: line.quantity,
+      });
+    }
+    receivingNow.set(item.id, already + line.quantity);
+    if (line.expiryDate < today) {
+      throw AppError.conflict('BATCH_EXPIRED', `Batch ${line.batchNumber} is already expired.`, {
+        fields: { [field('expiryDate')]: 'Expired stock cannot be received.' },
+      });
+    }
+    if (line.manufacturingDate && line.manufacturingDate > today) {
+      throw AppError.validation('Manufacturing date cannot be in the future.', {
+        fields: { [field('manufacturingDate')]: 'Cannot be in the future.' },
+      });
+    }
+  });
+
+  const receiving = await repo.insertReceiving(client, {
+    purchaseId: id,
+    branchId: branch.id,
+    userId: auth.userId,
+    notes: input.notes,
+  });
+
+  const received = [];
+  for (const line of input.items) {
+    const item = itemsById.get(line.purchaseItemId);
+    // Cost always comes from the order line; it is not editable on receiving.
+    const purchasePrice = item.unit_purchase_price;
+
+    const { batch } = await ledger.findOrCreateBatch(client, {
+      medicineId: item.medicine_id,
+      batchNumber: line.batchNumber,
+      manufacturingDate: line.manufacturingDate,
+      expiryDate: line.expiryDate,
+      purchasePrice,
+      supplierId: purchase.supplier_id,
+      userId: auth.userId,
+    });
+    const { row, created } = await ledger.ensureInventoryRow(client, {
+      branchId: branch.id,
+      batchId: batch.id,
+      sellingPrice: line.sellingPrice,
+    });
+    if (!created && toMoneyString(row.selling_price) !== toMoneyString(line.sellingPrice)) {
+      await inventoryRepo.updateInventoryField(client, row.id, 'selling_price', toMoneyString(line.sellingPrice));
+      await recordAudit(client, actor, {
+        action: 'SELLING_PRICE_CHANGED',
+        entityType: 'INVENTORY',
+        entityId: row.id,
+        branchId: branch.id,
+        description: `Selling price of ${item.medicine_name} batch ${batch.batch_number} changed on receiving ${purchase.purchase_number}`,
+        previousValues: { sellingPrice: row.selling_price },
+        newValues: { sellingPrice: toMoneyString(line.sellingPrice) },
+      });
+    }
+    await ledger.applyMovement(client, {
+      branchId: branch.id,
+      batchId: batch.id,
+      change: line.quantity,
+      movementType: 'PURCHASE_RECEIVED',
+      referenceType: 'PURCHASE_RECEIVING',
+      referenceId: receiving.id,
+      reason: `Received on ${purchase.purchase_number}`,
+      userId: auth.userId,
+    });
+    await repo.insertReceivingItem(client, {
+      receivingId: receiving.id,
+      purchaseItemId: item.id,
+      batchId: batch.id,
+      quantity: line.quantity,
+      purchasePrice: toMoneyString(purchasePrice),
+      sellingPrice: toMoneyString(line.sellingPrice),
+      notes: line.notes,
+    });
+    await repo.incrementReceived(client, item.id, line.quantity);
+    received.push({ medicine: item.medicine_name, batchNumber: batch.batch_number, quantity: line.quantity });
+  }
+
+  const fullyReceived = items.every((i) => i.remaining_quantity - (receivingNow.get(i.id) || 0) === 0);
+  const newStatus = fullyReceived ? 'RECEIVED' : 'PARTIALLY_RECEIVED';
+  await repo.setStatus(client, id, newStatus, auth.userId);
+
+  await recordAudit(client, actor, {
+    action: 'PURCHASE_RECEIVED',
+    entityType: 'PURCHASE',
+    entityId: id,
+    branchId: branch.id,
+    description: `${fullyReceived ? 'Fully' : 'Partially'} received ${purchase.purchase_number}`,
+    previousValues: { status: purchase.status },
+    newValues: { status: newStatus, receivingId: receiving.id, lines: received },
+  });
+
+  const recipients = await findBranchRecipients(client, branch.id, P.PURCHASE_VIEW, auth.userId);
+  await notifyUsers(client, recipients, {
+    type: fullyReceived ? 'PURCHASE_RECEIVED' : 'PURCHASE_PARTIALLY_RECEIVED',
+    title: fullyReceived ? 'Purchase received' : 'Purchase partially received',
+    message: `${purchase.purchase_number} from ${purchase.supplier_name} was ${fullyReceived ? 'fully' : 'partially'} received at ${branch.name}.`,
+    branchId: branch.id,
+    entityType: 'PURCHASE',
+    entityId: id,
+  });
+
+  return { receivingId: receiving.id, purchaseId: id, status: newStatus };
 }
 
 async function cancelPurchase(auth, actor, id, reason) {

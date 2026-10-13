@@ -56,3 +56,10 @@ export function estimateTotals(lines, discount, tax) {
     total: fromCents(totalCents),
   };
 }
+
+/** Default selling price on receiving: unit cost plus the configured markup, rounded to the cent. */
+export function suggestedSellingPrice(unitCost, markupPercent) {
+  if (unitCost === undefined || unitCost === null || unitCost === '') return '';
+  const markup = Number(markupPercent ?? 15);
+  return fromCents(roundCents((toCents(unitCost) * (100 + (Number.isFinite(markup) ? markup : 15))) / 100));
+}

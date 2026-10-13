@@ -308,3 +308,70 @@ describe('cost visibility', () => {
     expect(itemFor(detail.body.data, medA).orderedQuantity).toBe(100);
   });
 });
+
+describe('receiving and paying while creating a purchase', () => {
+  const receiveAt = (medicine, overrides = {}) => ({
+    medicineId: medicine.id, batchNumber: `${medicine.name.slice(0, 3).toUpperCase()}-NEW`, expiryDate: daysFromToday(400), quantity: 10, sellingPrice: '3.00', ...overrides,
+  });
+
+  test('records a partial receiving and a partial payment in one step', async () => {
+    const res = await admin.post('/api/v1/purchases').send(purchaseBody({
+      receive: { items: [receiveAt(medA, { quantity: 40 })] },
+      payment: { amount: '100.00', paymentMethod: 'CASH' },
+    }));
+    expect(res.status).toBe(201);
+    expect(res.body.data).toMatchObject({ status: 'PARTIALLY_RECEIVED', total: '300.00', amountPaid: '100.00', balance: '200.00' });
+    expect(itemFor(res.body.data, medA).receivedQuantity).toBe(40);
+    expect(await stockOf(medA.id)).toBe(40);
+    // The batch cost comes from the order line.
+    const batch = await pool.query("SELECT purchase_price FROM batches WHERE batch_number = 'AMO-NEW'");
+    expect(batch.rows[0].purchase_price).toBe('2.50');
+  });
+
+  test('can receive everything and pay in full', async () => {
+    const res = await admin.post('/api/v1/purchases').send(purchaseBody({
+      receive: { items: [receiveAt(medA, { quantity: 100 }), receiveAt(medB, { quantity: 50 })] },
+      payment: { amount: '300.00', paymentMethod: 'BANK_TRANSFER', referenceNumber: 'TX-1' },
+    }));
+    expect(res.body.data).toMatchObject({ status: 'RECEIVED', paymentStatus: 'PAID', balance: '0.00' });
+  });
+
+  test('is all-or-nothing: an invalid payment leaves no purchase and no stock', async () => {
+    const res = await admin.post('/api/v1/purchases').send(purchaseBody({
+      receive: { items: [receiveAt(medA)] },
+      payment: { amount: '999.00', paymentMethod: 'CASH' },
+    }));
+    expect(res.body.error.code).toBe('OVERPAYMENT_NOT_ALLOWED');
+    expect((await pool.query('SELECT count(*)::int AS n FROM purchases')).rows[0].n).toBe(0);
+    expect(await stockOf(medA.id)).toBe(0);
+  });
+
+  test('requires the matching permissions and a submitted order', async () => {
+    const pay = await pharmacist.post('/api/v1/purchases').send(purchaseBody({ payment: { amount: '1.00', paymentMethod: 'CASH' } }));
+    expect(pay.status).toBe(403);
+    const draft = await admin.post('/api/v1/purchases').send(purchaseBody({ status: 'DRAFT', receive: { items: [receiveAt(medA)] } }));
+    expect(draft.status).toBe(422);
+    const other = await createMedicine({ name: 'Ibuprofen' });
+    const notOnOrder = await admin.post('/api/v1/purchases').send(purchaseBody({ receive: { items: [receiveAt(other)] } }));
+    expect(notOnOrder.status).toBe(422);
+  });
+
+  test('the receive endpoint no longer accepts a unit cost override', async () => {
+    const purchase = (await pharmacist.post('/api/v1/purchases').send(purchaseBody())).body.data;
+    const res = await pharmacist.post(`/api/v1/purchases/${purchase.id}/receive`).send({
+      items: [receiveLine(itemFor(purchase, medA), { purchasePrice: '1.00' })],
+    });
+    expect(res.status).toBe(422);
+  });
+});
+
+describe('purchase amount filter', () => {
+  test('filters by total between min and max', async () => {
+    await admin.post('/api/v1/purchases').send(purchaseBody()); // 300.00
+    await admin.post('/api/v1/purchases').send(purchaseBody({ items: [{ medicineId: medA.id, orderedQuantity: 4, unitPurchasePrice: '5.00' }] })); // 20.00
+    const totals = async (q) => (await admin.get(`/api/v1/purchases?${q}`)).body.data.map((p) => p.total).sort();
+    expect(await totals('minAmount=100')).toEqual(['300.00']);
+    expect(await totals('maxAmount=100')).toEqual(['20.00']);
+    expect(await totals('minAmount=10&maxAmount=500')).toEqual(['20.00', '300.00']);
+  });
+});

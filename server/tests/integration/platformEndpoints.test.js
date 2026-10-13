@@ -94,6 +94,13 @@ describe('settings', () => {
     expect((await cashier.patch('/api/v1/settings').send({ pharmacyName: 'X' })).status).toBe(403);
   });
 
+  test('default markup is 15% and can be changed', async () => {
+    expect((await cashier.get('/api/v1/auth/me')).body.data.pharmacy.defaultMarkupPercent).toBe('15.00');
+    expect((await owner.patch('/api/v1/settings').send({ defaultMarkupPercent: '22.5' })).status).toBe(200);
+    expect((await cashier.get('/api/v1/auth/me')).body.data.pharmacy.defaultMarkupPercent).toBe('22.50');
+    expect((await owner.patch('/api/v1/settings').send({ defaultMarkupPercent: '-1' })).status).toBe(422);
+  });
+
   test('system info exposes numbering but no secrets', async () => {
     const res = await owner.get('/api/v1/system/info');
     expect(res.body.data.numbering.prefixes.SALE).toBe('SAL');

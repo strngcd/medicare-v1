@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import { api } from '../../api/client.js';
@@ -6,13 +6,36 @@ import { useApi } from '../../hooks/useApi.js';
 import { useAction } from '../../hooks/useAction.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useSuppliers, toOptions } from '../../hooks/useLookups.js';
-import { PageHeader, Panel, Button, SelectInput, TextInput, TextArea, IconButton, InlineAlert, ErrorState, SkeletonRows, EmptyState, LearnHow } from '../../components/ui/index.js';
+import { PageHeader, Panel, Button, SelectInput, TextInput, TextArea, IconButton, InlineAlert, ErrorState, SkeletonRows, EmptyState, LearnHow, Checkbox } from '../../components/ui/index.js';
 import { MedicinePicker } from '../../components/MedicinePicker.jsx';
-import { formatMoney, todayIso } from '../../utils/format.js';
-import { toCents, fromCents } from '../../utils/money.js';
+import { formatDateTime, formatMoney, todayIso } from '../../utils/format.js';
+import { toCents, fromCents, suggestedSellingPrice } from '../../utils/money.js';
 
 function lineTotal(item) {
   return toCents(item.unitPurchasePrice || '0') * (Number(item.orderedQuantity) || 0) - toCents(item.discount || '0') + toCents(item.tax || '0');
+}
+
+const EMPTY_PAYMENT = { enabled: false, amount: '', paymentMethod: 'BANK_TRANSFER', referenceNumber: '' };
+
+// Unsaved new purchases are kept in this browser only, per user.
+const draftKey = (userId) => `medicar.purchaseDraft.${userId}`;
+
+function readDraft(userId) {
+  try {
+    const raw = localStorage.getItem(draftKey(userId));
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(userId, draft) {
+  try {
+    if (draft) localStorage.setItem(draftKey(userId), JSON.stringify(draft));
+    else localStorage.removeItem(draftKey(userId));
+  } catch {
+    /* storage unavailable: the draft simply is not kept */
+  }
 }
 
 /** Create or edit a purchase (edit only before anything is received). */
@@ -20,19 +43,29 @@ export default function PurchaseFormPage() {
   const { id } = useParams();
   const [search] = useSearchParams();
   const navigate = useNavigate();
-  const { activeBranches, branchParam } = useAuth();
+  const { activeBranches, branchParam, user, can, pharmacy } = useAuth();
   const suppliers = useSuppliers();
   const existing = useApi(() => api.get(`/purchases/${id}`).then((r) => r.data), [id], { enabled: Boolean(id) });
   const action = useAction();
+  const markup = pharmacy && pharmacy.defaultMarkupPercent;
+  const isNew = !id;
+  const canReceive = isNew && can('PURCHASE_RECEIVE');
+  const canPay = isNew && can('SUPPLIER_PAYMENT_CREATE') && can('FINANCIAL_VIEW_PURCHASE_COST');
+  const defaultBranch = branchParam || (activeBranches[0] && activeBranches[0].id) || '';
 
-  const [form, setForm] = useState({
+  const [restored] = useState(() => (isNew && user ? readDraft(user.id) : null));
+  const [form, setForm] = useState(() => (restored && restored.form) || {
     supplierId: search.get('supplierId') || '',
-    branchId: branchParam || (activeBranches[0] && activeBranches[0].id) || '',
+    branchId: defaultBranch,
     purchaseDate: todayIso(),
     expectedDate: '',
     notes: '',
   });
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(() => (restored && restored.items) || []);
+  const [receiveNow, setReceiveNow] = useState(() => Boolean(restored && restored.receiveNow));
+  const [payment, setPayment] = useState(() => (restored && restored.payment) || EMPTY_PAYMENT);
+  const [showRestored, setShowRestored] = useState(Boolean(restored));
+  const saved = useRef(false);
 
   useEffect(() => {
     if (!existing.data) return;
@@ -44,8 +77,34 @@ export default function PurchaseFormPage() {
     })));
   }, [existing.data]);
 
+  // Keep the unsaved new purchase so leaving the page does not lose it.
+  useEffect(() => {
+    if (!isNew || !user || saved.current) return;
+    const empty = items.length === 0 && !form.notes && !form.supplierId;
+    writeDraft(user.id, empty ? null : { form, items, receiveNow, payment, savedAt: new Date().toISOString() });
+  }, [isNew, user, form, items, receiveNow, payment]);
+
+  const discardDraft = () => {
+    writeDraft(user.id, null);
+    setShowRestored(false);
+    setForm({ supplierId: '', branchId: defaultBranch, purchaseDate: todayIso(), expectedDate: '', notes: '' });
+    setItems([]);
+    setReceiveNow(false);
+    setPayment(EMPTY_PAYMENT);
+  };
+
   const totalCents = useMemo(() => items.reduce((sum, i) => sum + lineTotal(i), 0), [items]);
-  const setItem = (index, key, value) => setItems((list) => list.map((item, i) => (i === index ? { ...item, [key]: value } : item)));
+  const setItem = (index, key, value) => setItems((list) => list.map((item, i) => {
+    if (i !== index) return item;
+    const next = { ...item, [key]: value };
+    // The selling price keeps following the unit cost until the user edits it.
+    if (key === 'receiveSellingPrice') next.sellingPriceEdited = true;
+    return next;
+  }));
+  const sellingPriceOf = (item) => (item.sellingPriceEdited ? item.receiveSellingPrice : suggestedSellingPrice(item.unitPurchasePrice, markup));
+  const receiveQuantityOf = (item) => item.receiveQuantity ?? item.orderedQuantity;
+
+  const receivingLines = receiveNow ? items.filter((i) => Number(receiveQuantityOf(i)) > 0) : [];
 
   const save = async (status) => {
     const payload = {
@@ -63,15 +122,41 @@ export default function PurchaseFormPage() {
         notes: i.notes || null,
       })),
     };
+    if (receivingLines.length > 0) {
+      payload.receive = {
+        items: receivingLines.map((i) => ({
+          medicineId: i.medicineId,
+          batchNumber: (i.batchNumber || '').trim(),
+          manufacturingDate: i.manufacturingDate || null,
+          expiryDate: i.expiryDate || '',
+          quantity: Number(receiveQuantityOf(i)),
+          sellingPrice: sellingPriceOf(i) || '',
+        })),
+      };
+    }
+    if (payment.enabled) {
+      payload.payment = { amount: payment.amount, paymentMethod: payment.paymentMethod, referenceNumber: payment.referenceNumber || undefined };
+    }
     const call = id ? () => api.patch(`/purchases/${id}`, payload) : () => api.post('/purchases', { ...payload, branchId: form.branchId });
     const result = await action.run(call, { success: status === 'PENDING' ? 'Purchase submitted.' : 'Purchase saved as draft.' });
-    if (result) navigate(`/purchases/${result.data.id}`, { replace: true });
+    if (result) {
+      if (isNew) {
+        saved.current = true;
+        writeDraft(user.id, null);
+      }
+      navigate(`/purchases/${result.data.id}`, { replace: true });
+    }
   };
 
   if (id && existing.error) return <Panel><ErrorState error={existing.error} onRetry={existing.reload} /></Panel>;
   if (id && !existing.data) return <Panel><SkeletonRows /></Panel>;
   const editingPending = existing.data && existing.data.status === 'PENDING';
   const errors = action.fieldErrors;
+  const receiveError = (item, field) => {
+    const index = receivingLines.findIndex((l) => l.medicineId === item.medicineId);
+    return index >= 0 ? errors[`receive.items.${index}.${field}`] : undefined;
+  };
+  const extras = receivingLines.length > 0 || payment.enabled;
 
   return (
     <div className="stack">
@@ -80,6 +165,14 @@ export default function PurchaseFormPage() {
         breadcrumbs={[{ label: 'Purchases', to: '/purchases' }, { label: id ? existing.data.purchaseNumber : 'New' }]}
         actions={<LearnHow slug="purchasing-and-receiving" />}
       />
+      {showRestored && (
+        <InlineAlert tone="info">
+          <span className="spread" style={{ flexWrap: 'wrap', gap: 8 }}>
+            <span>Restored your unsaved purchase from {formatDateTime(restored.savedAt)}.</span>
+            <Button size="sm" variant="ghost" onClick={discardDraft}>Discard and start over</Button>
+          </span>
+        </InlineAlert>
+      )}
       <Panel title="Supplier and branch">
         <div className="form-grid">
           <SelectInput label="Supplier" required value={form.supplierId} onChange={(e) => setForm({ ...form, supplierId: e.target.value })}
@@ -126,10 +219,58 @@ export default function PurchaseFormPage() {
         )}
       </Panel>
 
+      {canReceive && items.length > 0 && (
+        <Panel title={<Checkbox label="Receive stock now (optional)" checked={receiveNow} onChange={(e) => setReceiveNow(e.target.checked)} />}>
+          {!receiveNow ? (
+            <p className="muted small">Tick this if the delivery has arrived. You can receive all or part of the order now and the rest later from the purchase page.</p>
+          ) : (
+            <div className="stack">
+              <p className="muted small">Set quantity to 0 to skip a medicine. Selling price starts at unit cost + {Number(markup ?? 15)}% and can be changed.</p>
+              {items.map((item, index) => (
+                <div key={item.medicineId} className="stack-sm">
+                  <strong>{item.medicineName}</strong>
+                  <div className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', alignItems: 'start' }}>
+                    <TextInput label="Batch number" value={item.batchNumber || ''} onChange={(e) => setItem(index, 'batchNumber', e.target.value)} error={receiveError(item, 'batchNumber')} />
+                    <TextInput label="Quantity" type="number" min="0" max={item.orderedQuantity} value={receiveQuantityOf(item)}
+                      onChange={(e) => setItem(index, 'receiveQuantity', e.target.value)} error={receiveError(item, 'quantity')} />
+                    <TextInput label="Manufactured" type="date" max={todayIso()} value={item.manufacturingDate || ''} onChange={(e) => setItem(index, 'manufacturingDate', e.target.value)} error={receiveError(item, 'manufacturingDate')} />
+                    <TextInput label="Expiry" type="date" min={todayIso()} value={item.expiryDate || ''} onChange={(e) => setItem(index, 'expiryDate', e.target.value)} error={receiveError(item, 'expiryDate')} />
+                    <TextInput label="Selling price" inputMode="decimal" value={sellingPriceOf(item)}
+                      onChange={(e) => setItem(index, 'receiveSellingPrice', e.target.value)} error={receiveError(item, 'sellingPrice')} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Panel>
+      )}
+
+      {canPay && items.length > 0 && (
+        <Panel title={<Checkbox label="Record a payment now (optional)" checked={payment.enabled} onChange={(e) => setPayment({ ...payment, enabled: e.target.checked })} />}>
+          {!payment.enabled ? (
+            <p className="muted small">Tick this if you are paying the supplier now. Partial payments are allowed; the rest can be paid later.</p>
+          ) : (
+            <div className="stack-sm">
+              <div className="form-grid">
+                <TextInput label="Amount" required inputMode="decimal" value={payment.amount} onChange={(e) => setPayment({ ...payment, amount: e.target.value })} error={errors['payment.amount']} />
+                <SelectInput label="Method" value={payment.paymentMethod} onChange={(e) => setPayment({ ...payment, paymentMethod: e.target.value })}
+                  options={[{ value: 'BANK_TRANSFER', label: 'Bank transfer' }, { value: 'CASH', label: 'Cash' }, { value: 'OTHER', label: 'Other' }]} />
+                <TextInput label="Reference number" value={payment.referenceNumber} onChange={(e) => setPayment({ ...payment, referenceNumber: e.target.value })} />
+              </div>
+              <div><Button size="sm" variant="ghost" onClick={() => setPayment({ ...payment, amount: fromCents(totalCents) })}>Pay the full {formatMoney(fromCents(totalCents))}</Button></div>
+            </div>
+          )}
+        </Panel>
+      )}
+
       {Object.keys(errors).some((k) => k.startsWith('items')) && <InlineAlert tone="danger">Check the highlighted item quantities and prices.</InlineAlert>}
+      {action.error && ['OVERPAYMENT_NOT_ALLOWED', 'BATCH_COST_CONFLICT', 'BATCH_DATA_CONFLICT', 'BATCH_EXPIRED', 'OVER_RECEIVING'].includes(action.error.code) && (
+        <InlineAlert tone="danger">{action.error.message} Nothing was saved.</InlineAlert>
+      )}
       <div className="form-actions">
         <Button variant="secondary" onClick={() => navigate(-1)} disabled={action.running}>Cancel</Button>
-        {!editingPending && <Button variant="secondary" onClick={() => save('DRAFT')} loading={action.running} disabled={items.length === 0}>Save draft</Button>}
+        {!editingPending && <Button variant="secondary" onClick={() => save('DRAFT')} loading={action.running} disabled={items.length === 0 || extras}
+          title={extras ? 'Drafts cannot include receiving or a payment' : undefined}>Save draft</Button>}
         <Button onClick={() => save('PENDING')} loading={action.running} disabled={items.length === 0}>{editingPending ? 'Save changes' : 'Submit order'}</Button>
       </div>
     </div>

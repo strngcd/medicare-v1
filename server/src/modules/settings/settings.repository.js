@@ -3,7 +3,7 @@ const { NUMBER_COLUMNS } = require('../documents/documentNumbers');
 
 const COLUMNS = `
   pharmacy_name, logo_url, phone, email, address, city, country, website, currency_code,
-  expiry_warning_days, tax_enabled, tax_name, tax_rate, tax_mode, updated_by, updated_at`;
+  expiry_warning_days, default_markup_percent, tax_enabled, tax_name, tax_rate, tax_mode, updated_by, updated_at`;
 
 const FIELD_COLUMNS = {
   pharmacyName: 'pharmacy_name',
@@ -16,6 +16,7 @@ const FIELD_COLUMNS = {
   website: 'website',
   currencyCode: 'currency_code',
   expiryWarningDays: 'expiry_warning_days',
+  defaultMarkupPercent: 'default_markup_percent',
   taxEnabled: 'tax_enabled',
   taxName: 'tax_name',
   taxRate: 'tax_rate',

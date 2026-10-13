@@ -24,7 +24,7 @@ const PURCHASE_FROM = `
   JOIN branches br ON br.id = p.branch_id
   JOIN users cu ON cu.id = p.created_by`;
 
-async function list({ branchIds, supplierId, status, paymentStatus, dateFrom, dateTo, search, limit, offset, orderBy }) {
+async function list({ branchIds, supplierId, status, paymentStatus, dateFrom, dateTo, search, minAmount, maxAmount, limit, offset, orderBy }) {
   const w = whereBuilder();
   if (branchIds) w.add('p.branch_id = ANY(?::uuid[])', branchIds);
   if (supplierId) w.add('p.supplier_id = ?', supplierId);
@@ -32,6 +32,8 @@ async function list({ branchIds, supplierId, status, paymentStatus, dateFrom, da
   if (dateFrom) w.add('p.purchase_date >= ?::date', dateFrom);
   if (dateTo) w.add('p.purchase_date <= ?::date', dateTo);
   if (search) w.add('(p.purchase_number ILIKE ? OR s.company_name ILIKE ?)', `%${search}%`, `%${search}%`);
+  if (minAmount) w.add('p.total >= ?::numeric', minAmount);
+  if (maxAmount) w.add('p.total <= ?::numeric', maxAmount);
 
   const paymentFilter = paymentStatus ? `WHERE payment_status = ${w.param(paymentStatus)}` : '';
   const { rows } = await query(

@@ -179,7 +179,11 @@ Purchases record what was ordered from a supplier for a branch. Creating a purch
 - Cancelled: cancelled before anything was received.
 
 ## Receiving
-For each item, enter the batch number, expiry date, quantity, purchase price and selling price. You can receive an item in several deliveries and across several batches. You cannot receive more than was ordered.
+For each item, enter the batch number, expiry date, quantity and selling price. The unit cost comes from the order and cannot be changed while receiving. The selling price starts at unit cost plus the default markup (15% unless changed under Settings > Inventory) and can be edited. You can receive an item in several deliveries and across several batches. You cannot receive more than was ordered.
+
+When creating a purchase you can also tick "Receive stock now" and "Record a payment now" to receive all or part of the delivery and pay all or part of the total in the same step. If any part fails, nothing is saved.
+
+An unsaved new purchase is kept in your browser, so you can leave the page and come back to it. It is cleared once the purchase is saved.
 
 If the batch already exists, it is reused. Its purchase price must match: a batch cannot have two different costs, and the system rejects the receipt with a batch cost conflict.
 
