@@ -76,41 +76,43 @@
   color-scheme: light;
 }
 
-/* Dark theme: navy surfaces, white text, teal accent. */
-:root[data-theme='dark'] {
-  --bg: #08111f;
-  --surface: #0e1b2e;
-  --surface-muted: #12223a;
-  --surface-sunken: #0a1627;
-  --border: #1f3350;
-  --border-strong: #2b4468;
-  --text: #e6edf6;
-  --text-muted: #9fb0c5;
-  --text-subtle: #70839b;
+/* Dark theme: navy surfaces, white text, teal accent. Screen only, so printouts are always dark-on-white. */
+@media screen {
+  :root[data-theme='dark'] {
+    --bg: #08111f;
+    --surface: #0e1b2e;
+    --surface-muted: #12223a;
+    --surface-sunken: #0a1627;
+    --border: #1f3350;
+    --border-strong: #2b4468;
+    --text: #e6edf6;
+    --text-muted: #9fb0c5;
+    --text-subtle: #70839b;
 
-  --primary: var(--teal-500);
-  --primary-hover: var(--teal-400);
-  --primary-soft: rgba(18, 164, 175, 0.14);
-  --primary-text: #5fd0d8;
+    --primary: var(--teal-500);
+    --primary-hover: var(--teal-400);
+    --primary-soft: rgba(18, 164, 175, 0.14);
+    --primary-text: #5fd0d8;
 
-  --sidebar-bg: #060f1c;
-  --sidebar-hover: #0e1b2e;
-  --sidebar-active: #13253f;
-  --sidebar-border: #13253f;
+    --sidebar-bg: #060f1c;
+    --sidebar-hover: #0e1b2e;
+    --sidebar-active: #13253f;
+    --sidebar-border: #13253f;
 
-  --success: #4cc38a;
-  --success-soft: rgba(76, 195, 138, 0.14);
-  --warning: #f0b44c;
-  --warning-soft: rgba(240, 180, 76, 0.14);
-  --danger: #f2756b;
-  --danger-soft: rgba(242, 117, 107, 0.14);
-  --info: #6fa8ec;
-  --info-soft: rgba(111, 168, 236, 0.14);
-  --neutral-soft: #16263d;
+    --success: #4cc38a;
+    --success-soft: rgba(76, 195, 138, 0.14);
+    --warning: #f0b44c;
+    --warning-soft: rgba(240, 180, 76, 0.14);
+    --danger: #f2756b;
+    --danger-soft: rgba(242, 117, 107, 0.14);
+    --info: #6fa8ec;
+    --info-soft: rgba(111, 168, 236, 0.14);
+    --neutral-soft: #16263d;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.45);
-  color-scheme: dark;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.45);
+    color-scheme: dark;
+  }
 }
 
 :root[data-density='compact'] {

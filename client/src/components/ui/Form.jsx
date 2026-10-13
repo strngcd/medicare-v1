@@ -1,4 +1,5 @@
-import { forwardRef, useId } from 'react';
+import { forwardRef, useId, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 export function Field({ label, required, hint, error, children, className = '', htmlFor }) {
   return (
@@ -25,6 +26,22 @@ export const TextInput = forwardRef(function TextInput({ label, required, hint, 
   return (
     <Field label={label} required={required} hint={hint} error={error} htmlFor={inputId} className={fieldClassName}>
       <input ref={ref} id={inputId} className={`input ${className || ''}`} aria-invalid={error ? 'true' : undefined} required={required} {...rest} />
+    </Field>
+  );
+});
+
+/** Password field with a show/hide toggle, matching the sign-in page. */
+export const PasswordInput = forwardRef(function PasswordInput({ label, required, hint, error, id, className, fieldClassName, ...rest }, ref) {
+  const inputId = useFieldId(id);
+  const [visible, setVisible] = useState(false);
+  return (
+    <Field label={label} required={required} hint={hint} error={error} htmlFor={inputId} className={fieldClassName}>
+      <div className="input-with-action">
+        <input ref={ref} id={inputId} className={`input ${className || ''}`} aria-invalid={error ? 'true' : undefined} required={required} {...rest} type={visible ? 'text' : 'password'} />
+        <button type="button" className="icon-btn input-action" onClick={() => setVisible((v) => !v)} aria-label={visible ? 'Hide password' : 'Show password'}>
+          {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+        </button>
+      </div>
     </Field>
   );
 });

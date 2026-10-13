@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { api } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
-import { PageHeader, Panel, TextInput, SelectInput, Button, Details, InlineAlert } from '../../components/ui/index.js';
+import { PageHeader, Panel, TextInput, PasswordInput, SelectInput, Button, Details, InlineAlert } from '../../components/ui/index.js';
 import { passwordProblem } from '../../validators/password.js';
 
 function PersonalInfo() {
@@ -79,10 +79,10 @@ function ChangePassword() {
   return (
     <Panel title="Change password">
       <form className="stack" onSubmit={submit} noValidate>
-        <TextInput label="Current password" type="password" autoComplete="current-password" value={form.currentPassword} error={errors.currentPassword} onChange={(e) => setForm({ ...form, currentPassword: e.target.value })} />
+        <PasswordInput label="Current password" autoComplete="current-password" value={form.currentPassword} error={errors.currentPassword} onChange={(e) => setForm({ ...form, currentPassword: e.target.value })} />
         <div className="form-grid">
-          <TextInput label="New password" type="password" autoComplete="new-password" value={form.newPassword} error={errors.newPassword} onChange={(e) => setForm({ ...form, newPassword: e.target.value })} hint="At least 8 characters with a letter and a number." />
-          <TextInput label="Confirm new password" type="password" autoComplete="new-password" value={form.confirm} error={errors.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} />
+          <PasswordInput label="New password" autoComplete="new-password" value={form.newPassword} error={errors.newPassword} onChange={(e) => setForm({ ...form, newPassword: e.target.value })} hint="At least 8 characters with a letter and a number." />
+          <PasswordInput label="Confirm new password" autoComplete="new-password" value={form.confirm} error={errors.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} />
         </div>
         <div className="form-actions"><Button type="submit" loading={saving}>Change password</Button></div>
       </form>
