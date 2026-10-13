@@ -1,4 +1,5 @@
 const { z, uuid, isoDate, money, listQuery } = require('../../validators/common');
+const { listRefundsQuery } = require('../refunds/refunds.validators');
 
 const range = {
   range: z.enum(['TODAY', 'WEEK', 'MONTH', 'YEAR', 'CUSTOM']).optional(),
@@ -37,6 +38,8 @@ const lossReportQuery = listQuery.extend({
   movementType: z.enum(['EXPIRED', 'DAMAGED', 'LOST', 'DISPOSED']).optional(),
 });
 
+const refundReportQuery = listRefundsQuery.extend({ range: range.range });
+
 const purchaseReportQuery = listQuery.extend({
   ...range,
   supplierId: uuid.optional(),
@@ -59,6 +62,7 @@ module.exports = {
   inventoryReportQuery,
   movementReportQuery,
   lossReportQuery,
+  refundReportQuery,
   purchaseReportQuery,
   supplierReportQuery,
   exportFormat,

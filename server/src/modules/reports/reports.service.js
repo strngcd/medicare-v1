@@ -10,6 +10,7 @@ const { getExpiryWarningDays } = require('../inventory/inventoryStatus');
 const salesService = require('../sales/sales.service');
 const inventoryService = require('../inventory/inventory.service');
 const purchasesService = require('../purchases/purchases.service');
+const refundsService = require('../refunds/refunds.service');
 const { resolveDateRange } = require('./dateRange');
 const repo = require('./reports.repository');
 
@@ -246,6 +247,37 @@ async function movementReport(auth, query) {
   }, auth);
 }
 
+/**
+ * Refunds with the Refunds page filters. A named range (or no dates at all,
+ * meaning all time) is supported so the page can export exactly what it shows.
+ */
+async function refundReport(auth, query, { exportAll = false } = {}) {
+  const range = query.range ? resolveDateRange(query) : null;
+  const listQuery = range ? { ...query, dateFrom: range.dateFrom, dateTo: range.dateTo } : query;
+  const [summary, rows, list] = await Promise.all([
+    refundsService.refundSummary(auth, listQuery),
+    exportAll ? collectAllPages((page) => refundsService.listRefunds(auth, { ...listQuery, page, limit: 100 })) : null,
+    exportAll ? null : refundsService.listRefunds(auth, listQuery),
+  ]);
+  return {
+    title: 'Refund report',
+    period: range || (query.dateFrom || query.dateTo ? { dateFrom: query.dateFrom || null, dateTo: query.dateTo || null } : undefined),
+    summary,
+    columns: [
+      { key: 'refundNumber', label: 'Refund' },
+      { key: 'createdAt', label: 'Date' },
+      { key: 'receiptNumber', label: 'Sale' },
+      { key: 'branchName', label: 'Branch' },
+      { key: 'reason', label: 'Reason' },
+      { key: 'paymentMethod', label: 'Method' },
+      { key: 'refundTotal', label: 'Amount' },
+      { key: 'processedByName', label: 'Processed by' },
+    ],
+    rows: exportAll ? rows : list.rows,
+    pagination: exportAll ? undefined : { page: list.page, limit: list.limit, total: list.total },
+  };
+}
+
 /** Stock written off (expired, disposed, damaged, lost), valued at purchase cost. */
 async function lossReport(auth, query, { exportAll = false } = {}) {
   const range = resolveDateRange({ range: query.range || (query.dateFrom ? 'CUSTOM' : 'MONTH'), ...query });
@@ -366,6 +398,7 @@ module.exports = {
   inventoryReport,
   movementReport,
   lossReport,
+  refundReport,
   purchaseReport,
   supplierReport,
   shapeSalesSummary,

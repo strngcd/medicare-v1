@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Undo2 } from 'lucide-react';
+import { Download, FileText, Undo2 } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, EmptyState, SelectInput, Modal, Details, SkeletonRows, ErrorState, FilterToolbar } from '../../components/ui/index.js';
+import { useToast } from '../../context/ToastContext.jsx';
+import { PageHeader, Panel, DataTable, Pagination, EmptyState, SelectInput, Modal, Details, SkeletonRows, ErrorState, FilterToolbar, Button } from '../../components/ui/index.js';
 import { formatDateTime, formatMoney, humanize } from '../../utils/format.js';
 import { Link } from 'react-router-dom';
 
@@ -42,15 +43,39 @@ function RefundDetail({ id, onClose }) {
 }
 
 export default function RefundsPage() {
-  const { branchParam } = useAuth();
+  const { branchParam, can } = useAuth();
+  const toast = useToast();
   const { state, update, clear, hasFilters } = useListState();
   const params = { ...state, branchId: branchParam };
   const list = useApi(() => api.get('/refunds', params), [JSON.stringify(params)]);
   const [open, setOpen] = useState(null);
+  const [exporting, setExporting] = useState(null);
+  const canExport = can('REPORT_EXPORT') && can('REPORT_SALES_VIEW');
+
+  // Exports exactly the filtered list (all pages), like the Reports page.
+  const doExport = async (format) => {
+    setExporting(format);
+    try {
+      const { page: _page, limit: _limit, sortBy: _sortBy, sortOrder: _sortOrder, ...filters } = params;
+      const clean = Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== undefined && v !== ''));
+      await api.download('/reports/refunds/export', { ...clean, format }, `refunds-report.${format}`);
+      toast.success('Export downloaded.');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setExporting(null);
+    }
+  };
 
   return (
     <div className="stack">
-      <PageHeader title="Refunds" description="Refunds are created from a sale. Each one returns stock to the original batches." />
+      <PageHeader title="Refunds" description="Refunds are created from a sale. Each one returns stock to the original batches."
+        actions={canExport && (
+          <>
+            <Button variant="secondary" icon={Download} onClick={() => doExport('csv')} loading={exporting === 'csv'}>CSV</Button>
+            <Button variant="secondary" icon={FileText} onClick={() => doExport('pdf')} loading={exporting === 'pdf'}>PDF</Button>
+          </>
+        )} />
       <Panel flush>
         <FilterToolbar>
           <div className="field search-field">
@@ -60,6 +85,8 @@ export default function RefundsPage() {
           <SelectInput label="Reason" value={state.reason || ''} placeholder="All" options={REASONS} onChange={(e) => update({ reason: e.target.value })} />
           <div className="field"><span className="field-label">From</span><input className="input" type="date" value={state.dateFrom || ''} onChange={(e) => update({ dateFrom: e.target.value })} /></div>
           <div className="field"><span className="field-label">To</span><input className="input" type="date" value={state.dateTo || ''} onChange={(e) => update({ dateTo: e.target.value })} /></div>
+          <div className="field" style={{ minWidth: 100, maxWidth: 130 }}><span className="field-label">Min amount</span><input className="input" inputMode="decimal" placeholder="0.00" defaultValue={state.minAmount || ''} onChange={(e) => update({ minAmount: e.target.value })} aria-label="Minimum amount" /></div>
+          <div className="field" style={{ minWidth: 100, maxWidth: 130 }}><span className="field-label">Max amount</span><input className="input" inputMode="decimal" placeholder="Any" defaultValue={state.maxAmount || ''} onChange={(e) => update({ maxAmount: e.target.value })} aria-label="Maximum amount" /></div>
         </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}

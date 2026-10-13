@@ -257,6 +257,9 @@ Refunds can cover a whole sale or specific quantities of specific items.
 
 Each refund receives a number such as REF-4M8TQ2.
 
+## Finding and exporting refunds
+The Refunds page filters by reason, date range and amount (minimum and maximum). Users with the export permission can download exactly the filtered list as CSV or PDF; the same report is also under Reports > Refunds.
+
 ## Voids
 Voiding cancels a completed sale entirely, for example when it was entered by mistake. The exact batches are restored and the sale stays in history marked as Voided.
 

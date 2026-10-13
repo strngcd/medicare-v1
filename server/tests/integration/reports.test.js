@@ -210,3 +210,36 @@ describe('exports', () => {
     expect(csv.text).not.toContain('60.00');
   });
 });
+
+describe('refund filters and export', () => {
+  async function refund(sale, quantity) {
+    const res = await admin.post('/api/v1/refunds').send({ saleId: sale.id, reason: 'CUSTOMER_RETURN', items: [{ saleItemId: sale.items[0].id, quantity }] });
+    expect(res.status).toBe(201);
+    return res.body.data;
+  }
+
+  test('the refunds list filters by amount and exports the same rows as CSV and PDF', async () => {
+    const small = await refund(await sell(cashier, branch.id, med.id, 1), 1); // 10.00
+    const large = await refund(await sell(cashier, branch.id, med.id, 6), 5); // 50.00
+
+    const amounts = async (q) => (await admin.get(`/api/v1/refunds?${q}`)).body.data.map((r) => r.refundNumber).sort();
+    expect(await amounts('minAmount=20')).toEqual([large.refundNumber]);
+    expect(await amounts('maxAmount=20')).toEqual([small.refundNumber]);
+
+    const report = await admin.get('/api/v1/reports/refunds?minAmount=20');
+    expect(report.body.data.summary).toMatchObject({ refundCount: 1, totalRefunded: '50.00' });
+
+    const csv = await admin.get('/api/v1/reports/refunds/export?format=csv&reason=CUSTOMER_RETURN&maxAmount=20');
+    const lines = csv.text.trim().split('\r\n');
+    expect(lines).toHaveLength(2);
+    expect(lines[1]).toContain(small.refundNumber);
+
+    const pdf = await admin.get('/api/v1/reports/refunds/export?format=pdf').buffer(true).parse((r, cb) => {
+      const chunks = [];
+      r.on('data', (c) => chunks.push(c));
+      r.on('end', () => cb(null, Buffer.concat(chunks)));
+    });
+    expect(pdf.body.slice(0, 4).toString()).toBe('%PDF');
+    expect((await cashier.get('/api/v1/reports/refunds/export?format=csv')).status).toBe(403);
+  });
+});

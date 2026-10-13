@@ -29,9 +29,8 @@ function assertCanSeeRefund(auth, refund) {
   throw AppError.notFound('Refund not found.');
 }
 
-async function listRefunds(auth, query) {
-  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'createdAt' });
-  const { rows, total } = await repo.list({
+function refundFilters(auth, query) {
+  return {
     branchIds: resolveBranchScope(auth, query.branchId),
     saleId: query.saleId,
     processedBy: query.staffId,
@@ -39,10 +38,20 @@ async function listRefunds(auth, query) {
     search: query.search,
     dateFrom: query.dateFrom,
     dateTo: query.dateTo,
+    minAmount: query.minAmount,
+    maxAmount: query.maxAmount,
     timezone: config.businessTimezone,
-    ...params,
-  });
+  };
+}
+
+async function listRefunds(auth, query) {
+  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'createdAt' });
+  const { rows, total } = await repo.list({ ...refundFilters(auth, query), ...params });
   return { rows: rows.map(toDto), total, page: params.page, limit: params.limit };
+}
+
+async function refundSummary(auth, query) {
+  return camelize(await repo.summary(refundFilters(auth, query)));
 }
 
 async function getRefund(auth, id) {
@@ -177,4 +186,4 @@ async function createRefund(auth, actor, input, idempotencyKey) {
   return { ...result, body: await getRefund(auth, result.body.id) };
 }
 
-module.exports = { listRefunds, getRefund, createRefund, planBatchReturn };
+module.exports = { listRefunds, refundSummary, getRefund, createRefund, planBatchReturn };

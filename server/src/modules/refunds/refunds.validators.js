@@ -1,4 +1,4 @@
-const { z, uuid, optionalText, isoDate, positiveInt, listQuery } = require('../../validators/common');
+const { z, uuid, optionalText, isoDate, money, positiveInt, listQuery } = require('../../validators/common');
 
 const REASONS = ['CUSTOMER_RETURN', 'DAMAGED_PRODUCT', 'WRONG_ITEM', 'WRONG_QUANTITY', 'DUPLICATE_SALE', 'OTHER'];
 
@@ -19,6 +19,8 @@ const listRefundsQuery = listQuery.extend({
   reason: z.enum(REASONS).optional(),
   dateFrom: isoDate.optional(),
   dateTo: isoDate.optional(),
+  minAmount: money.optional(),
+  maxAmount: money.optional(),
 });
 
 module.exports = { createRefundBody, listRefundsQuery };
