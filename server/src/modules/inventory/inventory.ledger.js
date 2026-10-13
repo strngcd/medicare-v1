@@ -25,8 +25,8 @@ async function lockInventoryRow(client, branchId, batchId) {
 /** Locks an inventory row by its own id. */
 async function lockInventoryById(client, inventoryId) {
   const { rows } = await query(
-    `SELECT bi.id, bi.branch_id, bi.batch_id, bi.quantity, bi.minimum_stock, bi.selling_price,
-            b.medicine_id, b.batch_number, b.expiry_date, m.name AS medicine_name, m.status AS medicine_status,
+    `SELECT bi.id, bi.branch_id, bi.batch_id, bi.quantity, bi.minimum_stock, bi.selling_price, bi.archived_at,
+            b.medicine_id, b.batch_number, b.expiry_date, b.purchase_price, m.name AS medicine_name, m.status AS medicine_status,
             br.status AS branch_status
        FROM branch_inventory bi
        JOIN batches b ON b.id = bi.batch_id
@@ -92,7 +92,16 @@ async function applyMovement(
     });
   }
 
-  await query('UPDATE branch_inventory SET quantity = $2 WHERE id = $1', [row.id, quantityAfter], client);
+  // Stock arriving for an archived batch row brings it back into view.
+  await query(
+    `UPDATE branch_inventory
+        SET quantity = $2,
+            archived_at = CASE WHEN $2 > 0 THEN NULL ELSE archived_at END,
+            archived_by = CASE WHEN $2 > 0 THEN NULL ELSE archived_by END
+      WHERE id = $1`,
+    [row.id, quantityAfter],
+    client,
+  );
   const { rows } = await query(
     `INSERT INTO stock_movements (branch_id, batch_id, movement_type, quantity_change, quantity_before,
        quantity_after, reference_type, reference_id, reason, created_by)

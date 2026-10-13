@@ -33,6 +33,16 @@ module.exports = {
     const result = await service.createAdjustment(req.auth, actorFromRequest(req), req.valid.body, readIdempotencyKey(req));
     sendIdempotent(res, result, 'Inventory adjusted.');
   },
+  async dispose(req, res) {
+    const result = await service.disposeStock(req.auth, actorFromRequest(req), req.valid.params.id, req.valid.body, readIdempotencyKey(req));
+    sendIdempotent(res, result, 'Stock disposed and recorded as a loss.');
+  },
+  async archive(req, res) {
+    sendData(res, await service.setInventoryArchived(req.auth, actorFromRequest(req), req.valid.params.id, true), { message: 'Batch archived.' });
+  },
+  async restore(req, res) {
+    sendData(res, await service.setInventoryArchived(req.auth, actorFromRequest(req), req.valid.params.id, false), { message: 'Batch restored.' });
+  },
   async movements(req, res) {
     sendPage(res, await service.listMovements(req.auth, req.valid.query));
   },

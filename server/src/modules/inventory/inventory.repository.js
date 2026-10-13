@@ -6,9 +6,11 @@ const { medicineStockCte, rowStatusSql } = require('./inventoryStatus');
  * Inventory rows (branch x batch) with derived status.
  * Params $1 = business date, $2 = expiry warning days.
  */
-async function listInventory({ today, warningDays, ids, branchIds, medicineId, categoryId, statuses, search, limit, offset, orderBy }) {
+async function listInventory({ today, warningDays, ids, branchIds, medicineId, categoryId, statuses, search, archived = false, limit, offset, orderBy }) {
   const w = whereBuilder([today, warningDays]);
   if (ids) w.add('bi.id = ANY(?::uuid[])', ids);
+  // Archived (empty, hidden) batch rows are listed only on request; lookups by id always find them.
+  else w.add(archived ? 'bi.archived_at IS NOT NULL' : 'bi.archived_at IS NULL');
   if (branchIds) w.add('bi.branch_id = ANY(?::uuid[])', branchIds);
   if (medicineId) w.add('b.medicine_id = ?', medicineId);
   if (categoryId) w.add('m.category_id = ?', categoryId);
@@ -27,7 +29,7 @@ async function listInventory({ today, warningDays, ids, branchIds, medicineId, c
             (bi.quantity * b.purchase_price)::numeric(14,2) AS inventory_value,
             (b.expiry_date - $1::date) AS days_to_expiry,
             ${rowStatusSql('$1', '$2')} AS status,
-            bi.created_at, bi.updated_at,
+            bi.archived_at, bi.created_at, bi.updated_at,
             count(*) OVER() AS total_count
        FROM branch_inventory bi
        JOIN batches b ON b.id = bi.batch_id
@@ -94,7 +96,7 @@ async function findBatch(id) {
 async function listBatchStock(batchId, branchIds) {
   const { rows } = await query(
     `SELECT bi.id AS inventory_id, bi.branch_id, br.name AS branch_name, br.code AS branch_code,
-            bi.quantity, bi.minimum_stock, bi.selling_price
+            bi.quantity, bi.minimum_stock, bi.selling_price, bi.archived_at
        FROM branch_inventory bi JOIN branches br ON br.id = bi.branch_id
       WHERE bi.batch_id = $1 AND ($2::uuid[] IS NULL OR bi.branch_id = ANY($2::uuid[]))
       ORDER BY br.name`,
@@ -151,6 +153,16 @@ async function insertAdjustment(client, data) {
 async function updateInventoryField(client, id, column, value) {
   if (!['minimum_stock', 'selling_price'].includes(column)) throw new Error('Unsupported inventory field');
   await query(`UPDATE branch_inventory SET ${column} = $2 WHERE id = $1`, [id, value], client);
+}
+
+async function setArchived(client, id, userId) {
+  await query(
+    `UPDATE branch_inventory
+        SET archived_at = CASE WHEN $2::uuid IS NULL THEN NULL ELSE now() END, archived_by = $2
+      WHERE id = $1`,
+    [id, userId],
+    client,
+  );
 }
 
 async function findMedicineForStock(client, medicineId) {
@@ -270,6 +282,7 @@ module.exports = {
   listMovements,
   insertAdjustment,
   updateInventoryField,
+  setArchived,
   findMedicineForStock,
   findSupplier,
   inventorySummary,

@@ -348,6 +348,55 @@ async function movementSummary({ timezone, dateFrom, dateTo, branchIds }) {
   return rows;
 }
 
+// Stock that left inventory without a sale: valued at the batch purchase price.
+const LOSS_MOVEMENT_TYPES = ['EXPIRED', 'DAMAGED', 'LOST', 'DISPOSED'];
+
+function lossFilter({ timezone, dateFrom, dateTo, branchIds, movementType }) {
+  const params = [timezone, dateFrom, dateTo, branchIds || null, movementType ? [movementType] : LOSS_MOVEMENT_TYPES];
+  const where = `sm.quantity_change < 0
+      AND sm.movement_type = ANY($5::text[])
+      AND (sm.created_at AT TIME ZONE $1)::date BETWEEN $2::date AND $3::date
+      AND ($4::uuid[] IS NULL OR sm.branch_id = ANY($4::uuid[]))`;
+  return { params, where };
+}
+
+async function stockLosses(filters, { limit, offset }) {
+  const { params, where } = lossFilter(filters);
+  params.push(limit, offset);
+  const { rows } = await query(
+    `SELECT sm.id, sm.created_at, br.name AS branch_name, m.name AS medicine_name, b.batch_number, b.expiry_date,
+            sm.movement_type, -sm.quantity_change AS quantity, b.purchase_price AS unit_cost,
+            (-sm.quantity_change * b.purchase_price)::numeric(14,2) AS loss_value,
+            u.full_name AS created_by_name, sm.reason,
+            count(*) OVER() AS total_count
+       FROM stock_movements sm
+       JOIN batches b ON b.id = sm.batch_id
+       JOIN medicines m ON m.id = b.medicine_id
+       JOIN branches br ON br.id = sm.branch_id
+       JOIN users u ON u.id = sm.created_by
+      WHERE ${where}
+      ORDER BY sm.created_at DESC
+      LIMIT $6 OFFSET $7`,
+    params,
+  );
+  return { rows, total: rows.length ? rows[0].total_count : 0 };
+}
+
+async function stockLossSummary(filters) {
+  const { params, where } = lossFilter(filters);
+  const { rows } = await query(
+    `SELECT count(*)::int AS entry_count,
+            COALESCE(sum(-sm.quantity_change), 0)::int AS units_lost,
+            COALESCE(sum(-sm.quantity_change * b.purchase_price), 0)::numeric(14,2) AS total_loss_value,
+            COALESCE(sum(-sm.quantity_change * b.purchase_price) FILTER (WHERE sm.movement_type IN ('EXPIRED', 'DISPOSED')), 0)::numeric(14,2) AS expiry_loss_value,
+            COALESCE(sum(-sm.quantity_change * b.purchase_price) FILTER (WHERE sm.movement_type IN ('DAMAGED', 'LOST')), 0)::numeric(14,2) AS damage_loss_value
+       FROM stock_movements sm JOIN batches b ON b.id = sm.batch_id
+      WHERE ${where}`,
+    params,
+  );
+  return rows[0];
+}
+
 async function purchaseSummary({ dateFrom, dateTo, branchIds, supplierId, status }) {
   const { rows } = await query(
     `WITH p AS (
@@ -414,6 +463,8 @@ module.exports = {
   inventoryDistribution,
   countActiveMedicines,
   movementSummary,
+  stockLosses,
+  stockLossSummary,
   purchaseSummary,
   supplierSummary,
 };

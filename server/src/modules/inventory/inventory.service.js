@@ -5,8 +5,8 @@ const { runIdempotent } = require('../idempotency/idempotency');
 const { nextDocumentNumber } = require('../documents/documentNumbers');
 const { parseListParams } = require('../../utils/pagination');
 const { camelize } = require('../../utils/camelize');
-const { toMoneyString } = require('../../utils/money');
-const { businessToday } = require('../../utils/time');
+const { money, toMoneyString } = require('../../utils/money');
+const { addDays, businessToday } = require('../../utils/time');
 const config = require('../../config');
 const { PERMISSIONS: P } = require('../../permissions/catalog');
 const { resolveBranchScope, assertBranchAccess, loadAccessibleBranch } = require('../../permissions/branchAccess');
@@ -35,6 +35,7 @@ const ADJUSTMENT_MOVEMENT_TYPE = {
   FOUND: 'CORRECTION',
   CORRECTION: 'CORRECTION',
   OTHER: 'ADJUSTMENT',
+  DISPOSED: 'DISPOSED',
 };
 
 // Fields only shown to users who may view batch details.
@@ -75,6 +76,7 @@ async function listInventory(auth, query, forcedStatuses) {
     categoryId: query.categoryId,
     search: query.search,
     statuses,
+    archived: Boolean(query.archived),
     ...params,
   });
   return { rows: presentInventory(auth, rows), total, page: params.page, limit: params.limit };
@@ -252,7 +254,7 @@ async function addStock(auth, actor, input, idempotencyKey) {
 
 function validateAdjustment({ reason, quantityChange, notes }, quantityBefore) {
   const errors = {};
-  if (['DAMAGED', 'EXPIRED', 'LOST'].includes(reason) && quantityChange >= 0) {
+  if (['DAMAGED', 'EXPIRED', 'LOST', 'DISPOSED'].includes(reason) && quantityChange >= 0) {
     errors.quantityChange = `${reason.toLowerCase()} adjustments must reduce stock.`;
   }
   if (reason === 'FOUND' && quantityChange <= 0) errors.quantityChange = 'Found stock must increase the quantity.';
@@ -359,6 +361,96 @@ async function createAdjustment(auth, actor, input, idempotencyKey) {
   );
 }
 
+/**
+ * Writes off all remaining stock of an expired or expiring batch row. The
+ * units leave inventory through a DISPOSED adjustment, valued at the batch's
+ * purchase price and reported as a stock loss. Optionally archives the row.
+ */
+async function disposeStock(auth, actor, id, { notes, archive }, idempotencyKey) {
+  const { today, warningDays } = await statusContext();
+  const result = await runIdempotent(
+    { userId: auth.userId, scope: `inventory.dispose:${id}`, key: idempotencyKey, payload: { notes, archive } },
+    async (client) => {
+      const row = await ledger.lockInventoryById(client, id);
+      if (!row) throw AppError.notFound('Inventory record not found.');
+      assertBranchAccess(auth, row.branch_id);
+      if (row.quantity === 0) throw AppError.conflict('NOTHING_TO_DISPOSE', 'This batch has no stock left to dispose of.');
+      const expired = row.expiry_date < today;
+      const expiringSoon = !expired && row.expiry_date <= addDays(today, warningDays);
+      if (!expired && !expiringSoon) {
+        throw AppError.conflict('NOT_DISPOSABLE', 'Only expired or expiring stock can be disposed of. Use a stock adjustment instead.');
+      }
+      if (archive && !auth.permissions.has(P.INVENTORY_BATCH_ARCHIVE)) {
+        throw AppError.forbidden('PERMISSION_DENIED', 'You do not have permission to archive batches.');
+      }
+
+      const quantity = row.quantity;
+      const lossValue = toMoneyString(money(row.purchase_price).times(quantity));
+      const adjustmentNumber = await nextDocumentNumber(client, 'STOCK_ADJUSTMENT');
+      const label = expired ? 'Expired stock disposed' : 'Expiring stock disposed';
+      const adjustment = await repo.insertAdjustment(client, {
+        adjustmentNumber,
+        branchId: row.branch_id,
+        batchId: row.batch_id,
+        inventoryId: row.id,
+        reason: 'DISPOSED',
+        quantityBefore: quantity,
+        quantityChange: -quantity,
+        quantityAfter: 0,
+        notes: notes || label,
+        userId: auth.userId,
+      });
+      await ledger.applyMovement(client, {
+        branchId: row.branch_id,
+        batchId: row.batch_id,
+        change: -quantity,
+        movementType: 'DISPOSED',
+        referenceType: 'INVENTORY_ADJUSTMENT',
+        referenceId: adjustment.id,
+        reason: notes ? `${label}: ${notes}` : label,
+        userId: auth.userId,
+      });
+      if (archive) await repo.setArchived(client, row.id, auth.userId);
+      await recordAudit(client, actor, {
+        action: 'STOCK_DISPOSED',
+        entityType: 'INVENTORY_ADJUSTMENT',
+        entityId: adjustment.id,
+        branchId: row.branch_id,
+        description: `${adjustmentNumber}: ${quantity} units of ${row.medicine_name} batch ${row.batch_number} disposed (${expired ? 'expired' : 'expiring soon'})`,
+        previousValues: { quantity },
+        newValues: { quantity: 0, expiryDate: row.expiry_date, lossValue, archived: Boolean(archive), notes: notes ?? null },
+      });
+      return { id: adjustment.id, adjustmentNumber, inventoryId: row.id, quantityDisposed: quantity, lossValue };
+    },
+  );
+  return { ...result, body: filterFinancialFields(result.body, auth) };
+}
+
+/** Hides (or un-hides) an empty batch row. Rows with stock cannot be archived. */
+async function setInventoryArchived(auth, actor, id, archived) {
+  await withTransaction(async (client) => {
+    const row = await ledger.lockInventoryById(client, id);
+    if (!row) throw AppError.notFound('Inventory record not found.');
+    assertBranchAccess(auth, row.branch_id);
+    if (archived && row.archived_at) throw AppError.conflict('BATCH_ALREADY_ARCHIVED', 'This batch is already archived.');
+    if (!archived && !row.archived_at) throw AppError.conflict('BATCH_NOT_ARCHIVED', 'This batch is not archived.');
+    if (archived && row.quantity > 0) {
+      throw AppError.conflict('BATCH_HAS_STOCK', `This batch still has ${row.quantity} units. Sell, transfer or dispose of them before archiving.`);
+    }
+    await repo.setArchived(client, id, archived ? auth.userId : null);
+    await recordAudit(client, actor, {
+      action: archived ? 'BATCH_ARCHIVED' : 'BATCH_RESTORED',
+      entityType: 'INVENTORY',
+      entityId: id,
+      branchId: row.branch_id,
+      description: `${row.medicine_name} batch ${row.batch_number} ${archived ? 'archived' : 'restored'}`,
+      previousValues: { archived: !archived },
+      newValues: { archived },
+    });
+  });
+  return getInventory(auth, id);
+}
+
 async function updateInventorySetting(auth, actor, id, field, value) {
   return withTransaction(async (client) => {
     const row = await ledger.lockInventoryById(client, id);
@@ -436,6 +528,8 @@ async function medicineInventory(auth, medicineId, branchId) {
 }
 
 module.exports = {
+  disposeStock,
+  setInventoryArchived,
   listInventory,
   getInventory,
   listStockLevels,

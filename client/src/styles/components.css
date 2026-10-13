@@ -304,6 +304,7 @@
 
 .toolbar .field { min-width: 150px; }
 .toolbar .search-field { flex: 1 1 220px; }
+.toolbar .toolbar-check { min-width: 0; height: var(--control-height); justify-content: center; }
 
 @media (max-width: 640px) {
   .toolbar .field { min-width: 0; flex: 1 1 100%; }

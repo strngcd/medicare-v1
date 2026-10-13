@@ -296,3 +296,70 @@ describe('inventory settings and FEFO preview', () => {
     expect(short.body.data.sufficient).toBe(false);
   });
 });
+
+describe('disposing of expired and expiring stock', () => {
+  const stockOf = (overrides) => createStock({ branch, medicine, user: pharmacistUser, purchasePrice: '4.00', ...overrides });
+
+  test('writes off all remaining units as a loss and clears the alert', async () => {
+    const { inventory, batch } = await stockOf({ expiryDate: daysFromToday(-2), quantity: 6 });
+    expect((await pharmacist.get(`/api/v1/alerts?branchId=${branch.id}`)).body.data.some((a) => a.type === 'EXPIRED')).toBe(true);
+
+    const res = await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({ notes: 'Sent for destruction' });
+    expect(res.status).toBe(201);
+    expect(res.body.data).toMatchObject({ quantityDisposed: 6, lossValue: '24.00' });
+    expect(res.body.data.adjustmentNumber).toMatch(/^STK-/);
+
+    const moves = await movementsFor(batch.id);
+    expect(moves[moves.length - 1]).toMatchObject({ movement_type: 'DISPOSED', quantity_change: -6, quantity_after: 0 });
+    expect((await pharmacist.get(`/api/v1/alerts?branchId=${branch.id}`)).body.data.some((a) => a.type === 'EXPIRED')).toBe(false);
+    // Nothing left: a second disposal is refused.
+    expect((await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({})).body.error.code).toBe('NOTHING_TO_DISPOSE');
+  });
+
+  test('allows expiring-soon stock but not healthy stock, and is limited by permission', async () => {
+    const soon = await stockOf({ expiryDate: daysFromToday(10), quantity: 3 });
+    const healthy = await stockOf({ expiryDate: daysFromToday(400), quantity: 3 });
+    expect((await cashier.post(`/api/v1/inventory/${soon.inventory.id}/dispose`).send({})).status).toBe(403);
+    expect((await pharmacist.post(`/api/v1/inventory/${healthy.inventory.id}/dispose`).send({})).body.error.code).toBe('NOT_DISPOSABLE');
+    expect((await admin.post(`/api/v1/inventory/${soon.inventory.id}/dispose`).send({})).status).toBe(201);
+  });
+
+  test('can archive in the same step and shows up in the loss and profit reports', async () => {
+    const { inventory } = await stockOf({ expiryDate: daysFromToday(-1), quantity: 5 });
+    await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({ archive: true });
+
+    const listed = await pharmacist.get(`/api/v1/inventory?branchId=${branch.id}`);
+    expect(listed.body.data.find((r) => r.id === inventory.id)).toBeUndefined();
+    const archived = await pharmacist.get(`/api/v1/inventory?branchId=${branch.id}&archived=true`);
+    expect(archived.body.data.map((r) => r.id)).toEqual([inventory.id]);
+
+    const losses = await admin.get('/api/v1/reports/losses?range=TODAY');
+    expect(losses.body.data.summary).toMatchObject({ unitsLost: 5, totalLossValue: '20.00', expiryLossValue: '20.00' });
+    expect(losses.body.data.rows[0]).toMatchObject({ movementType: 'DISPOSED', quantity: 5, lossValue: '20.00' });
+    const profit = await admin.get('/api/v1/reports/profit?range=TODAY');
+    expect(profit.body.data.summary).toMatchObject({ stockLosses: '20.00', netProfit: '-20.00' });
+    expect((await admin.get('/api/v1/reports/losses/export?range=TODAY&format=csv')).text).toContain('Amoxicillin');
+  });
+});
+
+describe('archiving batches', () => {
+  test('only empty rows can be archived; restore and new stock bring them back', async () => {
+    const { inventory, batch } = await createStock({ branch, medicine, user: pharmacistUser, quantity: 2, batchNumber: 'ARC-1' });
+    expect((await pharmacist.post(`/api/v1/inventory/${inventory.id}/archive`)).body.error.code).toBe('BATCH_HAS_STOCK');
+
+    await pool.query('UPDATE branch_inventory SET quantity = 0 WHERE id = $1', [inventory.id]);
+    expect((await cashier.post(`/api/v1/inventory/${inventory.id}/archive`)).status).toBe(403);
+    const archived = await pharmacist.post(`/api/v1/inventory/${inventory.id}/archive`);
+    expect(archived.status).toBe(200);
+    expect(archived.body.data.archivedAt).toBeTruthy();
+
+    const restored = await pharmacist.post(`/api/v1/inventory/${inventory.id}/restore`);
+    expect(restored.body.data.archivedAt).toBeNull();
+
+    // Receiving the same batch again un-archives the row automatically.
+    await pharmacist.post(`/api/v1/inventory/${inventory.id}/archive`);
+    await pharmacist.post('/api/v1/inventory/stock').send(stockBody({ batchNumber: 'ARC-1', expiryDate: batch.expiry_date, purchasePrice: batch.purchase_price, quantity: 4 }));
+    const { rows } = await pool.query('SELECT quantity, archived_at FROM branch_inventory WHERE id = $1', [inventory.id]);
+    expect(rows[0]).toEqual({ quantity: 4, archived_at: null });
+  });
+});

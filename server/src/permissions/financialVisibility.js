@@ -11,11 +11,16 @@ const COST_FIELDS = new Set([
   'costValue',
   'expiredValue',
   'expiringSoonValue',
+  'lossValue',
+  'totalLossValue',
+  'stockLosses',
+  'expiryLossValue',
+  'damageLossValue',
 ]);
 
 // Fields that reveal cost of goods sold, profit or margins.
 const PROFIT_FIELDS = new Set([
-  'cogs', 'grossProfit', 'profit', 'grossMargin', 'marginPercent', 'refundedCogs', 'netCogs', 'salesCogs',
+  'cogs', 'grossProfit', 'profit', 'grossMargin', 'marginPercent', 'refundedCogs', 'netCogs', 'salesCogs', 'netProfit',
 ]);
 
 /**

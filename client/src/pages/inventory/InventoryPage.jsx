@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Boxes, MoreHorizontal, SlidersHorizontal, Search } from 'lucide-react';
+import { Archive, ArchiveRestore, Boxes, MoreHorizontal, SlidersHorizontal, Search, Trash2 } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
+import { useAction } from '../../hooks/useAction.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useCategories, toOptions } from '../../hooks/useLookups.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Tabs, Dropdown, IconButton, LearnHow, FilterToolbar } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Tabs, Dropdown, IconButton, LearnHow, FilterToolbar, Checkbox } from '../../components/ui/index.js';
 import { AdjustStockModal } from '../../components/inventory/AdjustStockModal.jsx';
 import { InventorySettingModal } from '../../components/inventory/InventorySettingModal.jsx';
+import { DisposeStockModal } from '../../components/inventory/DisposeStockModal.jsx';
 import { formatDate, formatDateTime, formatMoney, formatNumber, humanize } from '../../utils/format.js';
 
 const STATUSES = ['AVAILABLE', 'LOW_STOCK', 'OUT_OF_STOCK', 'EXPIRING_SOON', 'EXPIRED'].map((s) => ({ value: s, label: humanize(s) }));
-const MOVEMENT_TYPES = ['PURCHASE_RECEIVED', 'SALE', 'REFUND', 'ADJUSTMENT', 'TRANSFER_OUT', 'TRANSFER_IN', 'EXPIRED', 'DAMAGED', 'LOST', 'CORRECTION']
+const MOVEMENT_TYPES = ['PURCHASE_RECEIVED', 'SALE', 'REFUND', 'ADJUSTMENT', 'TRANSFER_OUT', 'TRANSFER_IN', 'EXPIRED', 'DAMAGED', 'LOST', 'CORRECTION', 'DISPOSED']
   .map((s) => ({ value: s, label: humanize(s) }));
 
 function StockTab({ state, update, clear, hasFilters }) {
@@ -22,6 +24,26 @@ function StockTab({ state, update, clear, hasFilters }) {
   const [modal, setModal] = useState(null);
   const params = { ...state, tab: undefined, branchId: branchParam };
   const list = useApi(() => api.get('/inventory', params), [JSON.stringify(params)]);
+  const archiveAction = useAction();
+  const showingArchived = state.archived === 'true';
+  const setArchived = async (row, archived) => {
+    const result = await archiveAction.run(() => api.post(`/inventory/${row.id}/${archived ? 'archive' : 'restore'}`), { success: archived ? 'Batch archived.' : 'Batch restored.' });
+    if (result) list.reload({ silent: true });
+  };
+  const rowActions = (r) => {
+    if (r.archivedAt) {
+      return can('INVENTORY_BATCH_RESTORE') ? [{ label: 'Restore batch', icon: ArchiveRestore, run: () => setArchived(r, false) }] : [];
+    }
+    return [
+      can('INVENTORY_ADJUST') && { label: 'Adjust quantity', icon: SlidersHorizontal, run: () => setModal({ type: 'adjust', row: r }) },
+      can('INVENTORY_ADJUST') && { label: 'Change minimum stock', run: () => setModal({ type: 'minimumStock', row: r }) },
+      can('INVENTORY_ADJUST') && { label: 'Change selling price', run: () => setModal({ type: 'sellingPrice', row: r }) },
+      can('INVENTORY_DISPOSE') && r.quantity > 0 && ['EXPIRED', 'EXPIRING_SOON'].includes(r.status)
+        && { label: 'Dispose of stock', icon: Trash2, run: () => setModal({ type: 'dispose', row: r }) },
+      can('INVENTORY_BATCH_ARCHIVE') && r.quantity === 0 && { label: 'Archive batch', icon: Archive, run: () => setArchived(r, true) },
+    ].filter(Boolean);
+  };
+  const hasActions = ['INVENTORY_ADJUST', 'INVENTORY_DISPOSE', 'INVENTORY_BATCH_ARCHIVE', 'INVENTORY_BATCH_RESTORE'].some((p) => can(p));
 
   const columns = [
     { key: 'medicineName', label: 'Medicine', sortable: true, render: (r) => <span className="cell-strong">{r.medicineName}</span> },
@@ -32,18 +54,24 @@ function StockTab({ state, update, clear, hasFilters }) {
     { key: 'sellingPrice', label: 'Price', align: 'right', sortable: true, render: (r) => formatMoney(r.sellingPrice) },
     can('FINANCIAL_VIEW_PURCHASE_COST') && { key: 'inventoryValue', label: 'Value (cost)', align: 'right', render: (r) => formatMoney(r.inventoryValue) },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-    can('INVENTORY_ADJUST') && {
+    hasActions && {
       key: 'actions',
       label: '',
-      render: (r) => (
-        <span onClick={(e) => e.stopPropagation()}>
-          <Dropdown trigger={({ toggle }) => <IconButton icon={MoreHorizontal} label="Stock actions" onClick={toggle} />}>
-            <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'adjust', row: r })}><SlidersHorizontal aria-hidden="true" /> Adjust quantity</button>
-            <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'minimumStock', row: r })}>Change minimum stock</button>
-            <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'sellingPrice', row: r })}>Change selling price</button>
-          </Dropdown>
-        </span>
-      ),
+      render: (r) => {
+        const actions = rowActions(r);
+        if (actions.length === 0) return null;
+        return (
+          <span onClick={(e) => e.stopPropagation()}>
+            <Dropdown trigger={({ toggle }) => <IconButton icon={MoreHorizontal} label="Stock actions" onClick={toggle} />}>
+              {actions.map((a) => (
+                <button key={a.label} type="button" className="dropdown-item" onClick={a.run} disabled={archiveAction.running}>
+                  {a.icon && <a.icon aria-hidden="true" />} {a.label}
+                </button>
+              ))}
+            </Dropdown>
+          </span>
+        );
+      },
     },
   ].filter(Boolean);
 
@@ -59,14 +87,18 @@ function StockTab({ state, update, clear, hasFilters }) {
         </div>
         <SelectInput label="Category" value={state.categoryId || ''} placeholder="All categories" options={toOptions(categories.data)} onChange={(e) => update({ categoryId: e.target.value })} />
         <SelectInput label="Status" value={state.status || ''} placeholder="All statuses" options={STATUSES} onChange={(e) => update({ status: e.target.value })} />
+        <div className="field toolbar-check"><Checkbox label="Archived batches" checked={showingArchived} onChange={(e) => update({ archived: e.target.checked ? 'true' : '' })} /></div>
       </FilterToolbar>
       <DataTable columns={columns} rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
         sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
         onRowClick={(r) => navigate(`/medicines/${r.medicineId}`)}
-        empty={<EmptyState icon={Boxes} title="No stock recorded" message="Stock appears after receiving a purchase or adding stock to a medicine." learnHow="purchasing-and-receiving" />} />
+        empty={showingArchived
+          ? <EmptyState icon={Archive} title="No archived batches" message="Empty batches you archive are listed here and can be restored." />
+          : <EmptyState icon={Boxes} title="No stock recorded" message="Stock appears after receiving a purchase or adding stock to a medicine." learnHow="purchasing-and-receiving" />} />
       <Pagination pagination={list.data && list.data.pagination} onChange={(page) => update({ page }, { resetPage: false })} />
       {modal && modal.type === 'adjust' && <AdjustStockModal open inventory={modal.row} onClose={() => setModal(null)} onSaved={() => list.reload({ silent: true })} />}
-      {modal && modal.type !== 'adjust' && <InventorySettingModal open inventory={modal.row} field={modal.type} onClose={() => setModal(null)} onSaved={() => list.reload({ silent: true })} />}
+      {modal && modal.type === 'dispose' && <DisposeStockModal item={modal.row} onClose={() => setModal(null)} onDone={() => { setModal(null); list.reload({ silent: true }); }} />}
+      {modal && ['minimumStock', 'sellingPrice'].includes(modal.type) && <InventorySettingModal open inventory={modal.row} field={modal.type} onClose={() => setModal(null)} onSaved={() => list.reload({ silent: true })} />}
     </>
   );
 }

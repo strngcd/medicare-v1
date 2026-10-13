@@ -99,10 +99,16 @@ Stock is tracked per batch and per branch. The same batch can be stocked in seve
 - Low stock: sellable quantity is at or below the minimum stock level.
 - Available: none of the above.
 
-Out of stock takes precedence over low stock. Expired stock stays visible in inventory until it is adjusted out.
+Out of stock takes precedence over low stock. Expired stock stays visible in inventory until it is disposed of.
+
+## Disposing of expired or expiring stock
+Owners, Admins and Pharmacists can dispose of a batch that has expired or is expiring soon, from Inventory alerts or from the batch's actions in Inventory. All remaining units leave stock with a Disposed movement. Their purchase cost is recorded as a loss: see the Stock losses report, and Stock losses and Net profit on the Profit report. The batch and its history are kept.
+
+## Archiving batches
+A batch with no stock left in a branch can be archived to hide it from stock lists. Tick "Archived batches" in Inventory to see archived batches and restore them. If the same batch is received again, it is restored automatically.
 
 ## Alerts
-Inventory alerts are calculated from current stock. They cannot be dismissed; they disappear when the condition is resolved, for example by receiving stock or adjusting expired stock out.
+Inventory alerts are calculated from current stock. They cannot be dismissed; they disappear when the condition is resolved, for example by receiving stock or disposing of expired stock.
 `,
   },
   {

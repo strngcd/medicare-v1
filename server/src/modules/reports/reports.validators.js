@@ -32,6 +32,11 @@ const movementReportQuery = listQuery.extend({
   movementType: z.string().max(40).optional(),
 });
 
+const lossReportQuery = listQuery.extend({
+  ...range,
+  movementType: z.enum(['EXPIRED', 'DAMAGED', 'LOST', 'DISPOSED']).optional(),
+});
+
 const purchaseReportQuery = listQuery.extend({
   ...range,
   supplierId: uuid.optional(),
@@ -53,6 +58,7 @@ module.exports = {
   salesReportQuery,
   inventoryReportQuery,
   movementReportQuery,
+  lossReportQuery,
   purchaseReportQuery,
   supplierReportQuery,
   exportFormat,
