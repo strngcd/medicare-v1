@@ -131,12 +131,6 @@ describe('database invariants', () => {
     ).rejects.toMatchObject({ code: '23514' });
   });
 
-  test('document sequence types are restricted to the approved list', async () => {
-    await expect(
-      pool.query("INSERT INTO document_sequences (sequence_type, year, last_value) VALUES ('RECEIVING', 2026, 0)"),
-    ).rejects.toMatchObject({ code: '23514' });
-  });
-
   test('audit logs are append-only', async () => {
     const { rows } = await pool.query(
       "INSERT INTO audit_logs (action, entity_type, description) VALUES ('TEST', 'TEST', 'test') RETURNING id",

@@ -134,7 +134,7 @@ describe('adjustments', () => {
     });
     expect(res.status).toBe(201);
     expect(res.body.data).toMatchObject({ quantityBefore: 10, quantityChange: -3, quantityAfter: 7 });
-    expect(res.body.data.adjustmentNumber).toMatch(/^STK-\d{4}-000001$/);
+    expect(res.body.data.adjustmentNumber).toMatch(/^STK-[2-9A-Z]{6}$/);
 
     const moves = await movementsFor(batchId);
     expect(moves[1]).toMatchObject({ movement_type: 'DAMAGED', quantity_change: -3, quantity_after: 7, reference_type: 'INVENTORY_ADJUSTMENT' });

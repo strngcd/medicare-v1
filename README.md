@@ -171,8 +171,8 @@ with `TRUST_PROXY=1`).
   transaction with row locks.
 - Critical POSTs accept an `Idempotency-Key` header; retries never duplicate
   business transactions.
-- Document numbers (`SAL-2026-000001`, `PUR-`, `REF-`, `TRF-`, `STK-`) are
-  organization-wide, year-aware, gapless and never reused.
+- Document numbers (`SAL-7K3QX9`, `PUR-`, `REF-`, `TRF-`, `STK-`) are a prefix
+  plus a random 6-character code: non-sequential, unique and never reused.
 
 See the in-app Help center for user-facing explanations and
 [docs/API.md](docs/API.md) for the API reference.

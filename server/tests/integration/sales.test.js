@@ -66,7 +66,7 @@ describe('creating a sale', () => {
 
     const res = await sell(cashier, [{ medicineId: med.id, quantity: 5 }]);
     expect(res.status).toBe(201);
-    expect(res.body.data.receiptNumber).toMatch(/^SAL-\d{4}-000001$/);
+    expect(res.body.data.receiptNumber).toMatch(/^SAL-[2-9A-Z]{6}$/);
     expect(res.body.data).toMatchObject({ subtotal: '100.00', total: '100.00', status: 'COMPLETED', paymentMethod: 'CASH' });
     expect(res.body.data.items[0].allocations.map((a) => [a.batchNumber, a.quantity])).toEqual([['EARLY', 3], ['LATE', 2]]);
 
@@ -110,8 +110,7 @@ describe('creating a sale', () => {
     expect(await qty(a.batch.id)).toBe(10);
     const sales = await pool.query('SELECT count(*)::int AS n FROM sales');
     expect(sales.rows[0].n).toBe(0);
-    // The receipt number was not consumed.
-    expect((await sell(cashier, [{ medicineId: med.id, quantity: 1 }])).body.data.receiptNumber).toMatch(/-000001$/);
+    expect((await sell(cashier, [{ medicineId: med.id, quantity: 1 }])).status).toBe(201);
   });
 
   test('payment must equal the total exactly', async () => {
@@ -191,8 +190,8 @@ describe('creating a sale', () => {
     expect(attempts.filter((r) => r.status === 201)).toHaveLength(2);
     expect(attempts.filter((r) => r.status === 409)).toHaveLength(2);
     expect(await qty(s.batch.id)).toBe(1);
-    const numbers = attempts.filter((r) => r.status === 201).map((r) => r.body.data.receiptNumber).sort();
-    expect(numbers.map((n) => n.slice(-6))).toEqual(['000001', '000002']);
+    const numbers = attempts.filter((r) => r.status === 201).map((r) => r.body.data.receiptNumber);
+    expect(new Set(numbers).size).toBe(2);
   });
 
   test('retrying with the same Idempotency-Key does not sell twice', async () => {
@@ -274,7 +273,7 @@ describe('refunds', () => {
     const first = await cashier.post('/api/v1/refunds').send({ saleId: sale.id, reason: 'CUSTOMER_RETURN', items: [{ saleItemId: item.id, quantity: 1 }] });
     expect(first.status).toBe(201);
     expect(first.body.data).toMatchObject({ refundTotal: '10.00', paymentMethod: 'BANK_TRANSFER' });
-    expect(first.body.data.refundNumber).toMatch(/^REF-\d{4}-000001$/);
+    expect(first.body.data.refundNumber).toMatch(/^REF-[2-9A-Z]{6}$/);
     expect(first.body.data.items[0].allocations).toEqual([{ batchId: early.batch.id, batchNumber: 'EARLY', quantity: 1 }]);
     expect(await qty(early.batch.id)).toBe(1);
 
