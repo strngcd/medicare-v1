@@ -12,7 +12,7 @@ const FROM = `
   JOIN branches br ON br.id = r.branch_id
   JOIN users u ON u.id = r.processed_by`;
 
-async function list({ branchIds, saleId, processedBy, reason, dateFrom, dateTo, timezone, search, limit, offset, orderBy }) {
+function buildWhere({ branchIds, saleId, processedBy, reason, dateFrom, dateTo, timezone, search, minAmount, maxAmount }) {
   const w = whereBuilder();
   if (branchIds) w.add('r.branch_id = ANY(?::uuid[])', branchIds);
   if (saleId) w.add('r.sale_id = ?', saleId);
@@ -21,12 +21,31 @@ async function list({ branchIds, saleId, processedBy, reason, dateFrom, dateTo, 
   if (search) w.add('(r.refund_number ILIKE ? OR s.receipt_number ILIKE ?)', `%${search}%`, `%${search}%`);
   if (dateFrom) w.add('(r.created_at AT TIME ZONE ?)::date >= ?::date', timezone, dateFrom);
   if (dateTo) w.add('(r.created_at AT TIME ZONE ?)::date <= ?::date', timezone, dateTo);
+  if (minAmount) w.add('r.refund_total >= ?::numeric', minAmount);
+  if (maxAmount) w.add('r.refund_total <= ?::numeric', maxAmount);
+  return w;
+}
+
+async function list({ limit, offset, orderBy, ...filters }) {
+  const w = buildWhere(filters);
   const { rows } = await query(
     `SELECT ${COLUMNS}, count(*) OVER() AS total_count FROM ${FROM} ${w.sql}
       ORDER BY ${orderBy} LIMIT ${w.param(limit)} OFFSET ${w.param(offset)}`,
     w.params,
   );
   return { rows, total: rows.length ? rows[0].total_count : 0 };
+}
+
+async function summary(filters) {
+  const w = buildWhere(filters);
+  const { rows } = await query(
+    `SELECT count(*)::int AS refund_count, COALESCE(sum(r.refund_total), 0)::numeric(14,2) AS total_refunded,
+            COALESCE(sum(r.refund_total) FILTER (WHERE r.payment_method = 'CASH'), 0)::numeric(14,2) AS cash_refunded,
+            COALESCE(sum(r.refund_total) FILTER (WHERE r.payment_method = 'BANK_TRANSFER'), 0)::numeric(14,2) AS bank_transfer_refunded
+       FROM ${FROM} ${w.sql}`,
+    w.params,
+  );
+  return rows[0];
 }
 
 async function findById(id) {
@@ -95,4 +114,4 @@ async function insertRefundAllocation(client, refundItemId, batchId, quantity) {
   );
 }
 
-module.exports = { list, findById, loadRefundableItems, insertRefund, insertRefundItem, insertRefundAllocation };
+module.exports = { list, summary, findById, loadRefundableItems, insertRefund, insertRefundItem, insertRefundAllocation };

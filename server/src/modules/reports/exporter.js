@@ -40,7 +40,7 @@ function toPdf(report, { pharmacyName, generatedBy }) {
 
     doc.fontSize(16).fillColor('#0b1f3a').text(report.title);
     doc.fontSize(9).fillColor('#444')
-      .text(`${pharmacyName}${report.period ? `  |  ${report.period.dateFrom} to ${report.period.dateTo}` : ''}${report.asOf ? `  |  As of ${report.asOf}` : ''}`)
+      .text(`${pharmacyName}${report.period ? `  |  ${report.period.dateFrom || 'start'} to ${report.period.dateTo || 'today'}` : ''}${report.asOf ? `  |  As of ${report.asOf}` : ''}`)
       .text(`Generated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC by ${generatedBy}`);
     doc.moveDown();
 

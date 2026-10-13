@@ -13,6 +13,7 @@ import { formatDate, formatDateTime, formatMoney, formatNumber, humanize } from 
 
 const REPORTS = [
   { value: 'sales', label: 'Sales', permission: 'REPORT_SALES_VIEW', path: '/reports/sales', exportPath: '/reports/sales/export', dated: true },
+  { value: 'refunds', label: 'Refunds', permission: 'REPORT_SALES_VIEW', path: '/reports/refunds', exportPath: '/reports/refunds/export', dated: true },
   { value: 'profit', label: 'Profit', permission: 'REPORT_PROFIT_VIEW', also: 'FINANCIAL_VIEW_PROFIT', path: '/reports/profit', exportPath: '/reports/profit/export', dated: true },
   { value: 'inventory', label: 'Inventory', permission: 'REPORT_INVENTORY_VIEW', path: '/reports/inventory', exportPath: '/reports/inventory/export' },
   { value: 'movements', label: 'Inventory movements', permission: 'REPORT_INVENTORY_VIEW', path: '/reports/inventory/movements', dated: true },
@@ -21,8 +22,8 @@ const REPORTS = [
   { value: 'suppliers', label: 'Suppliers', permission: 'REPORT_SUPPLIER_VIEW', path: '/reports/suppliers', exportPath: '/reports/suppliers/export', dated: true },
 ];
 
-const MONEY_KEYS = /(sales|amount|total|revenue|cogs|profit|discount|tax|refunds|value|paid|outstanding|balance|purchased|price|subtotal|cost|losses)$/i;
-const NON_MONEY = new Set(['transactionCount', 'refundCount', 'voidedCount', 'purchaseCount', 'cancelledCount', 'openCount', 'totalUnits', 'expiredUnits', 'itemsSold', 'itemsRefunded', 'unitsLost', 'entryCount']);
+const MONEY_KEYS = /(sales|amount|total|revenue|cogs|profit|discount|tax|refunds|value|paid|outstanding|balance|purchased|price|subtotal|cost|losses|refunded)$/i;
+const NON_MONEY = new Set(['transactionCount', 'refundCount', 'voidedCount', 'purchaseCount', 'cancelledCount', 'openCount', 'totalUnits', 'expiredUnits', 'itemsSold', 'itemsRefunded', 'unitsLost', 'entryCount', 'quantityRefunded']);
 
 function formatCell(key, value) {
   if (value === null || value === undefined) return '—';
