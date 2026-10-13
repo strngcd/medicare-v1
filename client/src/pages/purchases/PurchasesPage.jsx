@@ -36,6 +36,12 @@ export default function PurchasesPage() {
           <SelectInput label="Payment" value={state.paymentStatus || ''} placeholder="All" options={PAYMENT} onChange={(e) => update({ paymentStatus: e.target.value })} />
           <div className="field"><span className="field-label">From</span><input className="input" type="date" value={state.dateFrom || ''} onChange={(e) => update({ dateFrom: e.target.value })} /></div>
           <div className="field"><span className="field-label">To</span><input className="input" type="date" value={state.dateTo || ''} onChange={(e) => update({ dateTo: e.target.value })} /></div>
+          {showCost && (
+            <>
+              <div className="field" style={{ minWidth: 100, maxWidth: 130 }}><span className="field-label">Min amount</span><input className="input" inputMode="decimal" placeholder="0.00" defaultValue={state.minAmount || ''} onChange={(e) => update({ minAmount: e.target.value })} aria-label="Minimum total" /></div>
+              <div className="field" style={{ minWidth: 100, maxWidth: 130 }}><span className="field-label">Max amount</span><input className="input" inputMode="decimal" placeholder="Any" defaultValue={state.maxAmount || ''} onChange={(e) => update({ maxAmount: e.target.value })} aria-label="Maximum total" /></div>
+            </>
+          )}
         </FilterToolbar>
         <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
           sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}

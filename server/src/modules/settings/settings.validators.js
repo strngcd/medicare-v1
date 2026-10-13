@@ -16,6 +16,9 @@ const updateSettingsBody = z.object({
   website: optionalUrl,
   currencyCode: z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/, 'Use a 3-letter ISO currency code.').optional(),
   expiryWarningDays: z.coerce.number().int().min(1).max(365).optional(),
+  defaultMarkupPercent: z.union([z.string(), z.number()]).transform(String)
+    .refine((v) => /^\d{1,4}(\.\d{1,2})?$/.test(v) && Number(v) <= 1000, 'Use a percentage between 0 and 1000 with up to 2 decimals.')
+    .optional(),
   taxEnabled: z.boolean().optional(),
   taxName: requiredText(40).optional(),
   taxRate: z.union([z.string(), z.number()]).transform(String)

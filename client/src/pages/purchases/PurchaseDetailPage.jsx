@@ -11,8 +11,9 @@ import {
   TextInput, TextArea, SelectInput, InlineAlert, IconButton, ConfirmDialog, Kpi, LearnHow,
 } from '../../components/ui/index.js';
 import { formatDate, formatDateTime, formatMoney, formatNumber, humanize, todayIso } from '../../utils/format.js';
+import { suggestedSellingPrice } from '../../utils/money.js';
 
-function newLine(item) {
+function newLine(item, markupPercent) {
   return {
     key: Math.random().toString(36).slice(2),
     purchaseItemId: item.id,
@@ -20,15 +21,16 @@ function newLine(item) {
     manufacturingDate: '',
     expiryDate: '',
     quantity: String(item.remainingQuantity),
-    purchasePrice: item.unitPurchasePrice || '',
-    sellingPrice: '',
+    sellingPrice: suggestedSellingPrice(item.unitPurchasePrice, markupPercent),
   };
 }
 
 /** Receive one delivery: one or more batch lines per outstanding item. */
 function ReceiveModal({ purchase, onClose, onDone }) {
+  const { pharmacy } = useAuth();
+  const markup = pharmacy && pharmacy.defaultMarkupPercent;
   const outstanding = purchase.items.filter((i) => i.remainingQuantity > 0);
-  const [lines, setLines] = useState(() => outstanding.map(newLine));
+  const [lines, setLines] = useState(() => outstanding.map((item) => newLine(item, markup)));
   const [notes, setNotes] = useState('');
   const [key] = useState(() => newIdempotencyKey('receive'));
   const action = useAction();
@@ -46,7 +48,6 @@ function ReceiveModal({ purchase, onClose, onDone }) {
         manufacturingDate: l.manufacturingDate || null,
         expiryDate: l.expiryDate,
         quantity: Number(l.quantity),
-        ...(showCost && l.purchasePrice ? { purchasePrice: l.purchasePrice } : {}),
         sellingPrice: l.sellingPrice,
       })),
     }, { idempotencyKey: key }), { success: (r) => (r.data.status === 'RECEIVED' ? 'Purchase fully received.' : 'Delivery received.') });
@@ -75,7 +76,10 @@ function ReceiveModal({ purchase, onClose, onDone }) {
         <div key={item.id} className="panel">
           <div className="panel-header">
             <h3>{item.medicineName}</h3>
-            <span className="small muted">Ordered {item.orderedQuantity} · received {item.receivedQuantity} · remaining {item.remainingQuantity}</span>
+            <span className="small muted">
+              Ordered {item.orderedQuantity} · received {item.receivedQuantity} · remaining {item.remainingQuantity}
+              {showCost && <> · unit cost <strong>{formatMoney(item.unitPurchasePrice)}</strong></>}
+            </span>
           </div>
           <div className="panel-body stack-sm">
             {lines.map((line, index) => line.purchaseItemId === item.id && (
@@ -84,14 +88,15 @@ function ReceiveModal({ purchase, onClose, onDone }) {
                 <TextInput label="Quantity" type="number" min="0" value={line.quantity} onChange={(e) => setLine(line.key, 'quantity', e.target.value)} error={errorFor(index, 'quantity')} />
                 <TextInput label="Manufactured" type="date" max={todayIso()} value={line.manufacturingDate} onChange={(e) => setLine(line.key, 'manufacturingDate', e.target.value)} error={errorFor(index, 'manufacturingDate')} />
                 <TextInput label="Expiry" type="date" min={todayIso()} value={line.expiryDate} onChange={(e) => setLine(line.key, 'expiryDate', e.target.value)} error={errorFor(index, 'expiryDate')} />
-                {showCost && <TextInput label="Unit cost" inputMode="decimal" value={line.purchasePrice} onChange={(e) => setLine(line.key, 'purchasePrice', e.target.value)} error={errorFor(index, 'purchasePrice')} />}
-                <TextInput label="Selling price" inputMode="decimal" value={line.sellingPrice} onChange={(e) => setLine(line.key, 'sellingPrice', e.target.value)} error={errorFor(index, 'sellingPrice')} />
+                {showCost && <TextInput label="Unit cost" value={formatMoney(item.unitPurchasePrice, { withCurrency: false })} readOnly disabled hint="From the order" />}
+                <TextInput label="Selling price" inputMode="decimal" value={line.sellingPrice} onChange={(e) => setLine(line.key, 'sellingPrice', e.target.value)} error={errorFor(index, 'sellingPrice')}
+                  hint={showCost ? `Cost + ${Number(markup ?? 15)}%` : undefined} />
                 {lines.filter((l) => l.purchaseItemId === item.id).length > 1 && (
                   <IconButton icon={Trash2} label="Remove batch line" onClick={() => setLines((list) => list.filter((l) => l.key !== line.key))} />
                 )}
               </div>
             ))}
-            <div><Button variant="ghost" size="sm" icon={Plus} onClick={() => setLines((list) => [...list, { ...newLine(item), quantity: '' }])}>Another batch</Button></div>
+            <div><Button variant="ghost" size="sm" icon={Plus} onClick={() => setLines((list) => [...list, { ...newLine(item, markup), quantity: '' }])}>Another batch</Button></div>
           </div>
         </div>
       ))}

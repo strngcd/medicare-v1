@@ -165,11 +165,16 @@ export default function SettingsPage() {
   } else if (section === 'inventory') {
     body = (
       <div className="stack">
-        <GlobalSection settings={s} fields={['expiryWarningDays']} onSaved={settings.setData}>
+        <GlobalSection settings={s} fields={['expiryWarningDays', 'defaultMarkupPercent']} onSaved={settings.setData}>
           {({ form, setForm, errors, editable }) => (
-            <TextInput label="Expiry warning period (days)" type="number" min="1" max="365" disabled={!editable} value={form.expiryWarningDays}
-              onChange={(e) => setForm({ ...form, expiryWarningDays: Number(e.target.value) })} error={errors.expiryWarningDays}
-              hint="Batches expiring within this many days are flagged as Expiring soon." />
+            <div className="form-grid">
+              <TextInput label="Expiry warning period (days)" type="number" min="1" max="365" disabled={!editable} value={form.expiryWarningDays}
+                onChange={(e) => setForm({ ...form, expiryWarningDays: Number(e.target.value) })} error={errors.expiryWarningDays}
+                hint="Batches expiring within this many days are flagged as Expiring soon." />
+              <TextInput label="Default markup (%)" inputMode="decimal" disabled={!editable} value={form.defaultMarkupPercent ?? ''}
+                onChange={(e) => setForm({ ...form, defaultMarkupPercent: e.target.value })} error={errors.defaultMarkupPercent}
+                hint="Suggested selling price when receiving stock = unit cost + this markup. Staff can still change it." />
+            </div>
           )}
         </GlobalSection>
         <BranchPicker branchId={branchId} setBranchId={setBranchId} />

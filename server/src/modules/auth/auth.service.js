@@ -57,6 +57,7 @@ async function buildSessionPayload(auth) {
       logoUrl: settings.logo_url,
       currencyCode: settings.currency_code,
       expiryWarningDays: settings.expiry_warning_days,
+      defaultMarkupPercent: settings.default_markup_percent,
       tax: {
         enabled: settings.tax_enabled,
         name: settings.tax_name,
