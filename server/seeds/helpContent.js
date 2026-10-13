@@ -250,6 +250,8 @@ Each refund receives a number such as REF-4M8TQ2.
 ## Voids
 Voiding cancels a completed sale entirely, for example when it was entered by mistake. The exact batches are restored and the sale stays in history marked as Voided.
 
+- A reason is always required.
+- Cashiers and pharmacists can void only sales they made themselves; Owners and Admins can void any sale.
 - Voided sales cannot be refunded.
 - A sale that already has a refund cannot be voided.
 `,

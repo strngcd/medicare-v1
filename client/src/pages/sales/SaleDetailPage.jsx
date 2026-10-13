@@ -99,7 +99,6 @@ export default function SaleDetailPage() {
   if (!sale.data) return <Panel><SkeletonRows rows={8} /></Panel>;
   const s = sale.data;
   const refundable = s.status === 'COMPLETED' && s.items.some((i) => i.refundableQuantity > 0);
-  const voidable = s.status === 'COMPLETED' && s.refunds.length === 0;
   const refresh = () => { setModal(null); sale.reload({ silent: true }); };
 
   const doVoid = async () => {
@@ -117,12 +116,12 @@ export default function SaleDetailPage() {
           <>
             <Can permission="SALES_PRINT_RECEIPT"><Button variant="secondary" icon={Printer} onClick={() => setModal('receipt')}>Receipt</Button></Can>
             {refundable && <Can permission="SALES_PROCESS_REFUND"><Button icon={Undo2} onClick={() => setModal('refund')}>Refund</Button></Can>}
-            {voidable && <Can permission="SALES_VOID"><Button variant="ghost" icon={Ban} onClick={() => setModal('void')}>Void</Button></Can>}
+            {s.canVoid && <Button variant="ghost" icon={Ban} onClick={() => setModal('void')}>Void</Button>}
           </>
         )}
       />
       {s.status === 'VOIDED' && <InlineAlert tone="warning">Voided {formatDateTime(s.voidedAt)} by {s.voidedByName}: {s.voidReason}. Stock was restored; the sale remains in history.</InlineAlert>}
-      {s.status === 'COMPLETED' && s.refunds.length > 0 && can('SALES_VOID') && <InlineAlert tone="info">This sale has refunds, so it can no longer be voided.</InlineAlert>}
+      {s.status === 'COMPLETED' && s.refunds.length > 0 && (can('SALES_VOID') || can('SALES_VOID_OWN')) && <InlineAlert tone="info">This sale has refunds, so it can no longer be voided.</InlineAlert>}
 
       <div className="grid-4">
         <Kpi label="Total" value={formatMoney(s.total)} note={`${humanize(s.paymentMethod)}`} />

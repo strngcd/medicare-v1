@@ -15,6 +15,6 @@ router.get('/my', requireAnyPermission(P.SALES_VIEW, P.SALES_CREATE), validate({
 router.post('/', requirePermission(P.SALES_CREATE), validate({ body: v.createSaleBody }), controller.create);
 router.get('/:id', requireAnyPermission(P.SALES_VIEW, P.SALES_VIEW_HISTORY), validate({ params: idParam }), controller.get);
 router.get('/:id/receipt', requirePermission(P.SALES_PRINT_RECEIPT), validate({ params: idParam }), controller.receipt);
-router.post('/:id/void', requirePermission(P.SALES_VOID), validate({ params: idParam, body: v.voidSaleBody }), controller.void);
+router.post('/:id/void', requireAnyPermission(P.SALES_VOID, P.SALES_VOID_OWN), validate({ params: idParam, body: v.voidSaleBody }), controller.void);
 
 module.exports = router;

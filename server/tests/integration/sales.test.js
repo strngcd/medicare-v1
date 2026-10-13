@@ -325,9 +325,11 @@ describe('voiding', () => {
   test('restores exact allocations, keeps history and blocks refunds', async () => {
     const early = await stock({ batchNumber: 'EARLY', expiryDate: daysFromToday(30), quantity: 2, sellingPrice: '10.00' });
     const late = await stock({ batchNumber: 'LATE', expiryDate: daysFromToday(300), quantity: 10, sellingPrice: '10.00' });
-    const sale = (await sell(cashier, [{ medicineId: med.id, quantity: 5 }])).body.data;
+    const sale = (await sell(admin, [{ medicineId: med.id, quantity: 5 }])).body.data;
 
-    expect((await cashier.post(`/api/v1/sales/${sale.id}/void`).send({ reason: 'x' })).status).toBe(403);
+    const notOwn = await cashier.post(`/api/v1/sales/${sale.id}/void`).send({ reason: 'x' });
+    expect(notOwn.status).toBe(403);
+    expect(notOwn.body.error.code).toBe('SALE_NOT_OWN');
     const voided = await admin.post(`/api/v1/sales/${sale.id}/void`).send({ reason: 'Entered twice' });
     expect(voided.status).toBe(200);
     expect(voided.body.data).toMatchObject({ status: 'VOIDED', voidReason: 'Entered twice' });
@@ -343,6 +345,25 @@ describe('voiding', () => {
 
     // The voided sale stays in history.
     expect((await admin.get(`/api/v1/sales?status=VOIDED`)).body.data).toHaveLength(1);
+  });
+
+  test('a cashier can void their own sale, with a reason', async () => {
+    const s = await stock({ quantity: 10, sellingPrice: '10.00' });
+    const sale = (await sell(cashier, [{ medicineId: med.id, quantity: 3 }])).body.data;
+    expect((await cashier.get(`/api/v1/sales/${sale.id}`)).body.data.canVoid).toBe(true);
+
+    expect((await cashier.post(`/api/v1/sales/${sale.id}/void`).send({ reason: '  ' })).status).toBe(422);
+    const voided = await cashier.post(`/api/v1/sales/${sale.id}/void`).send({ reason: 'Customer changed mind' });
+    expect(voided.status).toBe(200);
+    expect(voided.body.data).toMatchObject({ status: 'VOIDED', canVoid: false });
+    expect(await qty(s.batch.id)).toBe(10);
+  });
+
+  test('canVoid is false for sales the user cannot void', async () => {
+    await stock({ quantity: 10, sellingPrice: '10.00' });
+    const sale = (await sell(admin, [{ medicineId: med.id, quantity: 1 }])).body.data;
+    expect((await cashier.get(`/api/v1/sales/${sale.id}`)).body.data.canVoid).toBe(false);
+    expect((await admin.get(`/api/v1/sales/${sale.id}`)).body.data.canVoid).toBe(true);
   });
 
   test('concurrent void and refund: exactly one wins', async () => {
