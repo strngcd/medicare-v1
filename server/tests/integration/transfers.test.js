@@ -53,7 +53,7 @@ describe('transfer lifecycle', () => {
   test('full happy path moves stock only at ship and receive', async () => {
     const t = await createTransfer();
     expect(t).toMatchObject({ status: 'DRAFT', sourceBranchCode: 'BOLE', destinationBranchCode: 'PIASSA' });
-    expect(t.transferNumber).toMatch(/^TRF-\d{4}-000001$/);
+    expect(t.transferNumber).toMatch(/^TRF-[2-9A-Z]{6}$/);
 
     expect((await destAdmin.post(`/api/v1/transfers/${t.id}/request`)).body.data.status).toBe('REQUESTED');
 

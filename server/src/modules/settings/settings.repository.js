@@ -1,4 +1,5 @@
 const { query } = require('../../database/db');
+const { NUMBER_COLUMNS } = require('../documents/documentNumbers');
 
 const COLUMNS = `
   pharmacy_name, logo_url, phone, email, address, city, country, website, currency_code,
@@ -39,16 +40,18 @@ async function update(client, changes, userId) {
 }
 
 async function systemInfo() {
-  const [migrations, sequences, counts] = await Promise.all([
+  const latest = Object.entries(NUMBER_COLUMNS).map(([type, [table, column]]) =>
+    `(SELECT '${type}' AS document_type, ${column} AS number, created_at FROM ${table} ORDER BY created_at DESC LIMIT 1)`);
+  const [migrations, latestNumbers, counts] = await Promise.all([
     query('SELECT name, run_on FROM schema_migrations ORDER BY run_on DESC, id DESC LIMIT 1'),
-    query('SELECT sequence_type, year, last_value, updated_at FROM document_sequences ORDER BY year DESC, sequence_type'),
+    query(latest.join(' UNION ALL ')),
     query(
       `SELECT (SELECT count(*) FROM branches WHERE status = 'ACTIVE')::int AS active_branches,
               (SELECT count(*) FROM users WHERE status = 'ACTIVE')::int AS active_users,
               (SELECT count(*) FROM medicines WHERE status = 'ACTIVE')::int AS active_medicines`,
     ),
   ]);
-  return { latestMigration: migrations.rows[0] || null, sequences: sequences.rows, counts: counts.rows[0] };
+  return { latestMigration: migrations.rows[0] || null, latestNumbers: latestNumbers.rows, counts: counts.rows[0] };
 }
 
 /** Active Owners and Admins, who are told about important configuration changes. */

@@ -64,9 +64,9 @@ async function getSystemInfo() {
     schemaVersion: info.latestMigration ? info.latestMigration.name : null,
     counts: camelize(info.counts),
     numbering: {
-      format: 'PREFIX-YEAR-SEQUENCE (organization-wide, restarts every year, never reused)',
+      format: 'PREFIX-CODE, where CODE is 6 random letters and digits (non-sequential, never reused)',
       prefixes: PREFIXES,
-      sequences: camelize(info.sequences),
+      latestNumbers: camelize(info.latestNumbers),
     },
   };
 }

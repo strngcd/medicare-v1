@@ -1,10 +1,9 @@
 const { resetDatabase, pool } = require('../helpers/db');
 const { createUser } = require('../helpers/factories');
 const { withTransaction, query } = require('../../src/database/db');
-const { nextDocumentNumber } = require('../../src/modules/documents/documentNumbers');
+const { nextDocumentNumber, DOCUMENT_NUMBER_PATTERN } = require('../../src/modules/documents/documentNumbers');
 const { runIdempotent } = require('../../src/modules/idempotency/idempotency');
 const { recordAudit } = require('../../src/modules/audit/audit.recorder');
-const { businessYear } = require('../../src/utils/time');
 
 let user;
 
@@ -16,35 +15,23 @@ beforeEach(async () => {
 afterAll(() => pool.end());
 
 describe('document numbers', () => {
-  test('are formatted, sequential and year-aware', async () => {
-    const year = businessYear();
-    const first = await withTransaction((c) => nextDocumentNumber(c, 'SALE'));
-    const second = await withTransaction((c) => nextDocumentNumber(c, 'SALE'));
+  test('are a prefix plus a random 6-character code', async () => {
+    const sale = await withTransaction((c) => nextDocumentNumber(c, 'SALE'));
     const purchase = await withTransaction((c) => nextDocumentNumber(c, 'PURCHASE'));
-    expect(first).toBe(`SAL-${year}-000001`);
-    expect(second).toBe(`SAL-${year}-000002`);
-    expect(purchase).toBe(`PUR-${year}-000001`);
+    expect(sale).toMatch(/^SAL-[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/);
+    expect(purchase).toMatch(DOCUMENT_NUMBER_PATTERN);
+    expect(purchase.startsWith('PUR-')).toBe(true);
   });
 
-  test('are unique under concurrency', async () => {
+  test('are not sequential', async () => {
     const numbers = await Promise.all(
       Array.from({ length: 20 }, () => withTransaction((c) => nextDocumentNumber(c, 'REFUND'))),
     );
     expect(new Set(numbers).size).toBe(20);
+    expect([...numbers].sort()).not.toEqual(numbers);
   });
 
-  test('a rolled-back transaction does not consume a number', async () => {
-    await expect(
-      withTransaction(async (c) => {
-        await nextDocumentNumber(c, 'TRANSFER');
-        throw new Error('boom');
-      }),
-    ).rejects.toThrow('boom');
-    const next = await withTransaction((c) => nextDocumentNumber(c, 'TRANSFER'));
-    expect(next).toMatch(/-000001$/);
-  });
-
-  test('rejects unapproved sequence types', async () => {
+  test('rejects unknown document types', async () => {
     await expect(withTransaction((c) => nextDocumentNumber(c, 'RECEIVING'))).rejects.toThrow(/Unknown/);
   });
 });

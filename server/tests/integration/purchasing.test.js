@@ -60,7 +60,7 @@ describe('creating and editing purchases', () => {
   test('computes totals on the server and does not change stock', async () => {
     const res = await pharmacist.post('/api/v1/purchases').send(purchaseBody());
     expect(res.status).toBe(201);
-    expect(res.body.data.purchaseNumber).toMatch(/^PUR-\d{4}-000001$/);
+    expect(res.body.data.purchaseNumber).toMatch(/^PUR-[2-9A-Z]{6}$/);
     // A: 100 x 2.50 = 250 - 10 + 5 = 245; B: 50 x 1.10 = 55
     expect(res.body.data).toMatchObject({ subtotal: '305.00', discount: '10.00', tax: '5.00', total: '300.00', paymentStatus: 'UNPAID' });
     expect(res.body.data.items.map((i) => i.lineTotal)).toEqual(['245.00', '55.00']);
