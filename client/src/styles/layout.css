@@ -43,7 +43,9 @@
 
 .brand-mark svg { width: 17px; height: 17px; color: #fff; }
 
-.sidebar-nav { flex: 1; overflow-y: auto; padding: 10px 8px; }
+/* Still scrolls (wheel/touch) on short screens, but never shows a scrollbar. */
+.sidebar-nav { flex: 1; overflow-x: hidden; overflow-y: auto; padding: 10px 8px; scrollbar-width: none; }
+.sidebar-nav::-webkit-scrollbar { display: none; }
 
 .nav-section {
   font-size: 10.5px;
@@ -191,6 +193,10 @@
 }
 
 @media (max-width: 760px) {
+  /* Nothing may push the page wider than the screen. clip (not hidden) keeps sticky headers working. */
+  .app-shell { overflow-x: clip; }
+  /* 16px stops iOS Safari zooming in on focus, which leaves the page scrollable sideways. */
+  .input, .select, .textarea { font-size: 16px; }
   .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); width: var(--sidebar-width) !important; }
   .sidebar.mobile-open { transform: none; }
   .sidebar .nav-label, .sidebar .brand-name { display: inline !important; }
@@ -319,6 +325,14 @@
   .print-area-only body * { visibility: hidden; }
 }
 
+/* Printing only an audit entry dialog */
+@media print {
+  body.printing-audit .app-shell { display: none !important; }
+  body.printing-audit .modal-backdrop { position: static; padding: 0; background: none; }
+  body.printing-audit .modal { max-height: none; overflow: visible; }
+  body.printing-audit .modal-body { overflow: visible; }
+}
+
 /* Printing only the receipt dialog */
 @media print {
   body.printing-receipt .app-shell { display: none !important; }
@@ -328,3 +342,8 @@
 
 .profile-meta .name,
 .profile-meta .role { white-space: nowrap; }
+
+@media print {
+  /* Keep the before/after highlights when printing. */
+  .audit-changes td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

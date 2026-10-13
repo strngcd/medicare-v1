@@ -82,7 +82,8 @@
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 
-.textarea { height: auto; min-height: 76px; padding: 8px 10px; resize: vertical; }
+/* Fixed size so long notes never stretch the layout; overflow scrolls inside. */
+.textarea { height: 88px; padding: 8px 10px; resize: none; overflow-y: auto; }
 .select { padding-right: 28px; }
 
 .input:focus,
@@ -112,7 +113,10 @@
   pointer-events: none;
 }
 .input-with-icon > .input { padding-left: 34px; }
-.input-with-icon > .input-action {
+.input-with-action { position: relative; }
+.input-with-action > .input { padding-right: 40px; }
+.input-with-icon > .input-action,
+.input-with-action > .input-action {
   position: absolute;
   right: 4px;
   top: 50%;
@@ -245,6 +249,7 @@
 .table tbody tr.clickable:hover td { background: var(--surface-muted); }
 .table td.num,
 .table th.num { text-align: right; }
+.table td.num > .input { text-align: right; }
 .table .cell-strong { font-weight: 500; }
 
 @media (max-width: 640px) {
@@ -270,6 +275,10 @@
     text-align: left;
   }
   .table.responsive td[data-label='']::before { content: none; }
+  /* Editable cells: keep the label next to its input instead of at opposite edges. */
+  .table.responsive td:has(> .input) { justify-content: flex-start; align-items: center; }
+  .table.responsive td:has(> .input)::before { flex: 0 0 96px; }
+  .table.responsive td > .input { flex: 1; width: auto !important; }
 }
 
 .pagination {
@@ -400,6 +409,12 @@
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--primary-text); border-bottom-color: var(--primary); }
 
+/* Phones: tabs wrap onto extra rows instead of scrolling sideways. */
+@media (max-width: 760px) {
+  .tabs { flex-wrap: wrap; overflow-x: visible; }
+  .tab { padding: 8px 10px; }
+}
+
 /* ----------------------------------------------------------------- Toasts */
 .toasts {
   position: fixed;
@@ -503,3 +518,16 @@
   .toolbar.collapsible:not(.expanded) > .checkbox { display: none; }
   .toolbar.collapsible .filter-toggle { display: inline-flex; }
 }
+
+/* ------------------------------------------------------- Audit changes */
+.audit-changes th[scope='row'] { font-weight: 500; color: var(--text-muted); white-space: nowrap; vertical-align: top; width: 1%; }
+.audit-changes td { vertical-align: top; overflow-wrap: anywhere; }
+.audit-changes tr.changed td.before { background: var(--danger-soft); }
+.audit-changes tr.changed td.after { background: var(--success-soft); }
+.audit-subtable { border-collapse: collapse; font-size: 12.5px; }
+.audit-subtable th, .audit-subtable td { padding: 3px 8px; border: 1px solid var(--border); text-align: left; }
+.audit-subtable th { color: var(--text-subtle); font-weight: 500; }
+.audit-sublist { margin: 0; display: grid; gap: 2px; }
+.audit-sublist > div { display: flex; gap: 8px; }
+.audit-sublist dt { color: var(--text-subtle); }
+.audit-sublist dd { margin: 0; }

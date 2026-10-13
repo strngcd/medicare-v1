@@ -1,19 +1,21 @@
 import { useState } from 'react';
-import { ScrollText } from 'lucide-react';
+import { Printer, ScrollText } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, EmptyState, SelectInput, Modal, Details, FilterToolbar } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, EmptyState, SelectInput, Modal, Details, FilterToolbar, Button } from '../../components/ui/index.js';
 import { formatDateTime, humanize } from '../../utils/format.js';
+import { AuditChanges } from '../../components/audit/AuditChanges.jsx';
 
-function ValuesTable({ values }) {
-  if (!values || Object.keys(values).length === 0) return <span className="subtle">—</span>;
-  return (
-    <pre className="mono" style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', background: 'var(--surface-sunken)', padding: 10, borderRadius: 6 }}>
-      {JSON.stringify(values, null, 2)}
-    </pre>
-  );
+function printAuditEntry() {
+  document.body.classList.add('printing-audit');
+  const cleanup = () => {
+    document.body.classList.remove('printing-audit');
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  window.print();
 }
 
 export default function AuditLogPage() {
@@ -50,7 +52,9 @@ export default function AuditLogPage() {
         <Pagination pagination={list.data && list.data.pagination} onChange={(page) => update({ page }, { resetPage: false })} />
       </Panel>
       {open && (
-        <Modal open size="lg" title={humanize(open.action)} onClose={() => setOpen(null)}>
+        <Modal open size="lg" title={humanize(open.action)} onClose={() => setOpen(null)}
+          footer={<Button variant="secondary" icon={Printer} onClick={printAuditEntry}>Print</Button>}>
+          <h2 className="print-only">Audit entry · {humanize(open.action)}</h2>
           <Details items={[
             { label: 'When', value: formatDateTime(open.timestamp) },
             { label: 'User', value: open.userName },
@@ -60,10 +64,7 @@ export default function AuditLogPage() {
             { label: 'IP address', value: open.ipAddress },
           ]} />
           <p>{open.description}</p>
-          <div className="grid-2">
-            <div className="stack-sm"><span className="field-label">Before</span><ValuesTable values={open.previousValues} /></div>
-            <div className="stack-sm"><span className="field-label">After</span><ValuesTable values={open.newValues} /></div>
-          </div>
+          <AuditChanges before={open.previousValues} after={open.newValues} />
         </Modal>
       )}
     </div>

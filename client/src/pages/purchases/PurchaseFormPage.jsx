@@ -108,13 +108,13 @@ export default function PurchaseFormPage() {
                 {items.map((item, index) => (
                   <tr key={item.medicineId}>
                     <td data-label="Medicine" className="cell-strong">{item.medicineName}</td>
-                    <td data-label="Quantity"><input className="input" style={{ width: 90 }} type="number" min="1" value={item.orderedQuantity} aria-label="Quantity"
+                    <td data-label="Quantity" className="num"><input className="input" style={{ width: 90 }} type="number" min="1" value={item.orderedQuantity} aria-label="Quantity"
                       aria-invalid={errors[`items.${index}.orderedQuantity`] ? 'true' : undefined} onChange={(e) => setItem(index, 'orderedQuantity', e.target.value)} /></td>
-                    <td data-label="Unit cost"><input className="input" style={{ width: 100 }} inputMode="decimal" value={item.unitPurchasePrice} aria-label="Unit cost"
+                    <td data-label="Unit cost" className="num"><input className="input" style={{ width: 100 }} inputMode="decimal" value={item.unitPurchasePrice} aria-label="Unit cost"
                       aria-invalid={errors[`items.${index}.unitPurchasePrice`] ? 'true' : undefined} onChange={(e) => setItem(index, 'unitPurchasePrice', e.target.value)} /></td>
-                    <td data-label="Discount"><input className="input" style={{ width: 90 }} inputMode="decimal" value={item.discount} placeholder="0.00" aria-label="Discount"
+                    <td data-label="Discount" className="num"><input className="input" style={{ width: 90 }} inputMode="decimal" value={item.discount} placeholder="0.00" aria-label="Discount"
                       aria-invalid={errors[`items.${index}.discount`] ? 'true' : undefined} onChange={(e) => setItem(index, 'discount', e.target.value)} /></td>
-                    <td data-label="Tax"><input className="input" style={{ width: 90 }} inputMode="decimal" value={item.tax} placeholder="0.00" aria-label="Tax"
+                    <td data-label="Tax" className="num"><input className="input" style={{ width: 90 }} inputMode="decimal" value={item.tax} placeholder="0.00" aria-label="Tax"
                       onChange={(e) => setItem(index, 'tax', e.target.value)} /></td>
                     <td data-label="Line total" className="num">{formatMoney(fromCents(lineTotal(item)))}</td>
                     <td data-label=""><IconButton icon={Trash2} label="Remove" onClick={() => setItems((list) => list.filter((_, i) => i !== index))} /></td>

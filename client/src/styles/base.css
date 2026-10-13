@@ -101,7 +101,10 @@ textarea {
   * { transition: none !important; animation: none !important; }
 }
 
+.print-only { display: none; }
+
 @media print {
   body { background: #fff; }
   .no-print { display: none !important; }
+  .print-only { display: block; }
 }
