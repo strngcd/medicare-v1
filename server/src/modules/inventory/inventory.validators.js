@@ -64,7 +64,8 @@ const adjustmentPreviewBody = z.object(adjustmentFields).strict();
 const adjustmentBody = z.object({ ...adjustmentFields, expectedQuantityBefore: nonNegativeInt.optional() }).strict();
 
 // recordAsLoss (default true): false removes the stock without counting it in loss and profit reports.
-const disposeBody = z.object({ notes: optionalText(500), archive: z.boolean().optional(), recordAsLoss: z.boolean().optional() }).strict();
+// quantity defaults to everything left in the batch row.
+const disposeBody = z.object({ quantity: positiveInt.max(10000000).optional(), notes: optionalText(500), archive: z.boolean().optional(), recordAsLoss: z.boolean().optional() }).strict();
 
 const minimumStockBody = z.object({ minimumStock: nonNegativeInt.max(1000000) }).strict();
 const sellingPriceBody = z.object({ sellingPrice: money }).strict();

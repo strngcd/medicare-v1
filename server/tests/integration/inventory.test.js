@@ -332,6 +332,22 @@ describe('disposing of stock', () => {
     expect(rows[0].description).toMatch(/\(in date\)$/);
   });
 
+  test('can dispose of part of a batch; archive only applies once it is empty', async () => {
+    const { inventory, batch } = await stockOf({ expiryDate: daysFromToday(-1), quantity: 10 });
+    const res = await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({ quantity: 4, archive: true });
+    expect(res.status).toBe(201);
+    expect(res.body.data).toMatchObject({ quantityDisposed: 4, quantityRemaining: 6, archived: false, lossValue: '16.00' });
+    const moves = await movementsFor(batch.id);
+    expect(moves[moves.length - 1]).toMatchObject({ movement_type: 'DISPOSED', quantity_change: -4, quantity_after: 6 });
+
+    const tooMany = await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({ quantity: 7 });
+    expect(tooMany.status).toBe(422);
+    expect(tooMany.body.error.details.fields.quantity).toBeDefined();
+
+    const rest = await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({ archive: true });
+    expect(rest.body.data).toMatchObject({ quantityDisposed: 6, quantityRemaining: 0, archived: true });
+  });
+
   test('can be recorded without counting as a loss', async () => {
     const { inventory, batch } = await stockOf({ expiryDate: daysFromToday(400), quantity: 4 });
     const res = await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({ notes: 'Returned to supplier for credit', recordAsLoss: false });
