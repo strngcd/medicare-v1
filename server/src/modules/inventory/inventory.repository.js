@@ -6,7 +6,7 @@ const { medicineStockCte, rowStatusSql } = require('./inventoryStatus');
  * Inventory rows (branch x batch) with derived status.
  * Params $1 = business date, $2 = expiry warning days.
  */
-async function listInventory({ today, warningDays, ids, branchIds, medicineId, categoryId, statuses, search, archived = false, limit, offset, orderBy }) {
+async function listInventory({ today, warningDays, ids, branchIds, medicineId, categoryId, productType, statuses, search, archived = false, limit, offset, orderBy }) {
   const w = whereBuilder([today, warningDays]);
   if (ids) w.add('bi.id = ANY(?::uuid[])', ids);
   // Archived (empty, hidden) batch rows are listed only on request; lookups by id always find them.
@@ -14,6 +14,7 @@ async function listInventory({ today, warningDays, ids, branchIds, medicineId, c
   if (branchIds) w.add('bi.branch_id = ANY(?::uuid[])', branchIds);
   if (medicineId) w.add('b.medicine_id = ?', medicineId);
   if (categoryId) w.add('m.category_id = ?', categoryId);
+  if (productType) w.add('m.product_type = ?', productType);
   if (search) w.add('(m.name ILIKE ? OR m.generic_name ILIKE ? OR b.batch_number ILIKE ? OR m.barcode = ?)', `%${search}%`, `%${search}%`, `%${search}%`, search);
   if (statuses && statuses.length) w.add(`(${rowStatusSql('$1', '$2')}) = ANY(?::text[])`, statuses);
 
@@ -22,7 +23,7 @@ async function listInventory({ today, warningDays, ids, branchIds, medicineId, c
      SELECT bi.id, bi.branch_id, br.name AS branch_name, br.code AS branch_code, br.status AS branch_status,
             bi.batch_id, b.batch_number, b.manufacturing_date, b.expiry_date, b.purchase_price,
             b.supplier_id, s.company_name AS supplier_name,
-            b.medicine_id, m.name AS medicine_name, m.strength, m.dosage_form, m.package_size,
+            b.medicine_id, m.name AS medicine_name, m.product_type, m.strength, m.dosage_form, m.package_size,
             m.status AS medicine_status, m.category_id, c.name AS category_name,
             bi.quantity, bi.minimum_stock, bi.selling_price,
             ms.sellable_quantity AS medicine_sellable_quantity, ms.minimum_stock AS medicine_minimum_stock,
@@ -166,7 +167,7 @@ async function setArchived(client, id, userId) {
 }
 
 async function findMedicineForStock(client, medicineId) {
-  const { rows } = await query('SELECT id, name, status FROM medicines WHERE id = $1 FOR SHARE', [medicineId], client);
+  const { rows } = await query('SELECT id, name, status, product_type FROM medicines WHERE id = $1 FOR SHARE', [medicineId], client);
   return rows[0] || null;
 }
 

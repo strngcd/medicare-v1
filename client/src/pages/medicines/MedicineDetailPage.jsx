@@ -15,6 +15,7 @@ import { AdjustStockModal } from '../../components/inventory/AdjustStockModal.js
 import { InventorySettingModal } from '../../components/inventory/InventorySettingModal.jsx';
 import { MedicineFields, medicinePayload } from './MedicineFields.jsx';
 import { formatDate, formatDateTime, formatMoney, formatNumber, humanize } from '../../utils/format.js';
+import { productConfig } from './productTypes.js';
 
 function EditMedicineModal({ medicine, onClose, onSaved }) {
   const [form, setForm] = useState(() => {
@@ -25,14 +26,18 @@ function EditMedicineModal({ medicine, onClose, onSaved }) {
     return f;
   });
   const action = useAction();
+  const config = productConfig(medicine.productType);
   const save = async () => {
-    const result = await action.run(() => api.patch(`/medicines/${medicine.id}`, medicinePayload(form, { includeBarcode: false })), { success: 'Medicine updated.' });
+    const result = await action.run(
+      () => api.patch(`/medicines/${medicine.id}`, medicinePayload(form, { includeBarcode: false, productType: medicine.productType })),
+      { success: `${config.title} updated.` },
+    );
     if (result) onSaved(result.data);
   };
   return (
-    <Modal open title="Edit medicine" size="lg" onClose={onClose} closeDisabled={action.running}
+    <Modal open title={`Edit ${config.singular}`} size="lg" onClose={onClose} closeDisabled={action.running}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button onClick={save} loading={action.running}>Save changes</Button></>}>
-      <MedicineFields form={form} setForm={setForm} errors={action.fieldErrors} showBarcode={false} />
+      <MedicineFields form={form} setForm={setForm} errors={action.fieldErrors} showBarcode={false} productType={medicine.productType} />
     </Modal>
   );
 }
@@ -68,6 +73,8 @@ export default function MedicineDetailPage() {
   if (medicine.error) return <Panel><ErrorState error={medicine.error} onRetry={medicine.reload} /></Panel>;
   if (!medicine.data) return <Panel><SkeletonRows rows={6} /></Panel>;
   const m = medicine.data;
+  const config = productConfig(m.productType);
+  const cosmetic = m.productType === 'COSMETIC';
 
   const refreshAll = () => {
     medicine.reload({ silent: true });
@@ -82,7 +89,8 @@ export default function MedicineDetailPage() {
       restore: () => api.post(`/medicines/${id}/restore`),
       activate: () => api.patch(`/medicines/${id}`, { status: 'ACTIVE' }),
     };
-    const messages = { archive: 'Medicine archived.', restore: 'Medicine restored.', activate: 'Medicine activated.' };
+    const label = productConfig(medicine.data && medicine.data.productType).title;
+    const messages = { archive: `${label} archived.`, restore: `${label} restored.`, activate: `${label} activated.` };
     const result = await statusAction.run(calls[kind], { success: messages[kind] });
     setModal(null);
     if (result) refreshAll();
@@ -123,9 +131,9 @@ export default function MedicineDetailPage() {
   return (
     <div className="stack">
       <PageHeader
-        breadcrumbs={[{ label: 'Medicines', to: '/medicines' }, { label: m.name }]}
+        breadcrumbs={[{ label: config.plural, to: config.basePath }, { label: m.name }]}
         title={<span className="row-wrap">{m.name} <StatusBadge status={m.status} /> {m.prescriptionRequired && <Badge tone="info">Prescription required</Badge>}</span>}
-        description={[m.strength, m.dosageForm, m.packageSize, m.categoryName].filter(Boolean).join(' · ')}
+        description={[cosmetic ? m.brandName : m.strength, m.dosageForm, m.packageSize, m.categoryName].filter(Boolean).join(' · ')}
         actions={(
           <>
             {m.status !== 'ARCHIVED' && <Can permission="INVENTORY_ADD_STOCK"><Button icon={PackagePlus} onClick={() => setModal({ type: 'addStock' })}>Add stock</Button></Can>}
@@ -139,8 +147,8 @@ export default function MedicineDetailPage() {
         )}
       />
 
-      {m.status === 'DRAFT' && <InlineAlert tone="info">This medicine is a draft. Activate it to sell it or include it in purchases.</InlineAlert>}
-      {m.status === 'ARCHIVED' && <InlineAlert tone="warning">Archived medicines cannot be sold or purchased. History is kept.</InlineAlert>}
+      {m.status === 'DRAFT' && <InlineAlert tone="info">This {config.singular} is a draft. Activate it to sell it or include it in purchases.</InlineAlert>}
+      {m.status === 'ARCHIVED' && <InlineAlert tone="warning">Archived {config.plural.toLowerCase()} cannot be sold or purchased. History is kept.</InlineAlert>}
 
       <div className="grid-4">
         <Kpi label="Sellable stock" value={formatNumber(m.sellableQuantity)} tone={m.sellableQuantity === 0 && m.status === 'ACTIVE' ? 'danger' : undefined} note="Excludes expired batches" />
@@ -184,7 +192,18 @@ export default function MedicineDetailPage() {
         )}
         {activeTab === 'details' && (
           <div className="panel-body">
-            <Details items={[
+            <Details items={cosmetic ? [
+              { label: 'Brand', value: m.brandName },
+              { label: 'Category', value: m.categoryName },
+              { label: 'Form', value: m.dosageForm },
+              { label: 'Size', value: m.packageSize },
+              { label: 'Manufacturer', value: m.manufacturer },
+              { label: 'Country of origin', value: m.countryOfOrigin },
+              { label: 'Usage and storage', value: m.storageInstructions },
+              { label: 'Description', value: m.description },
+              { label: 'Created', value: formatDateTime(m.createdAt) },
+              { label: 'Last updated', value: formatDateTime(m.updatedAt) },
+            ] : [
               { label: 'Generic name', value: m.genericName },
               { label: 'Brand name', value: m.brandName },
               { label: 'Category', value: m.categoryName },
@@ -209,7 +228,7 @@ export default function MedicineDetailPage() {
       {modal && (modal.type === 'minimumStock' || modal.type === 'sellingPrice') && (
         <InventorySettingModal open inventory={modal.row} field={modal.type} onClose={() => setModal(null)} onSaved={refreshAll} />
       )}
-      <ConfirmDialog open={Boolean(modal && modal.type === 'archive')} title="Archive medicine"
+      <ConfirmDialog open={Boolean(modal && modal.type === 'archive')} title={`Archive ${config.singular}`}
         message={`${m.name} will no longer be available for sales or purchases. Its history is kept and it can be restored later.`}
         confirmLabel="Archive" tone="danger" loading={statusAction.running}
         onConfirm={() => changeStatus('archive')} onClose={() => setModal(null)} />

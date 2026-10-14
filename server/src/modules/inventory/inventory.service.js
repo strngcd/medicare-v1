@@ -1,4 +1,5 @@
 const AppError = require('../../errors/AppError');
+const { resolveBatchIdentity } = require('./batchIdentity');
 const { withTransaction } = require('../../database/db');
 const { recordAudit } = require('../audit/audit.recorder');
 const { runIdempotent } = require('../idempotency/idempotency');
@@ -74,6 +75,7 @@ async function listInventory(auth, query, forcedStatuses) {
     branchIds: resolveBranchScope(auth, query.branchId),
     medicineId: query.medicineId,
     categoryId: query.categoryId,
+    productType: query.productType,
     search: query.search,
     statuses,
     archived: Boolean(query.archived),
@@ -169,7 +171,7 @@ async function getMovement(auth, id) {
  */
 async function addStock(auth, actor, input, idempotencyKey) {
   const today = businessToday();
-  if (input.expiryDate < today) {
+  if (input.expiryDate && input.expiryDate < today) {
     throw AppError.conflict('BATCH_EXPIRED', 'Expired stock cannot be added.', { fields: { expiryDate: 'This date is in the past.' } });
   }
 
@@ -182,6 +184,7 @@ async function addStock(auth, actor, input, idempotencyKey) {
       if (medicine.status === 'ARCHIVED') {
         throw AppError.conflict('MEDICINE_ARCHIVED', 'Archived medicines cannot receive stock.');
       }
+      const identity = resolveBatchIdentity(medicine.product_type, input);
       if (input.supplierId) {
         const supplier = await repo.findSupplier(client, input.supplierId);
         if (!supplier) throw AppError.validation('Supplier not found.', { fields: { supplierId: 'Select a valid supplier.' } });
@@ -189,9 +192,9 @@ async function addStock(auth, actor, input, idempotencyKey) {
 
       const { batch, created: batchCreated } = await ledger.findOrCreateBatch(client, {
         medicineId: medicine.id,
-        batchNumber: input.batchNumber,
+        batchNumber: identity.batchNumber,
         manufacturingDate: input.manufacturingDate,
-        expiryDate: input.expiryDate,
+        expiryDate: identity.expiryDate,
         purchasePrice: input.purchasePrice,
         supplierId: input.supplierId,
         userId: auth.userId,

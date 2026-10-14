@@ -7,7 +7,7 @@ import { useDebouncedValue } from '../hooks/useApi.js';
  * Searchable medicine selector. `status` limits the list (e.g. ACTIVE for
  * purchases). Calls onSelect with the chosen medicine and clears itself.
  */
-export function MedicinePicker({ onSelect, status = 'ACTIVE', placeholder = 'Search medicine to add…', exclude = [] }) {
+export function MedicinePicker({ onSelect, status = 'ACTIVE', placeholder = 'Search medicine or cosmetic to add…', exclude = [] }) {
   const [term, setTerm] = useState('');
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState({ loading: false, rows: [] });
@@ -46,12 +46,12 @@ export function MedicinePicker({ onSelect, status = 'ACTIVE', placeholder = 'Sea
       {open && debounced && (
         <div className="search-results">
           {results.loading && rows.length === 0 && <div className="search-result muted">Searching…</div>}
-          {!results.loading && rows.length === 0 && <div className="search-result muted">No matching {status ? status.toLowerCase() : ''} medicines.</div>}
+          {!results.loading && rows.length === 0 && <div className="search-result muted">No matching {status ? status.toLowerCase() : ''} products.</div>}
           {rows.map((m) => (
             <button key={m.id} type="button" className="search-result" style={{ border: 'none', background: 'none', width: '100%', textAlign: 'left' }}
               onClick={() => { onSelect(m); setTerm(''); setOpen(false); }}>
               <span className="title">{m.name}</span>
-              <span className="subtitle">{[m.strength, m.dosageForm, m.packageSize].filter(Boolean).join(' · ')}</span>
+              <span className="subtitle">{[m.productType === 'COSMETIC' && 'Cosmetic', m.brandName, m.strength, m.dosageForm, m.packageSize].filter(Boolean).join(' · ')}</span>
             </button>
           ))}
         </div>

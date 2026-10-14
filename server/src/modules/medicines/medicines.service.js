@@ -20,6 +20,7 @@ const AUDITED_FIELDS = [
   'name', 'genericName', 'brandName', 'categoryId', 'manufacturer', 'countryOfOrigin', 'strength',
   'dosageForm', 'packageSize', 'prescriptionRequired', 'description', 'storageInstructions', 'status',
 ];
+const CREATE_AUDITED_FIELDS = ['productType', ...AUDITED_FIELDS, 'barcode'];
 
 function toDto(row) {
   const dto = camelize(row);
@@ -27,13 +28,30 @@ function toDto(row) {
   return dto;
 }
 
-async function assertAssignableCategory(client, categoryId) {
+const TYPE_LABELS = { MEDICINE: 'Medicine', COSMETIC: 'Cosmetic' };
+const typeLabel = (productType) => TYPE_LABELS[productType] || 'Medicine';
+
+async function assertAssignableCategory(client, categoryId, productType) {
   if (!categoryId) return;
   const category = await repo.findCategory(client, categoryId);
   if (!category) throw AppError.validation('Category not found.', { fields: { categoryId: 'Select a valid category.' } });
   if (category.status !== 'ACTIVE') {
     throw AppError.conflict('CATEGORY_ARCHIVED', 'Archived categories cannot be assigned to medicines.', {
       fields: { categoryId: 'This category is archived.' },
+    });
+  }
+  if (category.product_type !== productType) {
+    throw AppError.validation(`${category.name} is a ${typeLabel(category.product_type).toLowerCase()} category.`, {
+      fields: { categoryId: `Select a ${typeLabel(productType).toLowerCase()} category.` },
+    });
+  }
+}
+
+/** Cosmetics never require a prescription. */
+function assertPrescriptionRule(productType, prescriptionRequired) {
+  if (productType === 'COSMETIC' && prescriptionRequired === true) {
+    throw AppError.validation('Cosmetics cannot require a prescription.', {
+      fields: { prescriptionRequired: 'Cosmetics never require a prescription.' },
     });
   }
 }
@@ -68,6 +86,7 @@ async function listMedicines(auth, query) {
     categoryId: query.categoryId,
     status: query.status,
     prescriptionRequired: query.prescriptionRequired,
+    productType: query.productType,
     ...params,
   });
   return { rows: rows.map(toDto), total, page: params.page, limit: params.limit };
@@ -82,13 +101,14 @@ async function getMedicine(auth, id, branchId) {
   return toDto(row);
 }
 
-async function searchForSale(auth, { q, branchId, categoryId, limit }) {
+async function searchForSale(auth, { q, branchId, categoryId, productType, limit }) {
   await loadAccessibleBranch(auth, branchId);
   const rows = await repo.searchForSale({
     branchId,
     today: businessToday(),
     term: q,
     categoryId,
+    productType,
     limit: limit || 20,
   });
   return rows.map((r) => {
@@ -99,8 +119,11 @@ async function searchForSale(auth, { q, branchId, categoryId, limit }) {
 }
 
 async function createMedicine(auth, actor, data) {
+  const productType = data.productType || 'MEDICINE';
+  assertPrescriptionRule(productType, data.prescriptionRequired);
+  data = { ...data, productType, prescriptionRequired: productType === 'COSMETIC' ? false : data.prescriptionRequired };
   return withTransaction(async (client) => {
-    await assertAssignableCategory(client, data.categoryId);
+    await assertAssignableCategory(client, data.categoryId, productType);
     await assertBarcodeAvailable(client, data.barcode);
     const duplicates = toDuplicateWarnings(await repo.findDuplicates(client, data));
 
@@ -110,8 +133,8 @@ async function createMedicine(auth, actor, data) {
       action: 'MEDICINE_CREATED',
       entityType: 'MEDICINE',
       entityId: id,
-      description: `Medicine ${created.name} created as draft`,
-      newValues: Object.fromEntries([...AUDITED_FIELDS, 'barcode'].map((k) => [k, created[k] ?? null])),
+      description: `${typeLabel(productType)} ${created.name} created as draft`,
+      newValues: Object.fromEntries(CREATE_AUDITED_FIELDS.map((k) => [k, created[k] ?? null])),
     });
     // Duplicates are a warning only: the medicine is still created.
     return { medicine: created, warnings: { duplicates } };
@@ -126,8 +149,9 @@ async function updateMedicine(auth, actor, id, changes) {
       throw AppError.conflict('MEDICINE_ARCHIVED', 'Restore this medicine before editing it.');
     }
     if (changes.status === 'ACTIVE' && existing.status !== 'DRAFT') delete changes.status;
+    assertPrescriptionRule(existing.product_type, changes.prescriptionRequired);
     if (changes.categoryId && changes.categoryId !== existing.category_id) {
-      await assertAssignableCategory(client, changes.categoryId);
+      await assertAssignableCategory(client, changes.categoryId, existing.product_type);
     }
 
     const before = toDto(existing);
@@ -141,7 +165,7 @@ async function updateMedicine(auth, actor, id, changes) {
       action: 'MEDICINE_UPDATED',
       entityType: 'MEDICINE',
       entityId: id,
-      description: changes.status === 'ACTIVE' ? `Medicine ${updated.name} activated` : `Medicine ${updated.name} updated`,
+      description: `${typeLabel(existing.product_type)} ${updated.name} ${changes.status === 'ACTIVE' ? 'activated' : 'updated'}`,
       previousValues: previous,
       newValues: next,
     });
@@ -185,7 +209,7 @@ async function setArchived(auth, actor, id, archived) {
       action: archived ? 'MEDICINE_ARCHIVED' : 'MEDICINE_RESTORED',
       entityType: 'MEDICINE',
       entityId: id,
-      description: `Medicine ${existing.name} ${archived ? 'archived' : 'restored'}`,
+      description: `${typeLabel(existing.product_type)} ${existing.name} ${archived ? 'archived' : 'restored'}`,
       previousValues: { status: existing.status },
       newValues: { status: archived ? 'ARCHIVED' : 'ACTIVE' },
     });

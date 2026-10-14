@@ -64,6 +64,7 @@ function salesFilters(auth, query) {
       staffId: query.staffId,
       medicineId: query.medicineId,
       categoryId: query.categoryId,
+      productType: query.productType,
       paymentMethod: query.paymentMethod,
       receiptNumber: query.receiptNumber,
       minAmount: query.minAmount,
@@ -193,7 +194,7 @@ async function inventoryReport(auth, query, { exportAll = false } = {}) {
   const warningDays = await getExpiryWarningDays();
   const params = exportAll ? { page: 1, limit: 10000, offset: 0 } : parseListParams(query, { sortable: { d: '1' }, defaultSort: 'd' });
   const [positions, totals] = await Promise.all([
-    repo.inventoryPositions({ today, warningDays, branchIds, categoryId: query.categoryId, status: query.status, limit: params.limit, offset: params.offset }),
+    repo.inventoryPositions({ today, warningDays, branchIds, categoryId: query.categoryId, productType: query.productType, status: query.status, limit: params.limit, offset: params.offset }),
     cached(['inventory-totals', cacheScope(auth, branchIds), today], () => repo.inventoryTotals({ today, warningDays, branchIds })),
   ]);
   return restrictColumns(filterFinancialFields({

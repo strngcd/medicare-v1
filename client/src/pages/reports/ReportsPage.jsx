@@ -9,7 +9,10 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { PageHeader, Panel, Tabs, Button, Kpi, DataTable, Pagination, EmptyState, ErrorState, SkeletonRows, SelectInput, Unauthorized, LearnHow } from '../../components/ui/index.js';
 import { DateRangePicker, useDateRange } from '../../components/DateRangePicker.jsx';
 import { chartColors, shortPeriodLabel } from '../../components/charts/ChartTheme.js';
-import { formatDate, formatDateTime, formatMoney, formatNumber, humanize } from '../../utils/format.js';
+import { formatDate, formatDateTime, formatMoney, formatNumber, humanize, PRODUCT_TYPE_OPTIONS } from '../../utils/format.js';
+
+// Reports that can be limited to medicines or cosmetics.
+const TYPE_FILTERED = new Set(['sales', 'profit', 'inventory']);
 
 const REPORTS = [
   { value: 'sales', label: 'Sales', permission: 'REPORT_SALES_VIEW', path: '/reports/sales', exportPath: '/reports/sales/export', dated: true },
@@ -80,9 +83,14 @@ function ReportView({ report }) {
   const range = useDateRange(report.value === 'purchases' ? 'MONTH' : report.value === 'suppliers' ? 'YEAR' : 'MONTH');
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
+  const [productType, setProductType] = useState('');
   const filterParam = report.value === 'losses' ? 'movementType' : 'status';
   const [exporting, setExporting] = useState(null);
-  const params = { ...(report.dated ? range.params : {}), branchId: branchParam, page, ...(status ? { [filterParam]: status } : {}) };
+  const params = {
+    ...(report.dated ? range.params : {}), branchId: branchParam, page,
+    ...(status ? { [filterParam]: status } : {}),
+    ...(productType && TYPE_FILTERED.has(report.value) ? { productType } : {}),
+  };
   const data = useApi(() => api.get(report.path, params), [report.value, JSON.stringify(params)]);
 
   const doExport = async (format) => {
@@ -115,6 +123,12 @@ function ReportView({ report }) {
             <select className="select" style={{ width: 180 }} value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} aria-label={filterParam === 'status' ? 'Status filter' : 'Type filter'}>
               <option value="">{filterParam === 'status' ? 'All statuses' : 'All types'}</option>
               {statusOptions.map((s) => <option key={s} value={s}>{humanize(s)}</option>)}
+            </select>
+          )}
+          {TYPE_FILTERED.has(report.value) && (
+            <select className="select" style={{ width: 160 }} value={productType} onChange={(e) => { setProductType(e.target.value); setPage(1); }} aria-label="Product type filter">
+              <option value="">All products</option>
+              {PRODUCT_TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           )}
         </div>

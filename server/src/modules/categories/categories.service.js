@@ -23,7 +23,7 @@ async function assertNameAvailable(client, name, excludeId) {
 
 async function listCategories(query) {
   const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'name', defaultOrder: 'asc' });
-  const { rows, total } = await repo.list({ status: query.status, search: query.search, ...params });
+  const { rows, total } = await repo.list({ status: query.status, productType: query.productType, search: query.search, ...params });
   return { rows: rows.map(toDto), total, page: params.page, limit: params.limit };
 }
 
@@ -37,7 +37,7 @@ async function createCategory(auth, actor, data) {
       entityType: 'CATEGORY',
       entityId: id,
       description: `Category ${created.name} created`,
-      newValues: { name: created.name, description: created.description },
+      newValues: { name: created.name, description: created.description, productType: created.productType },
     });
     return created;
   });

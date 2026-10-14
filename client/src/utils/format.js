@@ -27,8 +27,12 @@ const dateTimeFormatter = new Intl.DateTimeFormat('en-GB', {
 });
 
 /** 'YYYY-MM-DD' calendar dates are formatted without time-zone shifts. */
+/** Stored expiry of products sold without one (see server batchIdentity). */
+export const NO_EXPIRY_DATE = '9999-12-31';
+
 export function formatDate(value) {
   if (!value) return '—';
+  if (value === NO_EXPIRY_DATE) return 'No expiry';
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     const [y, m, d] = value.split('-').map(Number);
     return dateFormatter.format(new Date(y, m - 1, d));
@@ -54,3 +58,8 @@ export function todayIso() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
+
+export const PRODUCT_TYPE_OPTIONS = [
+  { value: 'MEDICINE', label: 'Medicines' },
+  { value: 'COSMETIC', label: 'Cosmetics' },
+];

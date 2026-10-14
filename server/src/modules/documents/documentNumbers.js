@@ -51,4 +51,4 @@ async function nextDocumentNumber(client, documentType) {
 /** Matches numbers issued by nextDocumentNumber. */
 const DOCUMENT_NUMBER_PATTERN = new RegExp(`^[A-Z]{3}-[${ALPHABET}]{${CODE_LENGTH}}$`);
 
-module.exports = { nextDocumentNumber, PREFIXES, NUMBER_COLUMNS, DOCUMENT_NUMBER_PATTERN };
+module.exports = { nextDocumentNumber, randomCode, PREFIXES, NUMBER_COLUMNS, DOCUMENT_NUMBER_PATTERN };

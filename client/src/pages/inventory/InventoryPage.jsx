@@ -11,7 +11,7 @@ import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, Sele
 import { AdjustStockModal } from '../../components/inventory/AdjustStockModal.jsx';
 import { InventorySettingModal } from '../../components/inventory/InventorySettingModal.jsx';
 import { DisposeStockModal } from '../../components/inventory/DisposeStockModal.jsx';
-import { formatDate, formatDateTime, formatMoney, formatNumber, humanize } from '../../utils/format.js';
+import { formatDate, formatDateTime, formatMoney, formatNumber, humanize, PRODUCT_TYPE_OPTIONS } from '../../utils/format.js';
 
 const STATUSES = ['AVAILABLE', 'LOW_STOCK', 'OUT_OF_STOCK', 'EXPIRING_SOON', 'EXPIRED'].map((s) => ({ value: s, label: humanize(s) }));
 const MOVEMENT_TYPES = ['PURCHASE_RECEIVED', 'SALE', 'REFUND', 'ADJUSTMENT', 'TRANSFER_OUT', 'TRANSFER_IN', 'EXPIRED', 'DAMAGED', 'LOST', 'CORRECTION', 'DISPOSED']
@@ -20,7 +20,7 @@ const MOVEMENT_TYPES = ['PURCHASE_RECEIVED', 'SALE', 'REFUND', 'ADJUSTMENT', 'TR
 function StockTab({ state, update, clear, hasFilters }) {
   const navigate = useNavigate();
   const { branchParam, can } = useAuth();
-  const categories = useCategories();
+  const categories = useCategories(state.productType || undefined);
   const [modal, setModal] = useState(null);
   const params = { ...state, tab: undefined, branchId: branchParam };
   const list = useApi(() => api.get('/inventory', params), [JSON.stringify(params)]);
@@ -46,7 +46,7 @@ function StockTab({ state, update, clear, hasFilters }) {
   const hasActions = ['INVENTORY_ADJUST', 'INVENTORY_DISPOSE', 'INVENTORY_BATCH_ARCHIVE', 'INVENTORY_BATCH_RESTORE'].some((p) => can(p));
 
   const columns = [
-    { key: 'medicineName', label: 'Medicine', sortable: true, render: (r) => <span className="cell-strong">{r.medicineName}</span> },
+    { key: 'medicineName', label: 'Product', sortable: true, render: (r) => <span className="cell-strong">{r.medicineName}{r.productType === 'COSMETIC' && <span className="small muted"> · Cosmetic</span>}</span> },
     { key: 'branchName', label: 'Branch', sortable: true },
     can('INVENTORY_VIEW_BATCHES') && { key: 'batchNumber', label: 'Batch', render: (r) => <span className="mono">{r.batchNumber}</span> },
     { key: 'expiryDate', label: 'Expiry', sortable: true, render: (r) => formatDate(r.expiryDate) },
@@ -85,13 +85,14 @@ function StockTab({ state, update, clear, hasFilters }) {
             <input className="input" type="search" placeholder="Medicine, batch or barcode" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search stock" />
           </div>
         </div>
+        <SelectInput label="Type" value={state.productType || ''} placeholder="All products" options={PRODUCT_TYPE_OPTIONS} onChange={(e) => update({ productType: e.target.value, categoryId: '' })} />
         <SelectInput label="Category" value={state.categoryId || ''} placeholder="All categories" options={toOptions(categories.data)} onChange={(e) => update({ categoryId: e.target.value })} />
         <SelectInput label="Status" value={state.status || ''} placeholder="All statuses" options={STATUSES} onChange={(e) => update({ status: e.target.value })} />
         <div className="field toolbar-check"><Checkbox label="Archived batches" checked={showingArchived} onChange={(e) => update({ archived: e.target.checked ? 'true' : '' })} /></div>
       </FilterToolbar>
       <DataTable columns={columns} rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
         sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
-        onRowClick={(r) => navigate(`/medicines/${r.medicineId}`)}
+        onRowClick={(r) => navigate(`${r.productType === 'COSMETIC' ? '/cosmetics' : '/medicines'}/${r.medicineId}`)}
         empty={showingArchived
           ? <EmptyState icon={Archive} title="No archived batches" message="Empty batches you archive are listed here and can be restored." />
           : <EmptyState icon={Boxes} title="No stock recorded" message="Stock appears after receiving a purchase or adding stock to a medicine." learnHow="purchasing-and-receiving" />} />

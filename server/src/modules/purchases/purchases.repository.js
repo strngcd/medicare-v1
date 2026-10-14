@@ -66,7 +66,7 @@ async function findById(id, client, { forUpdate = false } = {}) {
 async function listItems(purchaseId, client, { forUpdate = false } = {}) {
   const { rows } = await query(
     `SELECT pi.id, pi.purchase_id, pi.medicine_id, m.name AS medicine_name, m.strength, m.dosage_form,
-            m.package_size, m.status AS medicine_status, pi.ordered_quantity, pi.received_quantity,
+            m.package_size, m.status AS medicine_status, m.product_type, pi.ordered_quantity, pi.received_quantity,
             (pi.ordered_quantity - pi.received_quantity) AS remaining_quantity,
             pi.unit_purchase_price, pi.discount, pi.tax, pi.line_total, pi.notes, pi.created_at
        FROM purchase_items pi JOIN medicines m ON m.id = pi.medicine_id

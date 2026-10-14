@@ -7,13 +7,17 @@ import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
 import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, Modal, TextInput, TextArea, SelectInput, IconButton, FilterToolbar } from '../../components/ui/index.js';
-import { formatNumber } from '../../utils/format.js';
+import { formatNumber, PRODUCT_TYPE_OPTIONS } from '../../utils/format.js';
+
+const TYPE_LABEL = { MEDICINE: 'Medicine', COSMETIC: 'Cosmetic' };
 
 function CategoryModal({ category, onClose, onSaved }) {
-  const [form, setForm] = useState({ name: category ? category.name : '', description: category ? category.description || '' : '' });
+  const [form, setForm] = useState({ name: category ? category.name : '', description: category ? category.description || '' : '', productType: 'MEDICINE' });
   const action = useAction();
   const save = async () => {
-    const call = category ? () => api.patch(`/medicine-categories/${category.id}`, form) : () => api.post('/medicine-categories', form);
+    const { productType, ...fields } = form;
+    // The type is chosen once, on create.
+    const call = category ? () => api.patch(`/medicine-categories/${category.id}`, fields) : () => api.post('/medicine-categories', form);
     const result = await action.run(call, { success: category ? 'Category updated.' : 'Category created.' });
     if (result) onSaved();
   };
@@ -21,6 +25,9 @@ function CategoryModal({ category, onClose, onSaved }) {
     <Modal open title={category ? 'Edit category' : 'New category'} onClose={onClose} closeDisabled={action.running}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button onClick={save} loading={action.running}>Save</Button></>}>
       <TextInput label="Name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} error={action.fieldErrors.name || (action.error && action.error.code === 'DUPLICATE_CATEGORY' ? action.error.message : undefined)} />
+      {category
+        ? <p className="small muted">For {TYPE_LABEL[category.productType].toLowerCase()}s. The type cannot be changed.</p>
+        : <SelectInput label="For" required value={form.productType} options={PRODUCT_TYPE_OPTIONS} onChange={(e) => setForm({ ...form, productType: e.target.value })} hint="Cannot be changed later." />}
       <TextArea label="Description" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
     </Modal>
   );
@@ -41,8 +48,9 @@ export default function CategoriesPage() {
 
   const columns = [
     { key: 'name', label: 'Name', sortable: true, render: (c) => <span className="cell-strong">{c.name}</span> },
+    { key: 'productType', label: 'For', render: (c) => TYPE_LABEL[c.productType] },
     { key: 'description', label: 'Description', render: (c) => <span className="small muted">{c.description || '—'}</span> },
-    { key: 'medicineCount', label: 'Medicines', align: 'right', sortable: true, render: (c) => formatNumber(c.medicineCount) },
+    { key: 'medicineCount', label: 'Products', align: 'right', sortable: true, render: (c) => formatNumber(c.medicineCount) },
     { key: 'status', label: 'Status', render: (c) => <StatusBadge status={c.status} /> },
     {
       key: 'actions',
@@ -59,7 +67,7 @@ export default function CategoriesPage() {
 
   return (
     <div className="stack">
-      <PageHeader title="Medicine categories" description="Archived categories stay on existing medicines but cannot be assigned to new ones."
+      <PageHeader title="Categories" description="Categories for medicines and cosmetics. Archived categories stay on existing products but cannot be assigned to new ones."
         actions={<Can permission="CATEGORY_CREATE"><Button icon={Plus} onClick={() => setModal({})}>New category</Button></Can>} />
       <Panel flush>
         <FilterToolbar>
@@ -67,6 +75,7 @@ export default function CategoriesPage() {
             <span className="field-label">Search</span>
             <input className="input" type="search" placeholder="Category name" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search categories" />
           </div>
+          <SelectInput label="For" value={state.productType || ''} placeholder="All" options={PRODUCT_TYPE_OPTIONS} onChange={(e) => update({ productType: e.target.value })} />
           <SelectInput label="Status" value={state.status || ''} placeholder="All" options={[{ value: 'ACTIVE', label: 'Active' }, { value: 'ARCHIVED', label: 'Archived' }]} onChange={(e) => update({ status: e.target.value })} />
         </FilterToolbar>
         <DataTable columns={columns} rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}

@@ -9,6 +9,7 @@ const MOVEMENT_TYPES = [
 const listInventoryQuery = listQuery.extend({
   branchId: uuid.optional(),
   medicineId: uuid.optional(),
+  productType: z.enum(['MEDICINE', 'COSMETIC']).optional(),
   categoryId: uuid.optional(),
   status: z.enum(INVENTORY_STATUSES).optional(),
   archived: queryBoolean.optional(),
@@ -37,16 +38,17 @@ const listMovementsQuery = listQuery.extend({
 const addStockBody = z.object({
   branchId: uuid,
   medicineId: uuid,
-  batchNumber: requiredText(60),
+  // Required for medicines; optional for cosmetics (checked in the service).
+  batchNumber: optionalText(60),
   manufacturingDate: isoDate.nullable().optional(),
-  expiryDate: isoDate,
+  expiryDate: isoDate.nullable().optional(),
   purchasePrice: money,
   sellingPrice: money,
   quantity: positiveInt.max(10000000),
   supplierId: uuid.nullable().optional(),
   minimumStock: nonNegativeInt.max(1000000).optional(),
   notes: optionalText(500),
-}).strict().refine((v) => !v.manufacturingDate || v.manufacturingDate <= v.expiryDate, {
+}).strict().refine((v) => !v.manufacturingDate || !v.expiryDate || v.manufacturingDate <= v.expiryDate, {
   message: 'Manufacturing date must be on or before the expiry date.',
   path: ['manufacturingDate'],
 });

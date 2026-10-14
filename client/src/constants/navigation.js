@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ShoppingCart, Pill, Boxes, Truck, Building2, ArrowLeftRight, Receipt, Undo2,
-  BellRing, BarChart3, Users, Store, ScrollText, KeyRound, Settings, FolderTree,
+  BellRing, BarChart3, Users, Store, ScrollText, KeyRound, Settings, FolderTree, Sparkles,
 } from 'lucide-react';
 
 /** Sidebar entries; each is shown only if the user holds one of `any`. */
@@ -17,6 +17,7 @@ export const NAVIGATION = [
     section: 'Catalog & stock',
     items: [
       { to: '/medicines', label: 'Medicines', icon: Pill, any: ['MEDICINE_VIEW'] },
+      { to: '/cosmetics', label: 'Cosmetics', icon: Sparkles, any: ['MEDICINE_VIEW'] },
       { to: '/categories', label: 'Categories', icon: FolderTree, any: ['CATEGORY_VIEW'] },
       { to: '/inventory', label: 'Inventory', icon: Boxes, any: ['INVENTORY_VIEW'] },
       { to: '/transfers', label: 'Transfers', icon: ArrowLeftRight, any: ['INVENTORY_TRANSFER_VIEW'] },

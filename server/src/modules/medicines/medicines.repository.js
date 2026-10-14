@@ -2,7 +2,7 @@ const { query } = require('../../database/db');
 const { whereBuilder } = require('../../utils/pagination');
 
 const COLUMNS = `
-  m.id, m.name, m.generic_name, m.brand_name, m.category_id, c.name AS category_name,
+  m.id, m.product_type, m.name, m.generic_name, m.brand_name, m.category_id, c.name AS category_name,
   m.manufacturer, m.country_of_origin, m.strength, m.dosage_form, m.package_size,
   m.prescription_required, m.description, m.storage_instructions, m.barcode, m.status,
   m.created_by, m.updated_by, m.created_at, m.updated_at, m.archived_at, m.archived_by`;
@@ -24,7 +24,7 @@ function stockSummarySql(branchParam, todayParam) {
     ) stock ON true`;
 }
 
-async function list({ branchIds, today, search, categoryId, status, prescriptionRequired, limit, offset, orderBy }) {
+async function list({ branchIds, today, search, categoryId, status, prescriptionRequired, productType, limit, offset, orderBy }) {
   const w = whereBuilder([branchIds, today]);
   if (search) {
     w.add(
@@ -35,6 +35,7 @@ async function list({ branchIds, today, search, categoryId, status, prescription
   if (categoryId) w.add('m.category_id = ?', categoryId);
   if (status) w.add('m.status = ?', status);
   if (prescriptionRequired !== undefined) w.add('m.prescription_required = ?', prescriptionRequired);
+  if (productType) w.add('m.product_type = ?', productType);
 
   const { rows } = await query(
     `SELECT ${COLUMNS}, stock.total_quantity, stock.sellable_quantity, stock.minimum_stock,
@@ -67,7 +68,7 @@ async function findById(id, client, { forUpdate = false, branchIds = null, today
  * POS search: active medicines by name/generic/brand or exact barcode, with
  * the branch's sellable quantity and the selling price of the next FEFO batch.
  */
-async function searchForSale({ branchId, today, term, categoryId, limit }) {
+async function searchForSale({ branchId, today, term, categoryId, productType, limit }) {
   // $1 branch, $2 business date, $3 search term (may be null).
   const w = whereBuilder([branchId, today, term || null]);
   w.add("m.status = 'ACTIVE'");
@@ -75,9 +76,10 @@ async function searchForSale({ branchId, today, term, categoryId, limit }) {
     w.add('(m.barcode = $3 OR m.name ILIKE ? OR m.generic_name ILIKE ? OR m.brand_name ILIKE ?)', `%${term}%`, `%${term}%`, `%${term}%`);
   }
   if (categoryId) w.add('m.category_id = ?', categoryId);
+  if (productType) w.add('m.product_type = ?', productType);
 
   const { rows } = await query(
-    `SELECT m.id, m.name, m.generic_name, m.brand_name, m.strength, m.dosage_form, m.package_size,
+    `SELECT m.id, m.product_type, m.name, m.generic_name, m.brand_name, m.strength, m.dosage_form, m.package_size,
             m.prescription_required, m.barcode, m.category_id, c.name AS category_name,
             COALESCE(stock.sellable_quantity, 0) AS sellable_quantity,
             stock.next_price, stock.min_price, stock.max_price,
@@ -125,11 +127,12 @@ async function barcodeOwner(client, barcode, excludeId = null) {
 }
 
 async function findCategory(client, id) {
-  const { rows } = await query('SELECT id, name, status FROM medicine_categories WHERE id = $1', [id], client);
+  const { rows } = await query('SELECT id, name, status, product_type FROM medicine_categories WHERE id = $1', [id], client);
   return rows[0] || null;
 }
 
 const FIELD_COLUMNS = {
+  productType: 'product_type',
   name: 'name',
   genericName: 'generic_name',
   brandName: 'brand_name',

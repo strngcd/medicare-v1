@@ -10,14 +10,15 @@ const itemSchema = z.object({
 }).strict();
 
 const receiveLineFields = {
-  batchNumber: requiredText(60),
+  // Required for medicines; optional for cosmetics (checked when receiving).
+  batchNumber: optionalText(60),
   manufacturingDate: isoDate.nullable().optional(),
-  expiryDate: isoDate,
+  expiryDate: isoDate.nullable().optional(),
   quantity: positiveInt.max(10000000),
   sellingPrice: money,
   notes: optionalText(500),
 };
-const datesInOrder = [(v) => !v.manufacturingDate || v.manufacturingDate <= v.expiryDate, {
+const datesInOrder = [(v) => !v.manufacturingDate || !v.expiryDate || v.manufacturingDate <= v.expiryDate, {
   message: 'Manufacturing date must be on or before the expiry date.',
   path: ['manufacturingDate'],
 }];
