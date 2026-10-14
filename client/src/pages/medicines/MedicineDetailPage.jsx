@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { PackagePlus, Pencil, Barcode, Archive, ArchiveRestore, CheckCircle2, SlidersHorizontal, MoreHorizontal } from 'lucide-react';
+import { PackagePlus, Pencil, Barcode, Archive, ArchiveRestore, CheckCircle2, SlidersHorizontal, MoreHorizontal, Trash2 } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useAction } from '../../hooks/useAction.js';
@@ -13,6 +13,7 @@ import {
 import { AddStockModal } from '../../components/inventory/AddStockModal.jsx';
 import { AdjustStockModal } from '../../components/inventory/AdjustStockModal.jsx';
 import { InventorySettingModal } from '../../components/inventory/InventorySettingModal.jsx';
+import { DisposeStockModal } from '../../components/inventory/DisposeStockModal.jsx';
 import { MedicineFields, medicinePayload } from './MedicineFields.jsx';
 import { formatDate, formatDateTime, formatMoney, formatNumber, humanize } from '../../utils/format.js';
 import { productConfig } from './productTypes.js';
@@ -105,15 +106,22 @@ export default function MedicineDetailPage() {
     { key: 'sellingPrice', label: 'Selling price', align: 'right', render: (r) => formatMoney(r.sellingPrice) },
     can('FINANCIAL_VIEW_PURCHASE_COST') && { key: 'purchasePrice', label: 'Cost', align: 'right', render: (r) => formatMoney(r.purchasePrice) },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-    (can('INVENTORY_ADJUST')) && {
+    (can('INVENTORY_ADJUST') || can('INVENTORY_DISPOSE')) && {
       key: 'actions',
       label: '',
       render: (r) => (
         <span onClick={(e) => e.stopPropagation()}>
           <Dropdown trigger={({ toggle }) => <IconButton icon={MoreHorizontal} label="Stock actions" onClick={toggle} />}>
-            <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'adjust', row: r })}><SlidersHorizontal aria-hidden="true" /> Adjust quantity</button>
-            <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'minimumStock', row: r })}>Change minimum stock</button>
-            <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'sellingPrice', row: r })}>Change selling price</button>
+            {can('INVENTORY_ADJUST') && (
+              <>
+                <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'adjust', row: r })}><SlidersHorizontal aria-hidden="true" /> Adjust quantity</button>
+                <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'minimumStock', row: r })}>Change minimum stock</button>
+                <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'sellingPrice', row: r })}>Change selling price</button>
+              </>
+            )}
+            {can('INVENTORY_DISPOSE') && r.quantity > 0 && (
+              <button type="button" className="dropdown-item" onClick={() => setModal({ type: 'dispose', row: r })}><Trash2 aria-hidden="true" /> Dispose of stock</button>
+            )}
           </Dropdown>
         </span>
       ),
@@ -224,6 +232,7 @@ export default function MedicineDetailPage() {
       {modal && modal.type === 'edit' && <EditMedicineModal medicine={m} onClose={() => setModal(null)} onSaved={() => { setModal(null); refreshAll(); }} />}
       {modal && modal.type === 'barcode' && <BarcodeModal medicine={m} onClose={() => setModal(null)} onSaved={() => { setModal(null); refreshAll(); }} />}
       {modal && modal.type === 'addStock' && <AddStockModal open medicine={m} onClose={() => setModal(null)} onSaved={refreshAll} />}
+      {modal && modal.type === 'dispose' && <DisposeStockModal item={modal.row} onClose={() => setModal(null)} onDone={() => { setModal(null); refreshAll(); }} />}
       {modal && modal.type === 'adjust' && <AdjustStockModal open inventory={modal.row} onClose={() => setModal(null)} onSaved={refreshAll} />}
       {modal && (modal.type === 'minimumStock' || modal.type === 'sellingPrice') && (
         <InventorySettingModal open inventory={modal.row} field={modal.type} onClose={() => setModal(null)} onSaved={refreshAll} />

@@ -6,7 +6,8 @@ import { ConfirmDialog, TextArea, Checkbox, Details } from '../ui/index.js';
 import { formatDate, formatMoney, formatNumber } from '../../utils/format.js';
 
 /**
- * Writes off all remaining units of an expired or expiring batch row.
+ * Writes off all remaining units of a batch row. Expired or expiring stock
+ * needs no reason; in-date stock (damaged, recalled...) does.
  * `item` needs inventoryId (or id), medicineName, batchNumber, expiryDate and
  * quantity; purchasePrice is optional and only used for the loss estimate.
  */
@@ -18,8 +19,15 @@ export function DisposeStockModal({ item, onClose, onDone }) {
   const [key] = useState(() => newIdempotencyKey('dispose'));
   const inventoryId = item.inventoryId || item.id;
   const estimate = item.purchasePrice !== undefined ? Number(item.purchasePrice) * item.quantity : null;
+  // Inventory rows carry `status`; alerts carry `type`.
+  const inDate = !['EXPIRED', 'EXPIRING_SOON'].includes(item.status || item.type);
+  const [reasonMissing, setReasonMissing] = useState(false);
 
   const confirm = async () => {
+    if (inDate && !notes.trim()) {
+      setReasonMissing(true);
+      return;
+    }
     const result = await action.run(
       () => api.post(`/inventory/${inventoryId}/dispose`, { notes: notes.trim() || undefined, archive }, { idempotencyKey: key }),
       { success: 'Stock disposed and recorded as a loss.' },
@@ -30,15 +38,19 @@ export function DisposeStockModal({ item, onClose, onDone }) {
   return (
     <ConfirmDialog open title="Dispose of stock" tone="danger" confirmLabel={`Dispose of ${formatNumber(item.quantity)} units`}
       loading={action.running} onClose={onClose} onConfirm={confirm}>
-      <p>All remaining units leave inventory and are recorded as a stock loss at their purchase cost. The batch stays in history and its alert clears.</p>
+      <p>All remaining units leave inventory and are recorded as a stock loss at their purchase cost. The batch stays in history{inDate ? '' : ' and its alert clears'}.</p>
       <Details items={[
-        { label: 'Medicine', value: item.medicineName },
+        { label: 'Product', value: item.medicineName },
         { label: 'Batch', value: item.batchNumber },
         { label: 'Expiry', value: formatDate(item.expiryDate) },
         { label: 'Units', value: formatNumber(item.quantity) },
         estimate !== null && { label: 'Loss (cost)', value: formatMoney(estimate) },
       ].filter(Boolean)} />
-      <TextArea label="Note" placeholder="e.g. Handed to the disposal contractor" value={notes} onChange={(e) => setNotes(e.target.value)} error={action.fieldErrors.notes} />
+      {inDate && <p className="warning-text small">This batch has not expired. Disposing of it records the whole remaining stock as a loss.</p>}
+      <TextArea label={inDate ? 'Reason' : 'Note'} required={inDate}
+        placeholder={inDate ? 'e.g. Damaged in storage, recalled by supplier' : 'e.g. Handed to the disposal contractor'}
+        value={notes} onChange={(e) => { setNotes(e.target.value); setReasonMissing(false); }}
+        error={action.fieldErrors.notes || (reasonMissing ? 'Say why this in-date stock is being disposed of.' : undefined)} />
       {can('INVENTORY_BATCH_ARCHIVE') && (
         <Checkbox label="Archive the batch afterwards (hides it from stock lists)" checked={archive} onChange={(e) => setArchive(e.target.checked)} />
       )}

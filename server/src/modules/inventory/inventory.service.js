@@ -365,8 +365,8 @@ async function createAdjustment(auth, actor, input, idempotencyKey) {
 }
 
 /**
- * Writes off all remaining stock of an expired or expiring batch row. The
- * units leave inventory through a DISPOSED adjustment, valued at the batch's
+ * Writes off all remaining stock of a batch row: expired, expiring, or in
+ * date with a reason (damaged, recalled...). The units leave inventory through a DISPOSED adjustment, valued at the batch's
  * purchase price and reported as a stock loss. Optionally archives the row.
  */
 async function disposeStock(auth, actor, id, { notes, archive }, idempotencyKey) {
@@ -380,8 +380,12 @@ async function disposeStock(auth, actor, id, { notes, archive }, idempotencyKey)
       if (row.quantity === 0) throw AppError.conflict('NOTHING_TO_DISPOSE', 'This batch has no stock left to dispose of.');
       const expired = row.expiry_date < today;
       const expiringSoon = !expired && row.expiry_date <= addDays(today, warningDays);
-      if (!expired && !expiringSoon) {
-        throw AppError.conflict('NOT_DISPOSABLE', 'Only expired or expiring stock can be disposed of. Use a stock adjustment instead.');
+      // In-date stock (damaged, recalled, contaminated...) may be disposed of too,
+      // but the loss must be explained.
+      if (!expired && !expiringSoon && !notes) {
+        throw AppError.validation('Say why in-date stock is being disposed of.', {
+          fields: { notes: 'Give a reason, e.g. damaged or recalled.' },
+        });
       }
       if (archive && !auth.permissions.has(P.INVENTORY_BATCH_ARCHIVE)) {
         throw AppError.forbidden('PERMISSION_DENIED', 'You do not have permission to archive batches.');
@@ -390,7 +394,8 @@ async function disposeStock(auth, actor, id, { notes, archive }, idempotencyKey)
       const quantity = row.quantity;
       const lossValue = toMoneyString(money(row.purchase_price).times(quantity));
       const adjustmentNumber = await nextDocumentNumber(client, 'STOCK_ADJUSTMENT');
-      const label = expired ? 'Expired stock disposed' : 'Expiring stock disposed';
+      const condition = expired ? 'expired' : expiringSoon ? 'expiring soon' : 'in date';
+      const label = expired ? 'Expired stock disposed' : expiringSoon ? 'Expiring stock disposed' : 'Stock disposed';
       const adjustment = await repo.insertAdjustment(client, {
         adjustmentNumber,
         branchId: row.branch_id,
@@ -419,7 +424,7 @@ async function disposeStock(auth, actor, id, { notes, archive }, idempotencyKey)
         entityType: 'INVENTORY_ADJUSTMENT',
         entityId: adjustment.id,
         branchId: row.branch_id,
-        description: `${adjustmentNumber}: ${quantity} units of ${row.medicine_name} batch ${row.batch_number} disposed (${expired ? 'expired' : 'expiring soon'})`,
+        description: `${adjustmentNumber}: ${quantity} units of ${row.medicine_name} batch ${row.batch_number} disposed (${condition})`,
         previousValues: { quantity },
         newValues: { quantity: 0, expiryDate: row.expiry_date, lossValue, archived: Boolean(archive), notes: notes ?? null },
       });

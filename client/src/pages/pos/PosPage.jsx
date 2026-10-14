@@ -9,6 +9,7 @@ import {
   PageHeader, Panel, Button, Badge, EmptyState, InlineAlert, Modal, TextInput, SelectInput, IconButton, SkeletonRows, ErrorState, LearnHow, FilterToolbar,
 } from '../../components/ui/index.js';
 import { ReceiptModal } from '../../components/sales/ReceiptModal.jsx';
+import { QuantityInput } from '../../components/sales/QuantityInput.jsx';
 import { estimateTotals, toCents, fromCents } from '../../utils/money.js';
 import { formatDate, formatMoney, formatNumber, PRODUCT_TYPE_OPTIONS } from '../../utils/format.js';
 
@@ -245,7 +246,8 @@ export default function PosPage() {
                   <div className="row">
                     <div className="qty-control">
                       <button type="button" aria-label="Decrease" onClick={() => setQuantity(l.medicineId, l.quantity - 1)}><Minus size={14} /></button>
-                      <input value={l.quantity} inputMode="numeric" aria-label={`Quantity of ${l.name}`} onChange={(e) => setQuantity(l.medicineId, e.target.value)} />
+                      <QuantityInput line={l} onChange={(q) => setQuantity(l.medicineId, q)}
+                        onTooMany={(line) => toast.error(`Only ${line.available} unit(s) of ${line.name} available.`)} />
                       <button type="button" aria-label="Increase" onClick={() => setQuantity(l.medicineId, l.quantity + 1)} disabled={l.quantity >= l.available}><Plus size={14} /></button>
                     </div>
                     {can('SALES_OVERRIDE_FEFO') && <IconButton icon={Layers} label="Choose batches" onClick={() => setOverrideFor(l)} />}
