@@ -17,9 +17,9 @@ npm install                                  # both workspaces
 npm run migrate                              # apply SQL migrations (dev DB)
 npm run migrate:down --workspace server      # roll back latest migration
 npm run migrate:create --workspace server -- <name>   # new SQL migration file
-npm run seed                                 # idempotent reference data (roles, permissions, settings, categories, help)
+npm run seed                                 # idempotent reference data (roles, permissions, settings, categories, help, 499-medicine catalog)
 npm run create-owner                         # first Owner (interactive, or OWNER_NAME/OWNER_EMAIL/OWNER_PASSWORD env)
-npm run seed:demo --workspace server         # demo branches/staff/transactions (dev only, needs Owner + empty catalog)
+npm run seed:demo --workspace server         # demo branches/staff/transactions (dev only, needs Owner + no stock)
 
 npm run dev:server                           # API on :4000 (node --watch)
 npm run dev:client                           # Vite on :5173, proxies /api -> :4000

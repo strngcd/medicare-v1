@@ -7,7 +7,8 @@
  * sales, a refund, a void and a transfer by calling the real services, so
  * every record follows the same business rules, ledger and audit trail as
  * normal use. All demo staff use the password printed at the end.
- * Requires an Owner account (npm run create-owner) and an empty catalog.
+ * Requires an Owner account (npm run create-owner) and no stock yet. The demo
+ * adds its own ten medicines next to the default catalog from npm run seed.
  */
 const config = require('../src/config');
 const { pool, query } = require('../src/database/db');
@@ -49,8 +50,8 @@ async function main() {
 
   const owner = await query("SELECT u.id FROM users u JOIN roles r ON r.id = u.role_id WHERE r.code = 'OWNER' AND u.status = 'ACTIVE' LIMIT 1");
   if (!owner.rows[0]) throw new Error('Create an Owner first: npm run create-owner');
-  const existing = await query('SELECT count(*)::int AS n FROM medicines');
-  if (existing.rows[0].n > 0) throw new Error('Demo data needs an empty catalog (medicines already exist).');
+  const existing = await query('SELECT count(*)::int AS n FROM batches');
+  if (existing.rows[0].n > 0) throw new Error('Demo data needs an empty inventory (stock already exists).');
 
   let ownerAuth = await loadAuthContext(owner.rows[0].id);
   const ownerActor = actorFor(ownerAuth);
