@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import {
   Banknote, Receipt, Package, Calculator, Pill, TrendingDown, PackageX, CalendarClock, CalendarX2,
-  Wallet, Percent, Landmark, Coins, Scale,
+  Wallet, Percent, Landmark, Coins, Scale, Trash2,
 } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
@@ -129,6 +129,12 @@ export default function DashboardPage() {
               {f.cogs !== undefined && <Kpi icon={Scale} label="Cost of goods sold" value={formatMoney(f.cogs)} />}
               {f.grossProfit !== undefined && <Kpi icon={Banknote} label="Gross profit" value={formatMoney(f.grossProfit)} note={`Margin ${f.grossMargin}%`} />}
               {f.inventoryValue !== undefined && <Kpi icon={Package} label="Inventory value (cost)" value={formatMoney(f.inventoryValue)} />}
+              {f.stockLosses !== undefined && (
+                <Kpi icon={Trash2} label="Stock losses (cost)" value={formatMoney(f.stockLosses)}
+                  tone={Number(f.stockLosses) > 0 ? 'danger' : undefined}
+                  note={`${formatNumber(f.stockLossUnits)} unit${f.stockLossUnits === 1 ? '' : 's'} expired, damaged, lost or disposed`}
+                  onClick={can('REPORT_INVENTORY_VIEW') ? () => navigate('/reports?report=losses') : undefined} />
+              )}
             </div>
           )}
         </>
