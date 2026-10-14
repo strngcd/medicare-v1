@@ -93,10 +93,12 @@ npm run create-owner    # interactive: creates the first Owner account
 ```
 
 `npm run seed` is idempotent and never creates users, stock or financial data.
-It loads the default catalog of 499 medicines (`server/seeds/data/medicine-catalog.csv`)
-as active medicines without stock, filed under the broad starter categories; medicines that
-already exist are skipped. Edit the CSV's `prescription_required` column to
-change which medicines need a prescription before seeding.
+It loads the default catalogs, 499 medicines (`server/seeds/data/medicine-catalog.csv`)
+and 95 cosmetics (`server/seeds/data/cosmetic-catalog.csv`), as active products
+without stock, filed under the broad starter categories. Each row has a permanent
+key, so products already loaded (even if edited since) are skipped. Edit the
+medicine CSV's `prescription_required` column to change which medicines need a
+prescription before seeding.
 For non-interactive provisioning set `OWNER_NAME`, `OWNER_EMAIL` and
 `OWNER_PASSWORD` before `npm run create-owner`.
 
