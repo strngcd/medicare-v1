@@ -1,4 +1,5 @@
 const PDFDocument = require('pdfkit');
+const { NO_EXPIRY_DATE } = require('../inventory/batchIdentity');
 
 /**
  * Exports a report produced by reports.service. Reports arrive with columns
@@ -9,6 +10,7 @@ const PDFDocument = require('pdfkit');
 function formatCell(value) {
   if (value === null || value === undefined) return '';
   if (value instanceof Date) return value.toISOString();
+  if (value === NO_EXPIRY_DATE) return 'No expiry';
   return String(value);
 }
 

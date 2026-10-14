@@ -44,9 +44,9 @@ function ReceiveModal({ purchase, onClose, onDone }) {
       notes: notes || undefined,
       items: receiving.map((l) => ({
         purchaseItemId: l.purchaseItemId,
-        batchNumber: l.batchNumber.trim(),
+        batchNumber: l.batchNumber.trim() || null,
         manufacturingDate: l.manufacturingDate || null,
-        expiryDate: l.expiryDate,
+        expiryDate: l.expiryDate || null,
         quantity: Number(l.quantity),
         sellingPrice: l.sellingPrice,
       })),
@@ -84,10 +84,12 @@ function ReceiveModal({ purchase, onClose, onDone }) {
           <div className="panel-body stack-sm">
             {lines.map((line, index) => line.purchaseItemId === item.id && (
               <div key={line.key} className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', alignItems: 'end' }}>
-                <TextInput label="Batch number" value={line.batchNumber} onChange={(e) => setLine(line.key, 'batchNumber', e.target.value)} error={errorFor(index, 'batchNumber')} />
+                <TextInput label="Batch number" value={line.batchNumber} onChange={(e) => setLine(line.key, 'batchNumber', e.target.value)} error={errorFor(index, 'batchNumber')}
+                  placeholder={item.productType === 'COSMETIC' ? 'Auto' : undefined} />
                 <TextInput label="Quantity" type="number" min="0" value={line.quantity} onChange={(e) => setLine(line.key, 'quantity', e.target.value)} error={errorFor(index, 'quantity')} />
                 <TextInput label="Manufactured" type="date" max={todayIso()} value={line.manufacturingDate} onChange={(e) => setLine(line.key, 'manufacturingDate', e.target.value)} error={errorFor(index, 'manufacturingDate')} />
-                <TextInput label="Expiry" type="date" min={todayIso()} value={line.expiryDate} onChange={(e) => setLine(line.key, 'expiryDate', e.target.value)} error={errorFor(index, 'expiryDate')} />
+                <TextInput label="Expiry" type="date" min={todayIso()} value={line.expiryDate} onChange={(e) => setLine(line.key, 'expiryDate', e.target.value)} error={errorFor(index, 'expiryDate')}
+                  hint={item.productType === 'COSMETIC' ? 'Optional for cosmetics' : undefined} />
                 {showCost && <TextInput label="Unit cost" value={formatMoney(item.unitPurchasePrice, { withCurrency: false })} readOnly disabled hint="From the order" />}
                 <TextInput label="Selling price" inputMode="decimal" value={line.sellingPrice} onChange={(e) => setLine(line.key, 'sellingPrice', e.target.value)} error={errorFor(index, 'sellingPrice')}
                   hint={showCost ? `Cost + ${Number(markup ?? 15)}%` : undefined} />

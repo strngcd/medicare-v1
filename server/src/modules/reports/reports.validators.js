@@ -1,6 +1,8 @@
 const { z, uuid, isoDate, money, listQuery } = require('../../validators/common');
 const { listRefundsQuery } = require('../refunds/refunds.validators');
 
+const productType = z.enum(['MEDICINE', 'COSMETIC']);
+
 const range = {
   range: z.enum(['TODAY', 'WEEK', 'MONTH', 'YEAR', 'CUSTOM']).optional(),
   dateFrom: isoDate.optional(),
@@ -13,6 +15,7 @@ const salesReportQuery = listQuery.extend({
   staffId: uuid.optional(),
   medicineId: uuid.optional(),
   categoryId: uuid.optional(),
+  productType: productType.optional(),
   paymentMethod: z.enum(['CASH', 'BANK_TRANSFER']).optional(),
   status: z.enum(['COMPLETED', 'VOIDED']).optional(),
   receiptNumber: z.string().trim().max(40).optional(),
@@ -23,6 +26,7 @@ const salesReportQuery = listQuery.extend({
 const inventoryReportQuery = listQuery.extend({
   branchId: uuid.optional(),
   categoryId: uuid.optional(),
+  productType: productType.optional(),
   status: z.enum(['AVAILABLE', 'LOW_STOCK', 'OUT_OF_STOCK', 'EXPIRING_SOON']).optional(),
 });
 

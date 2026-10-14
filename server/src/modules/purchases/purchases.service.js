@@ -1,4 +1,5 @@
 const AppError = require('../../errors/AppError');
+const { resolveBatchIdentity } = require('../inventory/batchIdentity');
 const { withTransaction } = require('../../database/db');
 const { recordAudit } = require('../audit/audit.recorder');
 const { runIdempotent } = require('../idempotency/idempotency');
@@ -326,6 +327,7 @@ async function receiveLines(client, auth, actor, id, input) {
   const items = await repo.listItems(id, client, { forUpdate: true });
   const itemsById = new Map(items.map((i) => [i.id, i]));
   const receivingNow = new Map();
+  const identities = [];
 
   // Validate every line before touching stock.
   input.items.forEach((line, index) => {
@@ -348,8 +350,9 @@ async function receiveLines(client, auth, actor, id, input) {
       });
     }
     receivingNow.set(item.id, already + line.quantity);
-    if (line.expiryDate < today) {
-      throw AppError.conflict('BATCH_EXPIRED', `Batch ${line.batchNumber} is already expired.`, {
+    identities[index] = resolveBatchIdentity(item.product_type, line, field);
+    if (line.expiryDate && line.expiryDate < today) {
+      throw AppError.conflict('BATCH_EXPIRED', `Batch ${identities[index].batchNumber} is already expired.`, {
         fields: { [field('expiryDate')]: 'Expired stock cannot be received.' },
       });
     }
@@ -368,16 +371,16 @@ async function receiveLines(client, auth, actor, id, input) {
   });
 
   const received = [];
-  for (const line of input.items) {
+  for (const [index, line] of input.items.entries()) {
     const item = itemsById.get(line.purchaseItemId);
     // Cost always comes from the order line; it is not editable on receiving.
     const purchasePrice = item.unit_purchase_price;
 
     const { batch } = await ledger.findOrCreateBatch(client, {
       medicineId: item.medicine_id,
-      batchNumber: line.batchNumber,
+      batchNumber: identities[index].batchNumber,
       manufacturingDate: line.manufacturingDate,
-      expiryDate: line.expiryDate,
+      expiryDate: identities[index].expiryDate,
       purchasePrice,
       supplierId: purchase.supplier_id,
       userId: auth.userId,

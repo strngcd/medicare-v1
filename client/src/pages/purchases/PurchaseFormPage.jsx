@@ -72,7 +72,7 @@ export default function PurchaseFormPage() {
     const p = existing.data;
     setForm({ supplierId: p.supplierId, branchId: p.branchId, purchaseDate: p.purchaseDate, expectedDate: p.expectedDate || '', notes: p.notes || '' });
     setItems(p.items.map((i) => ({
-      medicineId: i.medicineId, medicineName: i.medicineName, orderedQuantity: String(i.orderedQuantity),
+      medicineId: i.medicineId, medicineName: i.medicineName, productType: i.productType, orderedQuantity: String(i.orderedQuantity),
       unitPurchasePrice: i.unitPurchasePrice, discount: i.discount, tax: i.tax, notes: i.notes || '',
     })));
   }, [existing.data]);
@@ -126,9 +126,9 @@ export default function PurchaseFormPage() {
       payload.receive = {
         items: receivingLines.map((i) => ({
           medicineId: i.medicineId,
-          batchNumber: (i.batchNumber || '').trim(),
+          batchNumber: (i.batchNumber || '').trim() || null,
           manufacturingDate: i.manufacturingDate || null,
-          expiryDate: i.expiryDate || '',
+          expiryDate: i.expiryDate || null,
           quantity: Number(receiveQuantityOf(i)),
           sellingPrice: sellingPriceOf(i) || '',
         })),
@@ -187,7 +187,7 @@ export default function PurchaseFormPage() {
 
       <Panel title="Medicines" flush footer={<div className="spread"><span className="muted">Estimated total (the server calculates the final amount)</span><strong>{formatMoney(fromCents(totalCents))}</strong></div>}>
         <div className="panel-body"><MedicinePicker exclude={items.map((i) => i.medicineId)} onSelect={(m) => setItems((list) => [...list, {
-          medicineId: m.id, medicineName: `${m.name}${m.strength ? ` ${m.strength}` : ''}`, orderedQuantity: '', unitPurchasePrice: '', discount: '', tax: '', notes: '',
+          medicineId: m.id, medicineName: `${m.name}${m.strength ? ` ${m.strength}` : ''}`, productType: m.productType, orderedQuantity: '', unitPurchasePrice: '', discount: '', tax: '', notes: '',
         }])} /></div>
         {items.length === 0 ? (
           <EmptyState title="No medicines added" message="Search above to add the medicines you are ordering. Only active medicines can be purchased." />
@@ -225,16 +225,18 @@ export default function PurchaseFormPage() {
             <p className="muted small">Tick this if the delivery has arrived. You can receive all or part of the order now and the rest later from the purchase page.</p>
           ) : (
             <div className="stack">
-              <p className="muted small">Set quantity to 0 to skip a medicine. Selling price starts at unit cost + {Number(markup ?? 15)}% and can be changed.</p>
+              <p className="muted small">Set quantity to 0 to skip an item. Selling price starts at unit cost + {Number(markup ?? 15)}% and can be changed.</p>
               {items.map((item, index) => (
                 <div key={item.medicineId} className="stack-sm">
                   <strong>{item.medicineName}</strong>
                   <div className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', alignItems: 'start' }}>
-                    <TextInput label="Batch number" value={item.batchNumber || ''} onChange={(e) => setItem(index, 'batchNumber', e.target.value)} error={receiveError(item, 'batchNumber')} />
+                    <TextInput label="Batch number" value={item.batchNumber || ''} onChange={(e) => setItem(index, 'batchNumber', e.target.value)} error={receiveError(item, 'batchNumber')}
+                      placeholder={item.productType === 'COSMETIC' ? 'Auto' : undefined} />
                     <TextInput label="Quantity" type="number" min="0" max={item.orderedQuantity} value={receiveQuantityOf(item)}
                       onChange={(e) => setItem(index, 'receiveQuantity', e.target.value)} error={receiveError(item, 'quantity')} />
                     <TextInput label="Manufactured" type="date" max={todayIso()} value={item.manufacturingDate || ''} onChange={(e) => setItem(index, 'manufacturingDate', e.target.value)} error={receiveError(item, 'manufacturingDate')} />
-                    <TextInput label="Expiry" type="date" min={todayIso()} value={item.expiryDate || ''} onChange={(e) => setItem(index, 'expiryDate', e.target.value)} error={receiveError(item, 'expiryDate')} />
+                    <TextInput label="Expiry" type="date" min={todayIso()} value={item.expiryDate || ''} onChange={(e) => setItem(index, 'expiryDate', e.target.value)} error={receiveError(item, 'expiryDate')}
+                      hint={item.productType === 'COSMETIC' ? 'Optional for cosmetics' : undefined} />
                     <TextInput label="Selling price" inputMode="decimal" value={sellingPriceOf(item)}
                       onChange={(e) => setItem(index, 'receiveSellingPrice', e.target.value)} error={receiveError(item, 'sellingPrice')} />
                   </div>

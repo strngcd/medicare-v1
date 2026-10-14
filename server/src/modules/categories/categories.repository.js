@@ -2,13 +2,14 @@ const { query } = require('../../database/db');
 const { whereBuilder } = require('../../utils/pagination');
 
 const COLUMNS = `
-  c.id, c.name, c.description, c.status, c.created_at, c.updated_at,
+  c.id, c.name, c.description, c.product_type, c.status, c.created_at, c.updated_at,
   c.created_by, c.updated_by, c.archived_at, c.archived_by,
   (SELECT count(*) FROM medicines m WHERE m.category_id = c.id AND m.status <> 'ARCHIVED') AS medicine_count`;
 
-async function list({ status, search, limit, offset, orderBy }) {
+async function list({ status, productType, search, limit, offset, orderBy }) {
   const w = whereBuilder();
   if (status) w.add('c.status = ?', status);
+  if (productType) w.add('c.product_type = ?', productType);
   if (search) w.add('c.name ILIKE ?', `%${search}%`);
   const { rows } = await query(
     `SELECT ${COLUMNS}, count(*) OVER() AS total_count
@@ -38,11 +39,11 @@ async function nameExists(client, name, excludeId = null) {
   return rows.length > 0;
 }
 
-async function insert(client, { name, description }, actorId) {
+async function insert(client, { name, description, productType }, actorId) {
   const { rows } = await query(
-    `INSERT INTO medicine_categories (name, description, created_by, updated_by)
-     VALUES ($1, $2, $3, $3) RETURNING id`,
-    [name, description ?? null, actorId],
+    `INSERT INTO medicine_categories (name, description, product_type, created_by, updated_by)
+     VALUES ($1, $2, $3, $4, $4) RETURNING id`,
+    [name, description ?? null, productType || 'MEDICINE', actorId],
     client,
   );
   return rows[0].id;

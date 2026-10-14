@@ -8,14 +8,16 @@ import { PageHeader, Panel, Button, Steps, InlineAlert, DataTable, LearnHow } fr
 import { BatchFields, batchPayload } from '../../components/inventory/AddStockModal.jsx';
 import { MedicineFields, emptyMedicine, medicinePayload } from './MedicineFields.jsx';
 import { formatDate, formatMoney, formatNumber } from '../../utils/format.js';
-
-const STEPS = [{ value: 'info', label: 'Medicine information' }, { value: 'batches', label: 'Batches' }];
+import { productConfig } from './productTypes.js';
 
 /**
  * Two-step flow: 1) save the medicine as DRAFT, 2) add one or more batches,
  * then finish (DRAFT -> ACTIVE).
  */
-export default function MedicineCreatePage() {
+export default function MedicineCreatePage({ productType = 'MEDICINE' }) {
+  const config = productConfig(productType);
+  const cosmetic = productType === 'COSMETIC';
+  const STEPS = [{ value: 'info', label: `${config.title} information` }, { value: 'batches', label: 'Batches' }];
   const navigate = useNavigate();
   const { activeBranches, branchParam, can } = useAuth();
   const [step, setStep] = useState('info');
@@ -35,7 +37,7 @@ export default function MedicineCreatePage() {
 
   const saveDraft = async (e) => {
     e.preventDefault();
-    const result = await saveAction.run(() => api.post('/medicines', medicinePayload(form)), { success: 'Saved as draft.' });
+    const result = await saveAction.run(() => api.post('/medicines', medicinePayload(form, { productType, createType: productType })), { success: 'Saved as draft.' });
     if (result) {
       setMedicine(result.data.medicine);
       setDuplicates(result.data.warnings.duplicates);
@@ -56,25 +58,25 @@ export default function MedicineCreatePage() {
   };
 
   const finish = async () => {
-    const result = await finishAction.run(() => api.patch(`/medicines/${medicine.id}`, { status: 'ACTIVE' }), { success: 'Medicine is now active.' });
-    if (result) navigate(`/medicines/${medicine.id}`, { replace: true });
+    const result = await finishAction.run(() => api.patch(`/medicines/${medicine.id}`, { status: 'ACTIVE' }), { success: `${config.title} is now active.` });
+    if (result) navigate(`${config.basePath}/${medicine.id}`, { replace: true });
   };
 
   return (
     <div className="stack">
       <PageHeader
-        title="Add medicine"
-        breadcrumbs={[{ label: 'Medicines', to: '/medicines' }, { label: 'New' }]}
+        title={`Add ${config.singular}`}
+        breadcrumbs={[{ label: config.plural, to: config.basePath }, { label: 'New' }]}
         actions={<LearnHow slug="adding-a-medicine" />}
       />
       <Steps steps={STEPS} current={step} />
 
       {step === 'info' && (
-        <Panel title="Medicine information">
+        <Panel title={`${config.title} information`}>
           <form className="stack" onSubmit={saveDraft}>
-            <MedicineFields form={form} setForm={setForm} errors={saveAction.fieldErrors} />
+            <MedicineFields form={form} setForm={setForm} errors={saveAction.fieldErrors} productType={productType} />
             <div className="form-actions">
-              <Button variant="secondary" onClick={() => navigate('/medicines')}>Cancel</Button>
+              <Button variant="secondary" onClick={() => navigate(config.basePath)}>Cancel</Button>
               <Button type="submit" loading={saveAction.running}>Save draft and continue</Button>
             </div>
           </form>
@@ -85,9 +87,9 @@ export default function MedicineCreatePage() {
         <>
           {duplicates.length > 0 && (
             <InlineAlert tone="warning">
-              A similar medicine already exists:{' '}
+              A similar {config.singular} already exists:{' '}
               {duplicates.map((d, i) => (
-                <span key={d.id}>{i > 0 && ', '}<Link to={`/medicines/${d.id}`}>{d.name} {d.strength} ({d.status.toLowerCase()})</Link></span>
+                <span key={d.id}>{i > 0 && ', '}<Link to={`${config.basePath}/${d.id}`}>{d.name} {d.strength} ({d.status.toLowerCase()})</Link></span>
               ))}
               . Check it is not a duplicate before adding stock.
             </InlineAlert>
@@ -111,7 +113,7 @@ export default function MedicineCreatePage() {
           {can('INVENTORY_ADD_STOCK') ? (
             <Panel title="Add a batch">
               <div className="stack">
-                <BatchFields form={batch} setForm={setBatch} errors={batchAction.fieldErrors} showBranch
+                <BatchFields form={batch} setForm={setBatch} errors={batchAction.fieldErrors} cosmetic={cosmetic} showBranch
                   branchOptions={activeBranches.map((b) => ({ value: b.id, label: b.name }))} />
                 {batchAction.error && ['BATCH_COST_CONFLICT', 'BATCH_DATA_CONFLICT'].includes(batchAction.error.code) && (
                   <InlineAlert tone="danger">{batchAction.error.message}</InlineAlert>
@@ -122,11 +124,11 @@ export default function MedicineCreatePage() {
               </div>
             </Panel>
           ) : (
-            <InlineAlert tone="info">You do not have permission to add stock. The medicine can still be activated and stocked through purchasing.</InlineAlert>
+            <InlineAlert tone="info">You do not have permission to add stock. The {config.singular} can still be activated and stocked through purchasing.</InlineAlert>
           )}
 
           <div className="form-actions">
-            <Button variant="secondary" onClick={() => navigate(`/medicines/${medicine.id}`)}>Keep as draft</Button>
+            <Button variant="secondary" onClick={() => navigate(`${config.basePath}/${medicine.id}`)}>Keep as draft</Button>
             <Button icon={CheckCircle2} onClick={finish} loading={finishAction.running}>Finish and activate</Button>
           </div>
         </>

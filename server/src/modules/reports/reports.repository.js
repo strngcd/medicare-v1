@@ -29,6 +29,13 @@ function buildSalesFilter(f) {
   if (f.maxAmount) add('s.total <= ?::numeric', f.maxAmount);
   if (f.paymentMethod) add('EXISTS (SELECT 1 FROM sale_payments p WHERE p.sale_id = s.id AND p.payment_method = ?)', f.paymentMethod);
   if (f.medicineId) add('EXISTS (SELECT 1 FROM sale_items fi WHERE fi.sale_id = s.id AND fi.medicine_id = ?)', f.medicineId);
+  if (f.productType) {
+    add(
+      `EXISTS (SELECT 1 FROM sale_items fi JOIN medicines fm ON fm.id = fi.medicine_id
+                WHERE fi.sale_id = s.id AND fm.product_type = ?)`,
+      f.productType,
+    );
+  }
   if (f.categoryId) {
     add(
       `EXISTS (SELECT 1 FROM sale_items fi JOIN medicines fm ON fm.id = fi.medicine_id
@@ -237,9 +244,13 @@ async function branchComparison(filters) {
 }
 
 /** Stock position per medicine and branch, with value at batch cost. */
-async function inventoryPositions({ today, warningDays, branchIds, categoryId, status, limit, offset }) {
+async function inventoryPositions({ today, warningDays, branchIds, categoryId, productType, status, limit, offset }) {
   const params = [today, warningDays, branchIds];
   const filters = ["m.status <> 'ARCHIVED' OR x.total_quantity > 0"];
+  if (productType) {
+    params.push(productType);
+    filters.push(`m.product_type = $${params.length}`);
+  }
   if (categoryId) {
     params.push(categoryId);
     filters.push(`m.category_id = $${params.length}`);

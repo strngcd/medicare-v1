@@ -131,27 +131,35 @@ Users can never change their own role, permissions, branches, status or employee
 | GET | `/branches/:id/inventory-summary` | INVENTORY_VIEW | |
 | GET, PATCH | `/branches/:id/settings` | SETTINGS_VIEW or BRANCH_EDIT / SETTINGS_EDIT or BRANCH_EDIT | Receipt options, default minimum stock (new records only). |
 
-### Medicines and categories
+### Medicines, cosmetics and categories
+
+Medicines and cosmetics are both products (`productType`: `MEDICINE` | `COSMETIC`)
+in `/medicines`, sharing purchasing, inventory, sales, refunds, transfers and
+reports. The type is set on create and never changes; categories have a type too
+and a product only takes a category of its own type. Cosmetics never require a
+prescription (the flag may be omitted). Their batches may omit `batchNumber`
+(a `LOT-XXXXXX` code is generated) and `expiryDate` (stored as `9999-12-31`,
+meaning no expiry: never expiring, sold after dated stock). Medicines always need both.
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
-| GET | `/medicines` | MEDICINE_VIEW | Filters: `search, categoryId, status, prescriptionRequired, branchId`. Includes sellable stock. |
-| GET | `/medicines/search` | MEDICINE_VIEW | POS search: `q, branchId, categoryId`. Active medicines, sellable quantity, next FEFO price, `barcodeMatch`. |
+| GET | `/medicines` | MEDICINE_VIEW | Filters: `search, productType, categoryId, status, prescriptionRequired, branchId`. Includes sellable stock. |
+| GET | `/medicines/search` | MEDICINE_VIEW | POS search: `q, branchId, categoryId, productType`. Active medicines, sellable quantity, next FEFO price, `barcodeMatch`. |
 | POST | `/medicines` | MEDICINE_CREATE | Created as `DRAFT`. Returns `warnings.duplicates`. |
 | GET, PATCH | `/medicines/:id` | MEDICINE_VIEW / MEDICINE_EDIT | PATCH `{ status: "ACTIVE" }` activates a draft. |
 | PATCH | `/medicines/:id/barcode` | MEDICINE_EDIT | `{ barcode | null }`. `DUPLICATE_BARCODE`. |
 | POST | `/medicines/:id/archive` · `/restore` | MEDICINE_ARCHIVE · MEDICINE_RESTORE | |
 | GET | `/medicines/:id/batches` | INVENTORY_VIEW_BATCHES | |
 | GET | `/medicines/:id/inventory` | INVENTORY_VIEW | |
-| GET | `/medicine-categories` | CATEGORY_VIEW | |
-| POST, PATCH | `/medicine-categories[/:id]` | CATEGORY_CREATE / CATEGORY_EDIT | `DUPLICATE_CATEGORY`. |
+| GET | `/medicine-categories` | CATEGORY_VIEW | Filters `status, productType, search`. |
+| POST, PATCH | `/medicine-categories[/:id]` | CATEGORY_CREATE / CATEGORY_EDIT | POST takes `productType` (default `MEDICINE`). `DUPLICATE_CATEGORY`. |
 | POST | `/medicine-categories/:id/archive` · `/restore` | CATEGORY_ARCHIVE · CATEGORY_RESTORE | |
 
 ### Inventory
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
-| GET | `/inventory` | INVENTORY_VIEW | Rows per branch × batch with derived `status`. Batch details need INVENTORY_VIEW_BATCHES. |
+| GET | `/inventory` | INVENTORY_VIEW | Rows per branch × batch with derived `status`; filter `productType`. Batch details need INVENTORY_VIEW_BATCHES. |
 | GET | `/inventory/:id` | INVENTORY_VIEW | |
 | GET | `/inventory/expired` · `/expiring-soon` | INVENTORY_VIEW | Per batch row. |
 | GET | `/inventory/low-stock` · `/out-of-stock` | INVENTORY_VIEW | Per medicine and branch (sellable = non-expired stock). |
@@ -226,6 +234,9 @@ Invalid steps return `TRANSFER_INVALID_STATE`.
 ### Reports, analytics and exports
 
 Date parameters: `range` = `TODAY|WEEK|MONTH|YEAR|CUSTOM` with `dateFrom`/`dateTo` for CUSTOM. Future dates return 422.
+Sales, profit and inventory reports (and their exports) accept `productType` = `MEDICINE|COSMETIC`;
+for sales and profit it keeps sales containing at least one item of that type, like `categoryId`.
+Exports show the no-expiry date as "No expiry".
 
 | Method | Path | Permission |
 | --- | --- | --- |

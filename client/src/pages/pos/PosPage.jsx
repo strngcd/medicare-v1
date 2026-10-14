@@ -10,7 +10,7 @@ import {
 } from '../../components/ui/index.js';
 import { ReceiptModal } from '../../components/sales/ReceiptModal.jsx';
 import { estimateTotals, toCents, fromCents } from '../../utils/money.js';
-import { formatDate, formatMoney, formatNumber } from '../../utils/format.js';
+import { formatDate, formatMoney, formatNumber, PRODUCT_TYPE_OPTIONS } from '../../utils/format.js';
 
 /** Optional FEFO override: pick exact batches with a reason (permission-gated). */
 function BatchOverrideModal({ line, branchId, onClose, onApply }) {
@@ -63,6 +63,7 @@ export default function PosPage() {
   const categories = useCategories();
   const [term, setTerm] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [productType, setProductType] = useState('');
   const [cart, setCart] = useState([]);
   const [discount, setDiscount] = useState({ type: 'PERCENTAGE', value: '' });
   const [paymentMethod, setPaymentMethod] = useState('CASH');
@@ -76,8 +77,8 @@ export default function PosPage() {
   const branchId = branchParam;
 
   const results = useApi(
-    () => api.get('/medicines/search', { branchId, q: debounced || undefined, categoryId: categoryId || undefined, limit: 30 }).then((r) => r.data),
-    [branchId, debounced, categoryId],
+    () => api.get('/medicines/search', { branchId, q: debounced || undefined, categoryId: categoryId || undefined, productType: productType || undefined, limit: 30 }).then((r) => r.data),
+    [branchId, debounced, categoryId, productType],
     { enabled: Boolean(branchId) },
   );
 
@@ -192,17 +193,20 @@ export default function PosPage() {
               <span className="field-label">Search or scan</span>
               <div className="input-with-icon">
                 <ScanBarcode aria-hidden="true" />
-                <input ref={searchRef} className="input" type="search" autoFocus placeholder="Medicine name or barcode, then Enter"
+                <input ref={searchRef} className="input" type="search" autoFocus placeholder="Name or barcode, then Enter"
                   value={term} onChange={(e) => setTerm(e.target.value)} onKeyDown={onSearchKey} aria-label="Search or scan medicine" />
               </div>
             </div>
-            <SelectInput label="Category" value={categoryId} placeholder="All categories" options={toOptions(categories.data)} onChange={(e) => setCategoryId(e.target.value)} />
+            <SelectInput label="Type" value={productType} placeholder="All products" options={PRODUCT_TYPE_OPTIONS}
+              onChange={(e) => { setProductType(e.target.value); setCategoryId(''); }} />
+            <SelectInput label="Category" value={categoryId} placeholder="All categories"
+              options={toOptions((categories.data || []).filter((c) => !productType || c.productType === productType))} onChange={(e) => setCategoryId(e.target.value)} />
           </FilterToolbar>
           <div className="pos-results" aria-busy={results.loading || undefined}>
             {results.error && <ErrorState error={results.error} onRetry={results.reload} />}
             {!results.data && !results.error && <SkeletonRows rows={6} columns={3} />}
             {results.data && results.data.length === 0 && (
-              <EmptyState title={debounced ? 'No matching medicines' : 'No active medicines'} message={debounced ? 'Check the spelling or scan the barcode again.' : 'Active medicines with stock appear here.'} />
+              <EmptyState title={debounced ? 'No matching products' : 'No active products'} message={debounced ? 'Check the spelling or scan the barcode again.' : 'Active medicines and cosmetics with stock appear here.'} />
             )}
             {results.data && results.data.map((m) => (
               <button key={m.id} type="button" className="pos-item" onClick={() => addToCart(m)} disabled={m.sellableQuantity <= 0}>
@@ -212,7 +216,7 @@ export default function PosPage() {
                     {m.prescriptionRequired && <Badge tone="info">Rx</Badge>}
                     {m.sellableQuantity <= 0 && <Badge tone="danger">Out of stock</Badge>}
                   </span>
-                  <span className="small muted">{[m.strength, m.dosageForm, m.packageSize, m.categoryName].filter(Boolean).join(' · ')}</span>
+                  <span className="small muted">{[m.productType === 'COSMETIC' && 'Cosmetic', m.brandName, m.strength, m.dosageForm, m.packageSize, m.categoryName].filter(Boolean).join(' · ')}</span>
                 </span>
                 <span className="stack-sm" style={{ gap: 2, alignItems: 'flex-end' }}>
                   <strong className="nowrap">{m.nextPrice ? formatMoney(m.nextPrice) : '—'}</strong>

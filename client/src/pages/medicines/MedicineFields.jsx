@@ -2,6 +2,10 @@ import { TextInput, SelectInput, TextArea, Checkbox } from '../../components/ui/
 import { useCategories, toOptions } from '../../hooks/useLookups.js';
 
 export const DOSAGE_FORMS = ['Tablet', 'Capsule', 'Syrup', 'Suspension', 'Injection', 'Cream', 'Ointment', 'Drops', 'Inhaler', 'Powder', 'Suppository', 'Device'];
+export const COSMETIC_FORMS = ['Cream', 'Lotion', 'Gel', 'Serum', 'Oil', 'Balm', 'Foam', 'Shampoo', 'Conditioner', 'Soap', 'Spray', 'Powder', 'Stick', 'Wipes', 'Other'];
+
+// Medicine-only fields: never sent for cosmetics.
+const MEDICINE_ONLY = ['genericName', 'strength', 'prescriptionRequired'];
 
 export function emptyMedicine() {
   return {
@@ -10,21 +14,45 @@ export function emptyMedicine() {
   };
 }
 
-export function medicinePayload(form, { includeBarcode = true } = {}) {
+/**
+ * Request body from the form. `productType` is only sent on create (it is
+ * fixed afterwards); cosmetics leave out medicine-only fields.
+ */
+export function medicinePayload(form, { includeBarcode = true, productType, createType } = {}) {
   const payload = {};
   for (const [key, value] of Object.entries(form)) {
     if (key === 'barcode' && !includeBarcode) continue;
+    if (productType === 'COSMETIC' && MEDICINE_ONLY.includes(key)) continue;
     payload[key] = typeof value === 'string' ? (value.trim() === '' ? null : value.trim()) : value;
   }
   payload.name = form.name.trim();
   payload.packageSize = form.packageSize.trim();
   if (!includeBarcode) delete payload.barcode;
+  if (createType) payload.productType = createType;
   return payload;
 }
 
-export function MedicineFields({ form, setForm, errors, showBarcode = true }) {
-  const categories = useCategories();
+export function MedicineFields({ form, setForm, errors, showBarcode = true, productType = 'MEDICINE' }) {
+  const categories = useCategories(productType);
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
+  if (productType === 'COSMETIC') {
+    return (
+      <div className="form-grid">
+        <TextInput label="Name" required placeholder="e.g. Hydrating facial cleanser" value={form.name} onChange={set('name')} error={errors.name} fieldClassName="span-2" />
+        <TextInput label="Brand" value={form.brandName} onChange={set('brandName')} error={errors.brandName} />
+        <SelectInput label="Category" value={form.categoryId || ''} onChange={set('categoryId')} placeholder="Uncategorized"
+          options={toOptions(categories.data)} error={errors.categoryId} />
+        <SelectInput label="Form" value={form.dosageForm} onChange={set('dosageForm')} placeholder="Not specified"
+          options={COSMETIC_FORMS.map((d) => ({ value: d, label: d }))} error={errors.dosageForm} />
+        <TextInput label="Size" required placeholder="e.g. 200 mL or 50 g" value={form.packageSize} onChange={set('packageSize')} error={errors.packageSize} />
+        <TextInput label="Manufacturer" value={form.manufacturer} onChange={set('manufacturer')} error={errors.manufacturer} />
+        <TextInput label="Country of origin" value={form.countryOfOrigin} onChange={set('countryOfOrigin')} error={errors.countryOfOrigin} />
+        {showBarcode && <TextInput label="Barcode" value={form.barcode} onChange={set('barcode')} error={errors.barcode} hint="Optional. Each barcode can belong to one product." />}
+        <TextArea label="Usage and storage" rows={2} value={form.storageInstructions} onChange={set('storageInstructions')} fieldClassName="span-2" />
+        <TextArea label="Description" rows={2} value={form.description} onChange={set('description')} fieldClassName="span-2" />
+      </div>
+    );
+  }
   return (
     <div className="form-grid">
       <TextInput label="Name" required value={form.name} onChange={set('name')} error={errors.name} fieldClassName="span-2" />
