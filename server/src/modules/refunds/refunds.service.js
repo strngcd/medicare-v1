@@ -44,8 +44,8 @@ function refundFilters(auth, query) {
   };
 }
 
-async function listRefunds(auth, query) {
-  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'createdAt' });
+async function listRefunds(auth, query, { exportLimit } = {}) {
+  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'createdAt', exportLimit });
   const { rows, total } = await repo.list({ ...refundFilters(auth, query), ...params });
   return { rows: rows.map(toDto), total, page: params.page, limit: params.limit };
 }

@@ -123,8 +123,8 @@ function assertNotFuture(date, field) {
 // Queries
 // ---------------------------------------------------------------------------
 
-async function listPurchases(auth, query, fixed = {}) {
-  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'purchaseDate' });
+async function listPurchases(auth, query, fixed = {}, { exportLimit } = {}) {
+  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'purchaseDate', exportLimit });
   const { rows, total } = await repo.list({
     branchIds: resolveBranchScope(auth, query.branchId),
     supplierId: fixed.supplierId || query.supplierId,

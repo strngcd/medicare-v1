@@ -4,11 +4,13 @@ const config = require('../config');
  * Normalizes page/limit and resolves sorting against a whitelist.
  * `sortable` maps API field names to trusted SQL expressions; client input
  * is only ever used as a lookup key, never concatenated into SQL.
+ * `exportLimit` (server-side only, for exports) returns one page of up to
+ * that many rows instead of honouring the client's page and limit.
  */
-function parseListParams(query, { sortable, defaultSort, defaultOrder = 'desc' }) {
-  const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
+function parseListParams(query, { sortable, defaultSort, defaultOrder = 'desc', exportLimit }) {
+  const page = exportLimit ? 1 : Math.max(1, Number.parseInt(query.page, 10) || 1);
   const requestedLimit = Number.parseInt(query.limit, 10) || config.pagination.defaultLimit;
-  const limit = Math.min(Math.max(1, requestedLimit), config.pagination.maxLimit);
+  const limit = exportLimit || Math.min(Math.max(1, requestedLimit), config.pagination.maxLimit);
 
   const sortKey = Object.prototype.hasOwnProperty.call(sortable, query.sortBy) ? query.sortBy : defaultSort;
   const order = String(query.sortOrder || defaultOrder).toLowerCase() === 'asc' ? 'ASC' : 'DESC';

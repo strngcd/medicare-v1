@@ -61,6 +61,8 @@ const config = Object.freeze({
     from: process.env.SMTP_FROM || 'Medicar <no-reply@example.com>',
   }),
   pagination: Object.freeze({ defaultLimit: 25, maxLimit: 100 }),
+  // Largest report export; bigger ones are refused with a clear message (never cut short).
+  exportMaxRows: readInt('EXPORT_MAX_ROWS', 100000),
 });
 
 module.exports = config;
