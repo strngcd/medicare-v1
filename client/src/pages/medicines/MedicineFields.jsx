@@ -4,6 +4,12 @@ import { useCategories, toOptions } from '../../hooks/useLookups.js';
 export const DOSAGE_FORMS = ['Tablet', 'Capsule', 'Syrup', 'Suspension', 'Injection', 'Cream', 'Ointment', 'Drops', 'Inhaler', 'Powder', 'Suppository', 'Device'];
 export const COSMETIC_FORMS = ['Cream', 'Lotion', 'Gel', 'Serum', 'Oil', 'Balm', 'Foam', 'Shampoo', 'Conditioner', 'Soap', 'Spray', 'Powder', 'Stick', 'Wipes', 'Other'];
 
+/** Select options for a form list, keeping a value from the catalog that is not in the list. */
+function formOptions(list, current) {
+  const values = current && !list.includes(current) ? [current, ...list] : list;
+  return values.map((d) => ({ value: d, label: d }));
+}
+
 // Medicine-only fields: never sent for cosmetics.
 const MEDICINE_ONLY = ['genericName', 'strength', 'prescriptionRequired'];
 
@@ -43,7 +49,7 @@ export function MedicineFields({ form, setForm, errors, showBarcode = true, prod
         <SelectInput label="Category" value={form.categoryId || ''} onChange={set('categoryId')} placeholder="Uncategorized"
           options={toOptions(categories.data)} error={errors.categoryId} />
         <SelectInput label="Form" value={form.dosageForm} onChange={set('dosageForm')} placeholder="Not specified"
-          options={COSMETIC_FORMS.map((d) => ({ value: d, label: d }))} error={errors.dosageForm} />
+          options={formOptions(COSMETIC_FORMS, form.dosageForm)} error={errors.dosageForm} />
         <TextInput label="Size" required placeholder="e.g. 200 mL or 50 g" value={form.packageSize} onChange={set('packageSize')} error={errors.packageSize} />
         <TextInput label="Manufacturer" value={form.manufacturer} onChange={set('manufacturer')} error={errors.manufacturer} />
         <TextInput label="Country of origin" value={form.countryOfOrigin} onChange={set('countryOfOrigin')} error={errors.countryOfOrigin} />
@@ -60,7 +66,7 @@ export function MedicineFields({ form, setForm, errors, showBarcode = true, prod
       <TextInput label="Brand name" value={form.brandName} onChange={set('brandName')} error={errors.brandName} />
       <TextInput label="Strength" placeholder="e.g. 500 mg" value={form.strength} onChange={set('strength')} error={errors.strength} />
       <SelectInput label="Dosage form" value={form.dosageForm} onChange={set('dosageForm')} placeholder="Not specified"
-        options={DOSAGE_FORMS.map((d) => ({ value: d, label: d }))} error={errors.dosageForm} />
+        options={formOptions(DOSAGE_FORMS, form.dosageForm)} error={errors.dosageForm} />
       <TextInput label="Package size" required placeholder="e.g. 10 tablets" value={form.packageSize} onChange={set('packageSize')} error={errors.packageSize} />
       <SelectInput label="Category" value={form.categoryId || ''} onChange={set('categoryId')} placeholder="Uncategorized"
         options={toOptions(categories.data)} error={errors.categoryId} />

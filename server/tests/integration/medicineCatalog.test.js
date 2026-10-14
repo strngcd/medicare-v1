@@ -1,6 +1,6 @@
 const { resetDatabase, pool } = require('../helpers/db');
 const { withTransaction } = require('../../src/database/db');
-const { seedMedicineCatalog, parseCsv } = require('../../seeds/medicineCatalog');
+const { seedMedicineCatalog, seedCosmeticCatalog, parseCsv } = require('../../seeds/medicineCatalog');
 const { seedAll } = require('../../scripts/seed');
 
 beforeEach(() => resetDatabase());
@@ -69,6 +69,27 @@ test('marks prescription-only medicines', async () => {
 
   const { rows } = await pool.query("SELECT count(*)::int AS n FROM medicines WHERE manufacturer = 'Various' OR country_of_origin = 'Various'");
   expect(rows[0].n).toBe(0);
+});
+
+test('loads 95 active cosmetics into the cosmetic starter categories, once', async () => {
+  const before = (await pool.query('SELECT count(*)::int AS n FROM medicine_categories')).rows[0].n;
+  expect(await withTransaction((client) => seedCosmeticCatalog(client))).toEqual({ total: 95, created: 95, adopted: 0 });
+  expect((await pool.query('SELECT count(*)::int AS n FROM medicine_categories')).rows[0].n).toBe(before);
+
+  const { rows } = await pool.query(
+    `SELECT count(*)::int AS n,
+            count(*) FILTER (WHERE m.status = 'ACTIVE' AND NOT m.prescription_required)::int AS active_otc,
+            count(*) FILTER (WHERE c.product_type = 'COSMETIC')::int AS in_cosmetic_categories
+       FROM medicines m LEFT JOIN medicine_categories c ON c.id = m.category_id
+      WHERE m.product_type = 'COSMETIC'`,
+  );
+  expect(rows[0]).toEqual({ n: 95, active_otc: 95, in_cosmetic_categories: 95 });
+  const vaseline = await pool.query("SELECT brand_name, dosage_form, package_size, catalog_key FROM medicines WHERE name = 'Vaseline Original Petroleum Jelly'");
+  expect(vaseline.rows[0]).toEqual({ brand_name: 'Vaseline', dosage_form: 'Petroleum jelly', package_size: '100 g', catalog_key: 'COS0001' });
+  const doka = await pool.query("SELECT manufacturer FROM medicines WHERE name = 'Doka Shampoo'");
+  expect(doka.rows[0].manufacturer).toBeNull();
+
+  expect((await withTransaction((client) => seedCosmeticCatalog(client))).created).toBe(0);
 });
 
 test('parses quoted CSV fields', () => {

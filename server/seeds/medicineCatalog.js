@@ -59,44 +59,42 @@ function parseCsv(text) {
   return data.map((values) => Object.fromEntries(header.map((key, i) => [key.trim(), (values[i] || '').trim()])));
 }
 
-function loadCatalog() {
-  return parseCsv(fs.readFileSync(CATALOG_FILE, 'utf8').replace(/^﻿/, ''));
+function loadCatalog(file = CATALOG_FILE) {
+  return parseCsv(fs.readFileSync(file, 'utf8').replace(/^﻿/, ''));
 }
 
 const orNull = (value) => (value && value.toLowerCase() !== 'various' ? value : null);
 
-async function seedMedicineCatalog(client) {
-  const catalog = loadCatalog();
+/**
+ * Inserts catalog products once, keyed by catalog_key. Already-keyed products
+ * are skipped (even if staff edited them); an unkeyed product with the same
+ * name, strength, form and size (e.g. from a seed before keys existed) is
+ * adopted instead of duplicated.
+ */
+async function seedProducts(client, productType, products) {
   // Catalog categories are starter categories (seeds/categories.js), found by their permanent key.
   const categoryIds = new Map();
-  for (const name of new Set(catalog.map((r) => r.category).filter(Boolean))) {
+  for (const name of new Set(products.map((p) => p.category).filter(Boolean))) {
     const { rows } = await client.query('SELECT id FROM medicine_categories WHERE seed_key = $1', [seedKey(name)]);
     categoryIds.set(name, rows[0] ? rows[0].id : null);
   }
 
   let created = 0;
   let adopted = 0;
-  for (const r of catalog) {
-    // Already seeded (possibly edited by staff since): never touch or re-add it.
-    const known = await client.query('SELECT 1 FROM medicines WHERE catalog_key = $1', [r.catalog_id]);
+  for (const p of products) {
+    const known = await client.query('SELECT 1 FROM medicines WHERE catalog_key = $1', [p.catalogKey]);
     if (known.rowCount) continue;
 
-    const values = [
-      r.name, orNull(r.generic_name), orNull(r.brand_name), orNull(r.strength), orNull(r.dosage_form), r.package_size,
-      categoryIds.get(r.category) || null, orNull(r.manufacturer), orNull(r.country_of_origin), r.prescription_required === 'true',
-      r.catalog_id,
-    ];
-    // Seeded before catalog keys existed (or added by hand with identical details): adopt it.
     const adoption = await client.query(
       `UPDATE medicines SET catalog_key = $5
         WHERE id = (SELECT id FROM medicines
-                     WHERE catalog_key IS NULL AND product_type = 'MEDICINE'
+                     WHERE catalog_key IS NULL AND product_type = $6
                        AND lower(name) = lower($1)
                        AND lower(coalesce(strength, '')) = lower(coalesce($2, ''))
                        AND lower(coalesce(dosage_form, '')) = lower(coalesce($3, ''))
                        AND lower(package_size) = lower($4)
                      ORDER BY created_at LIMIT 1)`,
-      [r.name, orNull(r.strength), orNull(r.dosage_form), r.package_size, r.catalog_id],
+      [p.name, p.strength, p.dosageForm, p.packageSize, p.catalogKey, productType],
     );
     if (adoption.rowCount) {
       adopted += 1;
@@ -105,12 +103,57 @@ async function seedMedicineCatalog(client) {
     await client.query(
       `INSERT INTO medicines (product_type, name, generic_name, brand_name, strength, dosage_form, package_size,
          category_id, manufacturer, country_of_origin, prescription_required, status, catalog_key)
-       VALUES ('MEDICINE', $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'ACTIVE', $11)`,
-      values,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'ACTIVE', $12)`,
+      [
+        productType, p.name, p.genericName, p.brandName, p.strength, p.dosageForm, p.packageSize,
+        categoryIds.get(p.category) || null, p.manufacturer, p.countryOfOrigin, p.prescriptionRequired, p.catalogKey,
+      ],
     );
     created += 1;
   }
-  return { total: catalog.length, created, adopted };
+  return { total: products.length, created, adopted };
 }
 
-module.exports = { seedMedicineCatalog, loadCatalog, parseCsv };
+async function seedMedicineCatalog(client) {
+  const products = loadCatalog().map((r) => ({
+    catalogKey: r.catalog_id,
+    name: r.name,
+    genericName: orNull(r.generic_name),
+    brandName: orNull(r.brand_name),
+    strength: orNull(r.strength),
+    dosageForm: orNull(r.dosage_form),
+    packageSize: r.package_size,
+    category: r.category,
+    manufacturer: orNull(r.manufacturer),
+    countryOfOrigin: orNull(r.country_of_origin),
+    prescriptionRequired: r.prescription_required === 'true',
+  }));
+  return seedProducts(client, 'MEDICINE', products);
+}
+
+/**
+ * Default cosmetic catalog (seeds/data/cosmetic-catalog.csv, 95 products,
+ * keys COS0001...). Source: the pharmacy's cosmetics list, with its detailed
+ * categories grouped into the broad cosmetic starter categories. Cosmetics
+ * never require a prescription; expiry is entered per batch when stock arrives.
+ */
+const COSMETIC_FILE = path.join(__dirname, 'data', 'cosmetic-catalog.csv');
+
+async function seedCosmeticCatalog(client) {
+  const products = loadCatalog(COSMETIC_FILE).map((r) => ({
+    catalogKey: r.catalog_id,
+    name: r.name,
+    genericName: null,
+    brandName: orNull(r.brand_name),
+    strength: null,
+    dosageForm: orNull(r.form),
+    packageSize: r.size,
+    category: r.category,
+    manufacturer: orNull(r.manufacturer),
+    countryOfOrigin: orNull(r.country_of_origin),
+    prescriptionRequired: false,
+  }));
+  return seedProducts(client, 'COSMETIC', products);
+}
+
+module.exports = { seedMedicineCatalog, seedCosmeticCatalog, loadCatalog, parseCsv, COSMETIC_FILE };

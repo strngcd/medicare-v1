@@ -1,0 +1,96 @@
+catalog_id,name,brand_name,category,form,size,manufacturer,country_of_origin
+COS0001,Vaseline Original Petroleum Jelly,Vaseline,Skin Care,Petroleum jelly,100 g,Unilever,United States
+COS0002,Vaseline Cocoa Butter Petroleum Jelly,Vaseline,Skin Care,Petroleum jelly,100 g,Unilever,United States
+COS0003,Vaseline Intensive Care Lotion,Vaseline,Skin Care,Lotion,200 ml,Unilever,United States
+COS0004,Nivea Creme,Nivea,Skin Care,Cream,60 ml,Beiersdorf,Germany
+COS0005,Nivea Soft Moisturizing Cream,Nivea,Skin Care,Cream,100 ml,Beiersdorf,Germany
+COS0006,Nivea Nourishing Body Milk,Nivea,Skin Care,Body lotion,250 ml,Beiersdorf,Germany
+COS0007,Nivea Men Creme,Nivea,Men's Grooming,Cream,75 ml,Beiersdorf,Germany
+COS0008,Dove Beauty Cream Bar,Dove,Body Care,Beauty bar,135 g,Unilever,United Kingdom
+COS0009,Dove Sensitive Skin Beauty Bar,Dove,Body Care,Beauty bar,106 g,Unilever,United Kingdom
+COS0010,Dove Deeply Nourishing Body Wash,Dove,Body Care,Body wash,500 ml,Unilever,United Kingdom
+COS0011,Dove Nourishing Body Lotion,Dove,Skin Care,Body lotion,400 ml,Unilever,United Kingdom
+COS0012,Dove Original Deodorant,Dove,Personal Hygiene,Roll-on,50 ml,Unilever,United Kingdom
+COS0013,Nivea Pearl & Beauty Deodorant,Nivea,Personal Hygiene,Roll-on,50 ml,Beiersdorf,Germany
+COS0014,Nivea Fresh Natural Deodorant,Nivea,Personal Hygiene,Spray,150 ml,Beiersdorf,Germany
+COS0015,Rexona Invisible Dry Deodorant,Rexona,Personal Hygiene,Spray,150 ml,Unilever,United Kingdom
+COS0016,Axe Dark Temptation Body Spray,Axe,Fragrance,Body spray,150 ml,Unilever,United Kingdom
+COS0017,Lux Soft Touch Soap,Lux,Body Care,Soap bar,80 g,Unilever,United Kingdom
+COS0018,Lifebuoy Total Soap,Lifebuoy,Body Care,Soap bar,90 g,Unilever,United Kingdom
+COS0019,Dettol Original Soap,Dettol,Body Care,Soap bar,70 g,Reckitt,United Kingdom
+COS0020,Johnson's Baby Soap,Johnson's,Baby Care,Soap bar,125 g,Kenvue,United States
+COS0021,Johnson's Baby Lotion,Johnson's,Baby Care,Lotion,200 ml,Kenvue,United States
+COS0022,Johnson's Baby Shampoo,Johnson's,Baby Care,Shampoo,200 ml,Kenvue,United States
+COS0023,Johnson's Baby Powder,Johnson's,Baby Care,Powder,200 g,Kenvue,United States
+COS0024,Johnson's Baby Oil,Johnson's,Baby Care,Oil,200 ml,Kenvue,United States
+COS0025,Pampers Baby Wipes,Pampers,Baby Care,Wet wipes,56 wipes,Procter & Gamble,United States
+COS0026,Sudocrem Antiseptic Healing Cream,Sudocrem,Baby Care,Cream,60 g,Teva Pharmaceuticals,Ireland
+COS0027,Himalaya Gentle Baby Soap,Himalaya,Baby Care,Soap bar,75 g,Himalaya Wellness,India
+COS0028,Himalaya Baby Lotion,Himalaya,Baby Care,Lotion,200 ml,Himalaya Wellness,India
+COS0029,Himalaya Nourishing Skin Cream,Himalaya,Skin Care,Cream,50 ml,Himalaya Wellness,India
+COS0030,Himalaya Purifying Neem Face Wash,Himalaya,Skin Care,Face wash,100 ml,Himalaya Wellness,India
+COS0031,Garnier SkinActive Micellar Cleansing Water,Garnier,Skin Care,Cleansing water,400 ml,L'Oréal,France
+COS0032,Garnier Men Acno Fight Face Wash,Garnier Men,Men's Grooming,Face wash,100 ml,L'Oréal,France
+COS0033,L'Oréal Revitalift Moisturizing Cream,L'Oréal Paris,Skin Care,Cream,50 ml,L'Oréal,France
+COS0034,Clean & Clear Foaming Face Wash,Clean & Clear,Skin Care,Face wash,100 ml,Kenvue,United States
+COS0035,Pond's Age Miracle Cream,Pond's,Skin Care,Cream,50 g,Unilever,United Kingdom
+COS0036,Pond's Bright Beauty Face Cream,Pond's,Skin Care,Cream,50 g,Unilever,United Kingdom
+COS0037,Fair & Lovely Advanced Multi Vitamin Cream,Glow & Lovely,Skin Care,Cream,50 g,Unilever,India
+COS0038,Neutrogena Hydro Boost Water Gel,Neutrogena,Skin Care,Gel moisturizer,50 ml,Kenvue,United States
+COS0039,Neutrogena Ultra Sheer Sunscreen SPF 50+,Neutrogena,Sun Care,Sunscreen,88 ml,Kenvue,United States
+COS0040,Nivea Sun Protect & Moisture SPF 50,Nivea,Sun Care,Sunscreen lotion,200 ml,Beiersdorf,Germany
+COS0041,Glysolid Skin Cream,Glysolid,Skin Care,Cream,100 ml,Burnus,Germany
+COS0042,Glycerin Skin Care,Zenith,Skin Care,Glycerin,100 ml,Zenith Gebes-Eshet,Ethiopia
+COS0043,Zenith Paraffin Jelly,Zenith,Skin Care,Petroleum jelly,100 g,Zenith Gebes-Eshet,Ethiopia
+COS0044,Zenith Moisturizing Cream,Zenith,Skin Care,Cream,100 ml,Zenith Gebes-Eshet,Ethiopia
+COS0045,Zenith Body Lotion,Zenith,Skin Care,Body lotion,400 ml,Zenith Gebes-Eshet,Ethiopia
+COS0046,Sunset Shea Butter Body Lotion,Sunset Cosmetics,Skin Care,Body lotion,400 ml,Sunset Cosmetics,Ethiopia
+COS0047,Sunset Baby Jelly,Sunset Cosmetics,Baby Care,Petroleum jelly,300 ml,Sunset Cosmetics,Ethiopia
+COS0048,Sunset Aloe Vera Shampoo,Sunset Cosmetics,Hair Care,Shampoo,750 ml,Sunset Cosmetics,Ethiopia
+COS0049,Sunset Clove Conditioner,Sunset Cosmetics,Hair Care,Conditioner,750 ml,Sunset Cosmetics,Ethiopia
+COS0050,Dabur Amla Hair Oil,Dabur,Hair Care,Hair oil,200 ml,Dabur India,India
+COS0051,Dabur Vatika Coconut Hair Oil,Vatika,Hair Care,Hair oil,200 ml,Dabur India,India
+COS0052,Dabur Herbal Mint & Lemon Toothpaste,Dabur,Personal Hygiene,Toothpaste,150 g,Dabur India,India
+COS0053,Head & Shoulders Classic Clean Shampoo,Head & Shoulders,Hair Care,Shampoo,180 ml,Procter & Gamble,United States
+COS0054,Pantene Pro-V Repair & Protect Shampoo,Pantene,Hair Care,Shampoo,200 ml,Procter & Gamble,United States
+COS0055,Pantene Pro-V Conditioner,Pantene,Hair Care,Conditioner,200 ml,Procter & Gamble,United States
+COS0056,Sunsilk Black Shine Shampoo,Sunsilk,Hair Care,Shampoo,350 ml,Unilever,United Kingdom
+COS0057,Sunsilk Conditioner,Sunsilk,Hair Care,Conditioner,350 ml,Unilever,United Kingdom
+COS0058,Doka Shampoo,Doka,Hair Care,Shampoo,500 ml,,Ethiopia
+COS0059,Doka Conditioner,Doka,Hair Care,Conditioner,500 ml,,Ethiopia
+COS0060,Colgate Maximum Cavity Protection Toothpaste,Colgate,Personal Hygiene,Toothpaste,100 g,Colgate-Palmolive,United States
+COS0061,Colgate Total Toothpaste,Colgate,Personal Hygiene,Toothpaste,75 ml,Colgate-Palmolive,United States
+COS0062,Oral-B Toothbrush,Oral-B,Personal Hygiene,Toothbrush,1 piece,Procter & Gamble,United States
+COS0063,Listerine Cool Mint Mouthwash,Listerine,Personal Hygiene,Mouthwash,250 ml,Kenvue,United States
+COS0064,Closeup Red Hot Toothpaste,Closeup,Personal Hygiene,Toothpaste,120 g,Unilever,United Kingdom
+COS0065,Kotex Sanitary Pads,Kotex,Personal Hygiene,Sanitary pads,8 pads,Kimberly-Clark,United States
+COS0066,Always Ultra Sanitary Pads,Always,Personal Hygiene,Sanitary pads,8 pads,Procter & Gamble,United States
+COS0067,Carefree Panty Liners,Carefree,Personal Hygiene,Panty liners,20 liners,Kenvue,United States
+COS0068,Veet Hair Removal Cream,Veet,Body Care,Depilatory cream,100 g,Reckitt,United Kingdom
+COS0069,Nair Hair Removal Cream,Nair,Body Care,Depilatory cream,100 g,Church & Dwight,United States
+COS0070,Maybelline Fit Me Matte Foundation,Maybelline,Makeup,Liquid foundation,30 ml,L'Oréal,United States
+COS0071,Maybelline Baby Lips Lip Balm,Maybelline,Skin Care,Lip balm,4 g,L'Oréal,United States
+COS0072,Nivea Original Care Lip Balm,Nivea,Skin Care,Lip balm,4.8 g,Beiersdorf,Germany
+COS0073,Vaseline Lip Therapy Original,Vaseline,Skin Care,Lip balm,20 g,Unilever,United States
+COS0074,Golden Rose Nail Polish,Golden Rose,Makeup,Nail polish,11 ml,Erkul Cosmetics,Turkey
+COS0075,Essence Lash Princess Mascara,Essence,Makeup,Mascara,12 ml,cosnova,Germany
+COS0076,Pears Transparent Soap,Pears,Body Care,Soap bar,125 g,Hindustan Unilever,India
+COS0077,Yardley English Lavender Talcum Powder,Yardley,Body Care,Talcum powder,250 g,Wipro Consumer Care,India
+COS0078,Axe Apollo Deodorant Body Spray,Axe,Fragrance,Body spray,150 ml,Unilever,United Kingdom
+COS0079,Old Spice Original Deodorant,Old Spice,Personal Hygiene,Stick,50 g,Procter & Gamble,United States
+COS0080,Nivea Men Deep Shower Gel,Nivea Men,Men's Grooming,Shower gel,250 ml,Beiersdorf,Germany
+COS0081,Dove Men+Care Clean Comfort Body Wash,Dove Men+Care,Men's Grooming,Body wash,400 ml,Unilever,United Kingdom
+COS0082,Cetaphil Gentle Skin Cleanser,Cetaphil,Skin Care,Cleanser,125 ml,Galderma,Switzerland
+COS0083,Eucerin Advanced Repair Lotion,Eucerin,Skin Care,Body lotion,250 ml,Beiersdorf,Germany
+COS0084,CeraVe Moisturizing Cream,CeraVe,Skin Care,Cream,177 ml,L'Oréal,United States
+COS0085,Bio-Oil Skincare Oil,Bio-Oil,Skin Care,Skincare oil,60 ml,Union-Swiss,South Africa
+COS0086,Palmer's Cocoa Butter Formula Lotion,Palmer's,Skin Care,Body lotion,250 ml,E.T. Browne Drug Co.,United States
+COS0087,Nivea Men Sensitive Shaving Foam,Nivea Men,Men's Grooming,Shaving foam,200 ml,Beiersdorf,Germany
+COS0088,Gillette Blue II Disposable Razors,Gillette,Men's Grooming,Disposable razor,5 pieces,Procter & Gamble,United States
+COS0089,Vaseline Intensive Care Aloe Soothe Lotion,Vaseline,Skin Care,Body lotion,200 ml,Unilever,United States
+COS0090,Dove Exfoliating Body Polish,Dove,Body Care,Body scrub,298 g,Unilever,United Kingdom
+COS0091,Himalaya Herbals Lip Balm,Himalaya,Skin Care,Lip balm,10 g,Himalaya Wellness,India
+COS0092,Johnson's Baby Cotton Buds,Johnson's,Baby Care,Cotton buds,100 pieces,Kenvue,United States
+COS0093,Dettol Handwash Original,Dettol,Personal Hygiene,Liquid hand wash,200 ml,Reckitt,United Kingdom
+COS0094,Purell Advanced Hand Sanitizer,Purell,Personal Hygiene,Hand sanitizer gel,60 ml,GOJO Industries,United States
+COS0095,Always Daily Fresh Liners,Always,Personal Hygiene,Panty liners,20 liners,Procter & Gamble,United States

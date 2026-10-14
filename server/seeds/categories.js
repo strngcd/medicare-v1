@@ -33,6 +33,7 @@ const COSMETIC_CATEGORIES = [
   ['Personal Hygiene', 'Deodorants, soaps, oral and intimate care'],
   ['Baby Care', 'Baby lotions, oils, powders and wipes'],
   ['Body Care', 'Body lotions, creams, scrubs and oils'],
+  ["Men's Grooming", 'Shaving, razors, men\'s skin care and body wash'],
 ];
 
 /** Permanent key of a starter category: "Vitamins and Supplements" -> "vitamins-and-supplements". */
