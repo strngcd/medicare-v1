@@ -1,5 +1,5 @@
 const AppError = require('../../errors/AppError');
-const { resolveBatchIdentity } = require('./batchIdentity');
+const { resolveBatchIdentity, ensureNewLot } = require('./batchIdentity');
 const { withTransaction } = require('../../database/db');
 const { recordAudit } = require('../audit/audit.recorder');
 const { runIdempotent } = require('../idempotency/idempotency');
@@ -192,7 +192,7 @@ async function addStock(auth, actor, input, idempotencyKey) {
 
       const { batch, created: batchCreated } = await ledger.findOrCreateBatch(client, {
         medicineId: medicine.id,
-        batchNumber: identity.batchNumber,
+        batchNumber: await ensureNewLot(client, medicine.id, identity),
         manufacturingDate: input.manufacturingDate,
         expiryDate: identity.expiryDate,
         purchasePrice: input.purchasePrice,

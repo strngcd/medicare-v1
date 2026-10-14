@@ -1,5 +1,5 @@
 const AppError = require('../../errors/AppError');
-const { resolveBatchIdentity } = require('../inventory/batchIdentity');
+const { resolveBatchIdentity, ensureNewLot } = require('../inventory/batchIdentity');
 const { withTransaction } = require('../../database/db');
 const { recordAudit } = require('../audit/audit.recorder');
 const { runIdempotent } = require('../idempotency/idempotency');
@@ -378,7 +378,7 @@ async function receiveLines(client, auth, actor, id, input) {
 
     const { batch } = await ledger.findOrCreateBatch(client, {
       medicineId: item.medicine_id,
-      batchNumber: identities[index].batchNumber,
+      batchNumber: await ensureNewLot(client, item.medicine_id, identities[index]),
       manufacturingDate: line.manufacturingDate,
       expiryDate: identities[index].expiryDate,
       purchasePrice,
