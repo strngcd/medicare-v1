@@ -365,14 +365,15 @@ async function createAdjustment(auth, actor, input, idempotencyKey) {
 }
 
 /**
- * Writes off all remaining stock of a batch row: expired, expiring, or in
+ * Writes off some or (by default) all remaining stock of a batch row: expired, expiring, or in
  * date with a reason (damaged, recalled...). The units leave inventory through a DISPOSED adjustment, valued at the batch's
- * purchase price and, unless recordAsLoss is false, reported as a stock loss. Optionally archives the row.
+ * purchase price and, unless recordAsLoss is false, reported as a stock loss. Optionally archives the row
+ * when it ends up empty.
  */
-async function disposeStock(auth, actor, id, { notes, archive, recordAsLoss = true }, idempotencyKey) {
+async function disposeStock(auth, actor, id, { quantity: requested, notes, archive, recordAsLoss = true }, idempotencyKey) {
   const { today, warningDays } = await statusContext();
   const result = await runIdempotent(
-    { userId: auth.userId, scope: `inventory.dispose:${id}`, key: idempotencyKey, payload: { notes, archive, recordAsLoss } },
+    { userId: auth.userId, scope: `inventory.dispose:${id}`, key: idempotencyKey, payload: { quantity: requested, notes, archive, recordAsLoss } },
     async (client) => {
       const row = await ledger.lockInventoryById(client, id);
       if (!row) throw AppError.notFound('Inventory record not found.');
@@ -391,7 +392,13 @@ async function disposeStock(auth, actor, id, { notes, archive, recordAsLoss = tr
         throw AppError.forbidden('PERMISSION_DENIED', 'You do not have permission to archive batches.');
       }
 
-      const quantity = row.quantity;
+      const quantity = requested ?? row.quantity;
+      if (quantity > row.quantity) {
+        throw AppError.validation(`Only ${row.quantity} unit(s) are in stock.`, { fields: { quantity: `At most ${row.quantity}.` } });
+      }
+      const remaining = row.quantity - quantity;
+      // Archiving hides an empty row; a partial disposal leaves stock, so it stays visible.
+      const archived = Boolean(archive) && remaining === 0;
       const lossValue = toMoneyString(money(row.purchase_price).times(quantity));
       const adjustmentNumber = await nextDocumentNumber(client, 'STOCK_ADJUSTMENT');
       const condition = expired ? 'expired' : expiringSoon ? 'expiring soon' : 'in date';
@@ -402,9 +409,9 @@ async function disposeStock(auth, actor, id, { notes, archive, recordAsLoss = tr
         batchId: row.batch_id,
         inventoryId: row.id,
         reason: 'DISPOSED',
-        quantityBefore: quantity,
+        quantityBefore: row.quantity,
         quantityChange: -quantity,
-        quantityAfter: 0,
+        quantityAfter: remaining,
         notes: notes || label,
         userId: auth.userId,
       });
@@ -419,17 +426,17 @@ async function disposeStock(auth, actor, id, { notes, archive, recordAsLoss = tr
         userId: auth.userId,
         countsAsLoss: recordAsLoss,
       });
-      if (archive) await repo.setArchived(client, row.id, auth.userId);
+      if (archived) await repo.setArchived(client, row.id, auth.userId);
       await recordAudit(client, actor, {
         action: 'STOCK_DISPOSED',
         entityType: 'INVENTORY_ADJUSTMENT',
         entityId: adjustment.id,
         branchId: row.branch_id,
         description: `${adjustmentNumber}: ${quantity} units of ${row.medicine_name} batch ${row.batch_number} disposed (${condition}${recordAsLoss ? '' : ', not recorded as a loss'})`,
-        previousValues: { quantity },
-        newValues: { quantity: 0, expiryDate: row.expiry_date, lossValue: recordAsLoss ? lossValue : '0.00', recordedAsLoss: recordAsLoss, archived: Boolean(archive), notes: notes ?? null },
+        previousValues: { quantity: row.quantity },
+        newValues: { quantity: remaining, disposed: quantity, expiryDate: row.expiry_date, lossValue: recordAsLoss ? lossValue : '0.00', recordedAsLoss: recordAsLoss, archived, notes: notes ?? null },
       });
-      return { id: adjustment.id, adjustmentNumber, inventoryId: row.id, quantityDisposed: quantity, recordedAsLoss: recordAsLoss, lossValue: recordAsLoss ? lossValue : '0.00' };
+      return { id: adjustment.id, adjustmentNumber, inventoryId: row.id, quantityDisposed: quantity, quantityRemaining: remaining, archived, recordedAsLoss: recordAsLoss, lossValue: recordAsLoss ? lossValue : '0.00' };
     },
   );
   return { ...result, body: filterFinancialFields(result.body, auth) };
