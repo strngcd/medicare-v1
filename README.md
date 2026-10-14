@@ -88,11 +88,15 @@ database automatically.
 ### Seeds
 
 ```bash
-npm run seed            # roles, permissions, role defaults, settings, categories, help articles
+npm run seed            # roles, permissions, role defaults, settings, categories, help articles, default medicine catalog
 npm run create-owner    # interactive: creates the first Owner account
 ```
 
 `npm run seed` is idempotent and never creates users, stock or financial data.
+It loads the default catalog of 499 medicines (`server/seeds/data/medicine-catalog.csv`)
+as active medicines without stock, creating their categories; medicines that
+already exist are skipped. Edit the CSV's `prescription_required` column to
+change which medicines need a prescription before seeding.
 For non-interactive provisioning set `OWNER_NAME`, `OWNER_EMAIL` and
 `OWNER_PASSWORD` before `npm run create-owner`.
 
@@ -104,7 +108,7 @@ npm run seed:demo --workspace server
 
 Creates two demo branches, demo staff, medicines, suppliers, a received
 purchase, sales, a refund, a void and a shipped transfer through the real
-services. It refuses to run in production and requires an empty catalog.
+services. It refuses to run in production and requires an empty inventory.
 Demo staff sign in with the password printed by the script.
 
 ## Running in development

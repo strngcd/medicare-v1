@@ -21,7 +21,7 @@ async function resetDatabase() {
   bumpVersion();
 
   if (!referenceDataSeeded) {
-    await withTransaction(seedAll);
+    await withTransaction((client) => seedAll(client, { catalog: false }));
     referenceDataSeeded = true;
   } else {
     await withTransaction(async (client) => {

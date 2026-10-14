@@ -9,11 +9,19 @@ import { useAuth } from '../context/AuthContext.jsx';
 export function useCategories(productType) {
   const { can } = useAuth();
   return useApi(
-    () => (can('CATEGORY_VIEW')
-      ? api.get('/medicine-categories', { status: 'ACTIVE', productType, limit: 100, sortBy: 'name', sortOrder: 'asc' }).then((r) => r.data)
-      : Promise.resolve([])),
+    () => (can('CATEGORY_VIEW') ? fetchAllCategories(productType) : Promise.resolve([])),
     [productType],
   );
+}
+
+/** Every active category (the API pages at 100; the default catalog has more). */
+async function fetchAllCategories(productType) {
+  const all = [];
+  for (let page = 1; ; page += 1) {
+    const res = await api.get('/medicine-categories', { status: 'ACTIVE', productType, page, limit: 100, sortBy: 'name', sortOrder: 'asc' });
+    all.push(...res.data);
+    if (!res.pagination || page >= res.pagination.totalPages) return all;
+  }
 }
 
 export function useSuppliers() {
