@@ -35,20 +35,37 @@ const COSMETIC_CATEGORIES = [
   ['Body Care', 'Body lotions, creams, scrubs and oils'],
 ];
 
-/** Inserts the starter categories. Existing categories (by name) are left as they are. */
+/** Permanent key of a starter category: "Vitamins and Supplements" -> "vitamins-and-supplements". */
+const seedKey = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/**
+ * Inserts the starter categories once. Each carries a permanent seed_key,
+ * so a starter category that staff renamed or archived is recognised and
+ * left alone instead of being created again. A same-named category made by
+ * staff (from before seed keys existed) is adopted if it is the same type.
+ */
 async function seedCategories(client) {
   const all = [
     ...CATEGORIES.map(([name, description]) => [name, description, 'MEDICINE']),
     ...COSMETIC_CATEGORIES.map(([name, description]) => [name, description, 'COSMETIC']),
   ];
   for (const [name, description, productType] of all) {
+    const key = seedKey(name);
+    const known = await client.query('SELECT 1 FROM medicine_categories WHERE seed_key = $1', [key]);
+    if (known.rowCount) continue;
+    const adopted = await client.query(
+      `UPDATE medicine_categories SET seed_key = $1
+        WHERE lower(name) = lower($2) AND product_type = $3 AND seed_key IS NULL`,
+      [key, name, productType],
+    );
+    if (adopted.rowCount) continue;
     await client.query(
-      `INSERT INTO medicine_categories (name, description, product_type)
-       VALUES ($1, $2, $3)
+      `INSERT INTO medicine_categories (name, description, product_type, seed_key)
+       VALUES ($1, $2, $3, $4)
        ON CONFLICT ((lower(name))) DO NOTHING`,
-      [name, description, productType],
+      [name, description, productType, key],
     );
   }
 }
 
-module.exports = { seedCategories, CATEGORIES, COSMETIC_CATEGORIES };
+module.exports = { seedCategories, seedKey, CATEGORIES, COSMETIC_CATEGORIES };
