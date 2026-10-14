@@ -12,7 +12,8 @@ const { resolveDateRange } = require('./dateRange');
 const { shapeSalesSummary, cacheScope } = require('./reports.service');
 const repo = require('./reports.repository');
 
-const FINANCIAL_KPIS = ['revenue', 'discounts', 'tax', 'netSales', 'inventoryValue', 'refunds'];
+// stockLosses is also a cost field, so it additionally needs FINANCIAL_VIEW_PURCHASE_COST.
+const FINANCIAL_KPIS = ['revenue', 'discounts', 'tax', 'netSales', 'inventoryValue', 'refunds', 'stockLosses', 'stockLossUnits'];
 const PROFIT_KPIS = ['cogs', 'grossProfit', 'grossMargin'];
 
 /**
@@ -45,11 +46,12 @@ async function dashboard(auth, query) {
   const data = await cached(['dashboard', cacheScope(auth, filters.branchIds), filters], async () => {
     const today = businessToday();
     const warningDays = await getExpiryWarningDays();
-    const [summaryRaw, totals, totalMedicines, alertCounts] = await Promise.all([
+    const [summaryRaw, totals, totalMedicines, alertCounts, losses] = await Promise.all([
       repo.salesSummary(filters),
       repo.inventoryTotals({ today, warningDays, branchIds: filters.branchIds }),
       repo.countActiveMedicines(),
       alertsService.countAlerts(auth, query.branchId),
+      repo.stockLossSummary(filters),
     ]);
     const s = shapeSalesSummary(summaryRaw);
     return {
@@ -74,6 +76,9 @@ async function dashboard(auth, query) {
         refunds: s.refunds,
         netSales: s.netSales,
         inventoryValue: totals.inventory_value,
+        // Expired, damaged, lost and disposed stock in the period, at purchase cost.
+        stockLosses: losses.total_loss_value,
+        stockLossUnits: losses.units_lost,
         cogs: s.cogs,
         grossProfit: s.grossProfit,
         grossMargin: s.grossMargin,

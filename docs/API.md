@@ -248,7 +248,7 @@ Exports show the no-expiry date as "No expiry".
 | GET | `/reports/purchases` | REPORT_PURCHASE_VIEW |
 | GET | `/reports/suppliers` | REPORT_SUPPLIER_VIEW |
 | GET | `/reports/{sales,profit,inventory,purchases,suppliers}/export?format=csv|pdf` | REPORT_EXPORT + the report's permissions |
-| GET | `/analytics/dashboard` · `/sales-trend` · `/top-medicines` · `/sales-by-category` · `/inventory` · `/branch-comparison` | DASHBOARD_VIEW (financial KPIs: DASHBOARD_VIEW_FINANCIALS; profit KPIs: DASHBOARD_VIEW_PROFIT) |
+| GET | `/analytics/dashboard` · `/sales-trend` · `/top-medicines` · `/sales-by-category` · `/inventory` · `/branch-comparison` | DASHBOARD_VIEW (financial KPIs: DASHBOARD_VIEW_FINANCIALS, and `stockLosses` also FINANCIAL_VIEW_PURCHASE_COST; profit KPIs: DASHBOARD_VIEW_PROFIT) |
 
 Definitions: completed sales count; voided sales are excluded (reported
 separately); refunds reduce revenue and COGS on their refund date; revenue

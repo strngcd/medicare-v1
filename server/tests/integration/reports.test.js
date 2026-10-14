@@ -120,6 +120,21 @@ describe('branch scoping and financial protection', () => {
     expect(adminComparison.body.data.branches.map((b) => b.branchCode)).toEqual(['BOLE']);
   });
 
+  test('dashboard shows stock losses at cost, skipping disposals not recorded as a loss', async () => {
+    const { rows } = await pool.query(
+      'SELECT bi.id FROM branch_inventory bi WHERE bi.branch_id = $1', [branch.id],
+    );
+    const inventoryId = rows[0].id;
+    await admin.post(`/api/v1/inventory/${inventoryId}/dispose`).send({ quantity: 3, notes: 'Broken bottles' }).expect(201);
+    await admin.post(`/api/v1/inventory/${inventoryId}/dispose`).send({ quantity: 2, notes: 'Returned for credit', recordAsLoss: false }).expect(201);
+
+    const dash = await admin.get(`/api/v1/analytics/dashboard?range=TODAY&branchId=${branch.id}`);
+    expect(dash.body.data.financials).toMatchObject({ stockLosses: '18.00', stockLossUnits: 3 });
+
+    const cashierDash = await cashier.get('/api/v1/analytics/dashboard?range=TODAY');
+    expect(JSON.stringify(cashierDash.body.data)).not.toMatch(/stockLoss/);
+  });
+
   test('cashier dashboard has no financial or profit KPIs, even right after an admin read (cache isolation)', async () => {
     await sell(cashier, branch.id, med.id, 2);
     const adminDash = await admin.get('/api/v1/analytics/dashboard');
