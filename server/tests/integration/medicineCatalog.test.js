@@ -13,8 +13,11 @@ async function rxOf(name, dosageForm) {
   return rows[0].prescription_required;
 }
 
-test('loads 499 active medicines with categories, once', async () => {
+test('loads 499 active medicines into the starter categories, once', async () => {
+  const before = (await pool.query('SELECT count(*)::int AS n FROM medicine_categories')).rows[0].n;
   const first = await withTransaction((client) => seedMedicineCatalog(client));
+  // Every catalog category is one of the broad starter categories.
+  expect((await pool.query('SELECT count(*)::int AS n FROM medicine_categories')).rows[0].n).toBe(before);
   expect(first).toEqual({ total: 499, created: 499 });
 
   const { rows } = await pool.query(
