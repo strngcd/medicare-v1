@@ -5,7 +5,9 @@ const path = require('path');
  * Default medicine catalog (seeds/data/medicine-catalog.csv, 499 medicines).
  *
  * Source: the pharmacy's 500-row catalog list, minus one exact duplicate
- * (MED0172 = MED0489, Dextrose 10% 500 mL). `prescription_required` was added by
+ * (MED0172 = MED0489, Dextrose 10% 500 mL), with its specific therapeutic
+ * classes grouped into the broad starter categories (seeds/categories.js).
+ * `prescription_required` was added by
  * standard classification: oral/topical OTC products (simple analgesics,
  * antacids, laxatives, ORS, common dewormers, antihistamines, cough and cold,
  * antiseptics, emollients, topical antifungals, vitamins, minerals and iron,

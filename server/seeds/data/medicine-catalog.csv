@@ -1,500 +1,500 @@
 catalog_id,name,generic_name,brand_name,strength,dosage_form,package_size,category,manufacturer,country_of_origin,prescription_required
-MED0001,Paracetamol,Paracetamol,Panadol,500 mg,Tablet,100 tablets,Analgesic / Antipyretic,Haleon,United Kingdom,false
-MED0002,Paracetamol,Paracetamol,Panadol,1 g,Tablet,10 tablets,Analgesic / Antipyretic,Haleon,United Kingdom,false
-MED0003,Paracetamol,Paracetamol,Panadol,120 mg/5 mL,Oral suspension,100 mL bottle,Analgesic / Antipyretic,Haleon,United Kingdom,false
-MED0004,Paracetamol,Paracetamol,Panadol,250 mg/5 mL,Oral suspension,100 mL bottle,Analgesic / Antipyretic,Haleon,United Kingdom,false
-MED0005,Ibuprofen,Ibuprofen,Brufen,200 mg,Tablet,24 tablets,NSAID,Abbott,United States,false
-MED0006,Ibuprofen,Ibuprofen,Brufen,400 mg,Tablet,30 tablets,NSAID,Abbott,United States,false
-MED0007,Ibuprofen,Ibuprofen,Brufen,600 mg,Tablet,30 tablets,NSAID,Abbott,United States,false
-MED0008,Ibuprofen,Ibuprofen,Brufen,100 mg/5 mL,Oral suspension,100 mL bottle,NSAID,Abbott,United States,false
-MED0009,Amoxicillin,Amoxicillin,Amoxil,250 mg,Capsule,21 capsules,Antibiotic,GSK,United Kingdom,true
-MED0010,Amoxicillin,Amoxicillin,Amoxil,500 mg,Capsule,21 capsules,Antibiotic,GSK,United Kingdom,true
-MED0011,Amoxicillin,Amoxicillin,Amoxil,125 mg/5 mL,Powder for oral suspension,100 mL after reconstitution,Antibiotic,GSK,United Kingdom,true
-MED0012,Amoxicillin,Amoxicillin,Amoxil,250 mg/5 mL,Powder for oral suspension,100 mL after reconstitution,Antibiotic,GSK,United Kingdom,true
-MED0013,Amoxicillin + clavulanic acid,Amoxicillin + clavulanate potassium,Augmentin,625 mg (500/125 mg),Tablet,14 tablets,Antibiotic,GSK,United Kingdom,true
-MED0014,Amoxicillin + clavulanic acid,Amoxicillin + clavulanate potassium,Augmentin,1 g (875/125 mg),Tablet,14 tablets,Antibiotic,GSK,United Kingdom,true
-MED0015,Amoxicillin + clavulanic acid,Amoxicillin + clavulanate potassium,Augmentin,457 mg/5 mL,Powder for oral suspension,70 mL after reconstitution,Antibiotic,GSK,United Kingdom,true
-MED0016,Amoxicillin + clavulanic acid,Amoxicillin + clavulanate potassium,Augmentin,312.5 mg/5 mL,Powder for oral suspension,100 mL after reconstitution,Antibiotic,GSK,United Kingdom,true
-MED0017,Azithromycin,Azithromycin,Zithromax,250 mg,Tablet,6 tablets,Antibiotic,Pfizer,United States,true
-MED0018,Azithromycin,Azithromycin,Zithromax,500 mg,Tablet,3 tablets,Antibiotic,Pfizer,United States,true
-MED0019,Azithromycin,Azithromycin,Zithromax,200 mg/5 mL,Powder for oral suspension,15 mL after reconstitution,Antibiotic,Pfizer,United States,true
-MED0020,Azithromycin,Azithromycin,Zithromax,100 mg/5 mL,Powder for oral suspension,30 mL after reconstitution,Antibiotic,Pfizer,United States,true
-MED0021,Ciprofloxacin,Ciprofloxacin,Cipro,250 mg,Tablet,10 tablets,Antibiotic,Bayer,Germany,true
-MED0022,Ciprofloxacin,Ciprofloxacin,Cipro,500 mg,Tablet,10 tablets,Antibiotic,Bayer,Germany,true
-MED0023,Ciprofloxacin,Ciprofloxacin,Cipro,750 mg,Tablet,5 tablets,Antibiotic,Bayer,Germany,true
-MED0024,Ciprofloxacin,Ciprofloxacin,Cipro,200 mg/100 mL,IV infusion,100 mL bag,Antibiotic,Bayer,Germany,true
-MED0025,Metronidazole,Metronidazole,Flagyl,200 mg,Tablet,21 tablets,Antiprotozoal / Antibiotic,Sanofi,France,true
-MED0026,Metronidazole,Metronidazole,Flagyl,400 mg,Tablet,21 tablets,Antiprotozoal / Antibiotic,Sanofi,France,true
-MED0027,Metronidazole,Metronidazole,Flagyl,500 mg,Tablet,21 tablets,Antiprotozoal / Antibiotic,Sanofi,France,true
-MED0028,Metronidazole,Metronidazole,Flagyl,125 mg/5 mL,Oral suspension,100 mL bottle,Antiprotozoal / Antibiotic,Sanofi,France,true
-MED0029,Cefixime,Cefixime,Suprax,100 mg,Capsule,10 capsules,Antibiotic,Lupin,India,true
-MED0030,Cefixime,Cefixime,Suprax,200 mg,Capsule,10 capsules,Antibiotic,Lupin,India,true
-MED0031,Cefixime,Cefixime,Suprax,400 mg,Tablet,5 tablets,Antibiotic,Lupin,India,true
-MED0032,Cefixime,Cefixime,Suprax,100 mg/5 mL,Powder for oral suspension,50 mL after reconstitution,Antibiotic,Lupin,India,true
-MED0033,Doxycycline,Doxycycline hyclate,Vibramycin,50 mg,Capsule,10 capsules,Antibiotic,Pfizer,United States,true
-MED0034,Doxycycline,Doxycycline hyclate,Vibramycin,100 mg,Capsule,10 capsules,Antibiotic,Pfizer,United States,true
-MED0035,Doxycycline,Doxycycline hyclate,Vibramycin,100 mg,Tablet,10 tablets,Antibiotic,Pfizer,United States,true
-MED0036,Fluconazole,Fluconazole,Diflucan,50 mg,Capsule,7 capsules,Antifungal,Pfizer,United States,true
-MED0037,Fluconazole,Fluconazole,Diflucan,150 mg,Capsule,1 capsule,Antifungal,Pfizer,United States,true
-MED0038,Fluconazole,Fluconazole,Diflucan,200 mg,Capsule,7 capsules,Antifungal,Pfizer,United States,true
-MED0039,Fluconazole,Fluconazole,Diflucan,2 mg/mL,IV infusion,100 mL bag,Antifungal,Pfizer,United States,true
-MED0040,Omeprazole,Omeprazole,Losec,10 mg,Capsule,14 capsules,Gastrointestinal / PPI,AstraZeneca,United Kingdom,true
-MED0041,Omeprazole,Omeprazole,Losec,20 mg,Capsule,14 capsules,Gastrointestinal / PPI,AstraZeneca,United Kingdom,true
-MED0042,Omeprazole,Omeprazole,Losec,40 mg,Capsule,14 capsules,Gastrointestinal / PPI,AstraZeneca,United Kingdom,true
-MED0043,Omeprazole,Omeprazole,Losec,40 mg,Powder for injection,1 vial,Gastrointestinal / PPI,AstraZeneca,United Kingdom,true
-MED0044,Pantoprazole,Pantoprazole sodium,Controloc,20 mg,Gastro-resistant tablet,14 tablets,Gastrointestinal / PPI,Takeda,Japan,true
-MED0045,Pantoprazole,Pantoprazole sodium,Controloc,40 mg,Gastro-resistant tablet,14 tablets,Gastrointestinal / PPI,Takeda,Japan,true
-MED0046,Pantoprazole,Pantoprazole sodium,Controloc,40 mg,Powder for injection,1 vial,Gastrointestinal / PPI,Takeda,Japan,true
-MED0047,Metformin,Metformin hydrochloride,Glucophage,500 mg,Tablet,60 tablets,Antidiabetic,Merck,Germany,true
-MED0048,Metformin,Metformin hydrochloride,Glucophage,850 mg,Tablet,60 tablets,Antidiabetic,Merck,Germany,true
-MED0049,Metformin,Metformin hydrochloride,Glucophage,1000 mg,Tablet,60 tablets,Antidiabetic,Merck,Germany,true
-MED0050,Metformin,Metformin hydrochloride,Glucophage,1000 mg,Extended-release tablet,30 tablets,Antidiabetic,Merck,Germany,true
-MED0051,Gliclazide,Gliclazide,Diamicron,30 mg,Modified-release tablet,30 tablets,Antidiabetic,Servier,France,true
-MED0052,Gliclazide,Gliclazide,Diamicron,60 mg,Modified-release tablet,30 tablets,Antidiabetic,Servier,France,true
-MED0053,Gliclazide,Gliclazide,Diamicron,80 mg,Tablet,60 tablets,Antidiabetic,Servier,France,true
-MED0054,Amlodipine,Amlodipine besylate,Norvasc,2.5 mg,Tablet,30 tablets,Antihypertensive,Pfizer,United States,true
-MED0055,Amlodipine,Amlodipine besylate,Norvasc,5 mg,Tablet,30 tablets,Antihypertensive,Pfizer,United States,true
-MED0056,Amlodipine,Amlodipine besylate,Norvasc,10 mg,Tablet,30 tablets,Antihypertensive,Pfizer,United States,true
-MED0057,Losartan,Losartan potassium,Cozaar,25 mg,Tablet,30 tablets,Antihypertensive / ARB,Merck,United States,true
-MED0058,Losartan,Losartan potassium,Cozaar,50 mg,Tablet,30 tablets,Antihypertensive / ARB,Merck,United States,true
-MED0059,Losartan,Losartan potassium,Cozaar,100 mg,Tablet,30 tablets,Antihypertensive / ARB,Merck,United States,true
-MED0060,Enalapril,Enalapril maleate,Renitec,5 mg,Tablet,30 tablets,Antihypertensive / ACE inhibitor,Merck,United States,true
-MED0061,Enalapril,Enalapril maleate,Renitec,10 mg,Tablet,30 tablets,Antihypertensive / ACE inhibitor,Merck,United States,true
-MED0062,Enalapril,Enalapril maleate,Renitec,20 mg,Tablet,30 tablets,Antihypertensive / ACE inhibitor,Merck,United States,true
-MED0063,Atorvastatin,Atorvastatin calcium,Lipitor,10 mg,Tablet,30 tablets,Lipid-lowering,Pfizer,United States,true
-MED0064,Atorvastatin,Atorvastatin calcium,Lipitor,20 mg,Tablet,30 tablets,Lipid-lowering,Pfizer,United States,true
-MED0065,Atorvastatin,Atorvastatin calcium,Lipitor,40 mg,Tablet,30 tablets,Lipid-lowering,Pfizer,United States,true
-MED0066,Atorvastatin,Atorvastatin calcium,Lipitor,80 mg,Tablet,30 tablets,Lipid-lowering,Pfizer,United States,true
-MED0067,Aspirin,Acetylsalicylic acid,Aspirin Cardio,75 mg,Enteric-coated tablet,30 tablets,Antiplatelet / Analgesic,Bayer,Germany,false
-MED0068,Aspirin,Acetylsalicylic acid,Aspirin Cardio,100 mg,Enteric-coated tablet,30 tablets,Antiplatelet / Analgesic,Bayer,Germany,false
-MED0069,Aspirin,Acetylsalicylic acid,Aspirin Cardio,300 mg,Tablet,100 tablets,Antiplatelet / Analgesic,Bayer,Germany,false
-MED0070,Cetirizine,Cetirizine hydrochloride,Zyrtec,5 mg,Tablet,30 tablets,Antihistamine,UCB,Belgium,false
-MED0071,Cetirizine,Cetirizine hydrochloride,Zyrtec,10 mg,Tablet,30 tablets,Antihistamine,UCB,Belgium,false
-MED0072,Cetirizine,Cetirizine hydrochloride,Zyrtec,1 mg/mL,Oral solution,75 mL bottle,Antihistamine,UCB,Belgium,false
-MED0073,Loratadine,Loratadine,Claritin,10 mg,Tablet,30 tablets,Antihistamine,Bayer,Germany,false
-MED0074,Loratadine,Loratadine,Claritin,5 mg/5 mL,Syrup,100 mL bottle,Antihistamine,Bayer,Germany,false
-MED0075,Salbutamol,Salbutamol sulfate,Ventolin,100 mcg/actuation,Metered-dose inhaler,200 actuations,Respiratory / Bronchodilator,GSK,United Kingdom,true
-MED0076,Salbutamol,Salbutamol sulfate,Ventolin,2 mg/5 mL,Syrup,100 mL bottle,Respiratory / Bronchodilator,GSK,United Kingdom,true
-MED0077,Salbutamol,Salbutamol sulfate,Ventolin,2.5 mg/2.5 mL,Nebulizer solution,20 nebules,Respiratory / Bronchodilator,GSK,United Kingdom,true
-MED0078,Budesonide + formoterol,Budesonide + formoterol fumarate,Symbicort,80/4.5 mcg per actuation,Inhaler,120 actuations,Respiratory / ICS-LABA,AstraZeneca,United Kingdom,true
-MED0079,Budesonide + formoterol,Budesonide + formoterol fumarate,Symbicort,160/4.5 mcg per actuation,Inhaler,120 actuations,Respiratory / ICS-LABA,AstraZeneca,United Kingdom,true
-MED0080,Prednisolone,Prednisolone,Deltacortril,5 mg,Tablet,30 tablets,Corticosteroid,Pfizer,United States,true
-MED0081,Prednisolone,Prednisolone,Deltacortril,20 mg,Tablet,30 tablets,Corticosteroid,Pfizer,United States,true
-MED0082,Prednisolone,Prednisolone,Deltacortril,15 mg/5 mL,Oral solution,100 mL bottle,Corticosteroid,Pfizer,United States,true
-MED0083,Dexamethasone,Dexamethasone,Decadron,0.5 mg,Tablet,100 tablets,Corticosteroid,Organon,United States,true
-MED0084,Dexamethasone,Dexamethasone,Decadron,4 mg,Tablet,20 tablets,Corticosteroid,Organon,United States,true
-MED0085,Dexamethasone,Dexamethasone,Decadron,4 mg/mL,Injection,1 mL ampoule,Corticosteroid,Organon,United States,true
-MED0086,Levothyroxine,Levothyroxine sodium,Eltroxin,25 mcg,Tablet,100 tablets,Thyroid hormone,GSK,United Kingdom,true
-MED0087,Levothyroxine,Levothyroxine sodium,Eltroxin,50 mcg,Tablet,100 tablets,Thyroid hormone,GSK,United Kingdom,true
-MED0088,Levothyroxine,Levothyroxine sodium,Eltroxin,100 mcg,Tablet,100 tablets,Thyroid hormone,GSK,United Kingdom,true
-MED0089,Insulin regular,Human insulin,Actrapid,100 IU/mL,Injection,10 mL vial,Antidiabetic / Insulin,Novo Nordisk,Denmark,true
-MED0090,Insulin regular,Human insulin,Actrapid,100 IU/mL,Cartridge,3 mL cartridge,Antidiabetic / Insulin,Novo Nordisk,Denmark,true
-MED0091,Insulin glargine,Insulin glargine,Lantus,100 IU/mL,Injection pen,3 mL pen,Antidiabetic / Insulin,Sanofi,France,true
-MED0092,Insulin glargine,Insulin glargine,Lantus,100 IU/mL,10 mL vial,10 mL vial,Antidiabetic / Insulin,Sanofi,France,true
-MED0093,Furosemide,Furosemide,Lasix,20 mg,Tablet,30 tablets,Diuretic,Sanofi,France,true
-MED0094,Furosemide,Furosemide,Lasix,40 mg,Tablet,30 tablets,Diuretic,Sanofi,France,true
-MED0095,Furosemide,Furosemide,Lasix,10 mg/mL,Injection,2 mL ampoule,Diuretic,Sanofi,France,true
-MED0096,Hydrochlorothiazide,Hydrochlorothiazide,Esidrix,12.5 mg,Tablet,30 tablets,Diuretic / Antihypertensive,Novartis,Switzerland,true
-MED0097,Hydrochlorothiazide,Hydrochlorothiazide,Esidrix,25 mg,Tablet,30 tablets,Diuretic / Antihypertensive,Novartis,Switzerland,true
-MED0098,Hydrochlorothiazide,Hydrochlorothiazide,Esidrix,50 mg,Tablet,30 tablets,Diuretic / Antihypertensive,Novartis,Switzerland,true
-MED0099,Spironolactone,Spironolactone,Aldactone,25 mg,Tablet,30 tablets,Diuretic,Pfizer,United States,true
-MED0100,Spironolactone,Spironolactone,Aldactone,50 mg,Tablet,30 tablets,Diuretic,Pfizer,United States,true
-MED0101,Spironolactone,Spironolactone,Aldactone,100 mg,Tablet,30 tablets,Diuretic,Pfizer,United States,true
-MED0102,Warfarin,Warfarin sodium,Coumadin,1 mg,Tablet,30 tablets,Anticoagulant,Bristol Myers Squibb,United States,true
-MED0103,Warfarin,Warfarin sodium,Coumadin,2 mg,Tablet,30 tablets,Anticoagulant,Bristol Myers Squibb,United States,true
-MED0104,Warfarin,Warfarin sodium,Coumadin,5 mg,Tablet,30 tablets,Anticoagulant,Bristol Myers Squibb,United States,true
-MED0105,Enoxaparin,Enoxaparin sodium,Clexane,40 mg/0.4 mL,Prefilled syringe,0.4 mL syringe,Anticoagulant,Sanofi,France,true
-MED0106,Enoxaparin,Enoxaparin sodium,Clexane,60 mg/0.6 mL,Prefilled syringe,0.6 mL syringe,Anticoagulant,Sanofi,France,true
-MED0107,Enoxaparin,Enoxaparin sodium,Clexane,80 mg/0.8 mL,Prefilled syringe,0.8 mL syringe,Anticoagulant,Sanofi,France,true
-MED0108,Paracetamol + caffeine,Paracetamol + caffeine,Panadol Extra,500/65 mg,Tablet,24 tablets,Analgesic,Haleon,United Kingdom,false
-MED0109,Diclofenac,Diclofenac sodium,Voltaren,25 mg,Tablet,20 tablets,NSAID,Novartis,Switzerland,true
-MED0110,Diclofenac,Diclofenac sodium,Voltaren,50 mg,Enteric-coated tablet,20 tablets,NSAID,Novartis,Switzerland,true
-MED0111,Diclofenac,Diclofenac sodium,Voltaren,100 mg,Sustained-release tablet,10 tablets,NSAID,Novartis,Switzerland,true
-MED0112,Diclofenac,Diclofenac sodium,Voltaren,1%,Topical gel,30 g tube,NSAID,Novartis,Switzerland,false
-MED0113,Naproxen,Naproxen,Naprosyn,250 mg,Tablet,30 tablets,NSAID,Roche,Switzerland,true
-MED0114,Naproxen,Naproxen,Naprosyn,500 mg,Tablet,20 tablets,NSAID,Roche,Switzerland,true
-MED0115,Celecoxib,Celecoxib,Celebrex,100 mg,Capsule,20 capsules,NSAID / COX-2 inhibitor,Pfizer,United States,true
-MED0116,Celecoxib,Celecoxib,Celebrex,200 mg,Capsule,30 capsules,NSAID / COX-2 inhibitor,Pfizer,United States,true
-MED0117,Tramadol,Tramadol hydrochloride,Tramal,50 mg,Capsule,20 capsules,Opioid analgesic,Grünenthal,Germany,true
-MED0118,Tramadol,Tramadol hydrochloride,Tramal,100 mg,Modified-release tablet,10 tablets,Opioid analgesic,Grünenthal,Germany,true
-MED0119,Loperamide,Loperamide hydrochloride,Imodium,2 mg,Capsule,12 capsules,Antidiarrheal,Johnson & Johnson,United States,false
-MED0120,Loperamide,Loperamide hydrochloride,Imodium,1 mg/5 mL,Oral solution,100 mL bottle,Antidiarrheal,Johnson & Johnson,United States,false
-MED0121,Oral rehydration salts,Glucose + electrolytes,ORS,WHO formula,Powder for oral solution,1 sachet,Rehydration,Various,Various,false
-MED0122,Lactulose,Lactulose,Duphalac,3.35 g/5 mL,Oral solution,200 mL bottle,Laxative,Abbott,United States,false
-MED0123,Bisacodyl,Bisacodyl,Dulcolax,5 mg,Enteric-coated tablet,20 tablets,Laxative,Sanofi,France,false
-MED0124,Bisacodyl,Bisacodyl,Dulcolax,10 mg,Suppository,6 suppositories,Laxative,Sanofi,France,false
-MED0125,Albendazole,Albendazole,Zentel,200 mg,Tablet,2 tablets,Anthelmintic,GSK,United Kingdom,false
-MED0126,Albendazole,Albendazole,Zentel,400 mg,Chewable tablet,1 tablet,Anthelmintic,GSK,United Kingdom,false
-MED0127,Albendazole,Albendazole,Zentel,400 mg/10 mL,Oral suspension,10 mL bottle,Anthelmintic,GSK,United Kingdom,false
-MED0128,Mebendazole,Mebendazole,Vermox,100 mg,Tablet,6 tablets,Anthelmintic,Janssen,Belgium,false
-MED0129,Mebendazole,Mebendazole,Vermox,500 mg,Chewable tablet,1 tablet,Anthelmintic,Janssen,Belgium,false
-MED0130,Artemether + lumefantrine,Artemether + lumefantrine,Coartem,20/120 mg,Tablet,24 tablets,Antimalarial,Novartis,Switzerland,true
-MED0131,Artemether + lumefantrine,Artemether + lumefantrine,Coartem,80/480 mg,Tablet,6 tablets,Antimalarial,Novartis,Switzerland,true
-MED0132,Tenofovir disoproxil fumarate,Tenofovir disoproxil fumarate,Viread,300 mg,Tablet,30 tablets,Antiretroviral,Gilead Sciences,United States,true
-MED0133,Dolutegravir,Dolutegravir sodium,Tivicay,50 mg,Tablet,30 tablets,Antiretroviral,ViiV Healthcare,United Kingdom,true
-MED0134,Rifampicin + isoniazid,Rifampicin + isoniazid,Rifinah,150/100 mg,Tablet,60 tablets,Antituberculosis,Sanofi,France,true
-MED0135,Rifampicin + isoniazid,Rifampicin + isoniazid,Rifinah,300/150 mg,Tablet,60 tablets,Antituberculosis,Sanofi,France,true
-MED0136,Ferrous sulfate + folic acid,Ferrous sulfate + folic acid,Fefol,150 mg + 0.5 mg,Capsule,30 capsules,Hematinic,GSK,United Kingdom,false
-MED0137,Folic acid,Folic acid,Folvite,400 mcg,Tablet,30 tablets,Vitamin / Hematinic,Pfizer,United States,false
-MED0138,Folic acid,Folic acid,Folvite,1 mg,Tablet,100 tablets,Vitamin / Hematinic,Pfizer,United States,false
-MED0139,Folic acid,Folic acid,Folvite,5 mg,Tablet,100 tablets,Vitamin / Hematinic,Pfizer,United States,false
-MED0140,Vitamin C,Ascorbic acid,Redoxon,500 mg,Effervescent tablet,10 tablets,Vitamin / Supplement,Bayer,Germany,false
-MED0141,Vitamin C,Ascorbic acid,Redoxon,1000 mg,Effervescent tablet,10 tablets,Vitamin / Supplement,Bayer,Germany,false
-MED0142,Vitamin D3,Cholecalciferol,D-Cure,1000 IU,Capsule,30 capsules,Vitamin / Supplement,Laboratoires SMB,Belgium,false
-MED0143,Vitamin D3,Cholecalciferol,D-Cure,"20,000 IU",Capsule,4 capsules,Vitamin / Supplement,Laboratoires SMB,Belgium,false
-MED0144,Vitamin D3,Cholecalciferol,D-Cure,"50,000 IU",Capsule,4 capsules,Vitamin / Supplement,Laboratoires SMB,Belgium,false
-MED0145,Zinc sulfate,Zinc sulfate monohydrate,Zinc,10 mg elemental zinc,Dispersible tablet,10 tablets,Mineral / Supplement,Various,Various,false
-MED0146,Zinc sulfate,Zinc sulfate monohydrate,Zinc,20 mg elemental zinc,Dispersible tablet,10 tablets,Mineral / Supplement,Various,Various,false
-MED0147,Timolol,Timolol maleate,Timoptic,0.25%,Eye drops,5 mL bottle,Ophthalmic / Glaucoma,Merck,United States,true
-MED0148,Timolol,Timolol maleate,Timoptic,0.5%,Eye drops,5 mL bottle,Ophthalmic / Glaucoma,Merck,United States,true
-MED0149,Chloramphenicol,Chloramphenicol,Chloromycetin,0.5%,Eye drops,10 mL bottle,Ophthalmic antibiotic,Pfizer,United States,true
-MED0150,Chloramphenicol,Chloramphenicol,Chloromycetin,1%,Eye ointment,5 g tube,Ophthalmic antibiotic,Pfizer,United States,true
-MED0151,Latanoprost,Latanoprost,Xalatan,0.005%,Eye drops,2.5 mL bottle,Ophthalmic / Glaucoma,Pfizer,United States,true
-MED0152,Clotrimazole,Clotrimazole,Canesten,1%,Cream,20 g tube,Antifungal,Bayer,Germany,false
-MED0153,Clotrimazole,Clotrimazole,Canesten,100 mg,Vaginal tablet,6 tablets,Antifungal,Bayer,Germany,false
-MED0154,Mupirocin,Mupirocin,Bactroban,2%,Topical ointment,15 g tube,Topical antibiotic,GSK,United Kingdom,true
-MED0155,Hydrocortisone,Hydrocortisone acetate,Cortaid,0.5%,Cream,15 g tube,Topical corticosteroid,Bayer,Germany,false
-MED0156,Hydrocortisone,Hydrocortisone acetate,Cortaid,1%,Cream,15 g tube,Topical corticosteroid,Bayer,Germany,false
-MED0157,Permethrin,Permethrin,Lyclear,1%,Lotion,100 mL bottle,Scabicide / Pediculicide,Omega Pharma,Belgium,false
-MED0158,Permethrin,Permethrin,Lyclear,5%,Cream,30 g tube,Scabicide / Pediculicide,Omega Pharma,Belgium,false
-MED0159,Povidone-iodine,Povidone-iodine,Betadine,10%,Topical solution,100 mL bottle,Antiseptic,Mundipharma,Switzerland,false
-MED0160,Povidone-iodine,Povidone-iodine,Betadine,7.5%,Surgical scrub,500 mL bottle,Antiseptic,Mundipharma,Switzerland,false
-MED0161,Chlorhexidine,Chlorhexidine gluconate,Corsodyl,0.2%,Mouthwash,300 mL bottle,Antiseptic,Haleon,United Kingdom,false
-MED0162,Chlorhexidine,Chlorhexidine gluconate,Corsodyl,4%,Antiseptic wash,500 mL bottle,Antiseptic,Haleon,United Kingdom,false
-MED0163,Lidocaine,Lidocaine hydrochloride,Xylocaine,1%,Injection,20 mL vial,Local anesthetic,Aspen Pharmacare,South Africa,true
-MED0164,Lidocaine,Lidocaine hydrochloride,Xylocaine,2%,Injection,20 mL vial,Local anesthetic,Aspen Pharmacare,South Africa,true
-MED0165,Lidocaine,Lidocaine hydrochloride,Xylocaine,2%,Topical gel,30 g tube,Local anesthetic,Aspen Pharmacare,South Africa,false
-MED0166,Normal saline,Sodium chloride,0.9% Sodium Chloride,0.9%,IV infusion,100 mL bag,IV fluid,Various,Various,true
-MED0167,Normal saline,Sodium chloride,0.9% Sodium Chloride,0.9%,IV infusion,500 mL bag,IV fluid,Various,Various,true
-MED0168,Normal saline,Sodium chloride,0.9% Sodium Chloride,0.9%,IV infusion,1 L bag,IV fluid,Various,Various,true
-MED0169,Ringer's lactate,Electrolytes,Ringer's Lactate,Standard formulation,IV infusion,500 mL bag,IV fluid,Various,Various,true
-MED0170,Ringer's lactate,Electrolytes,Ringer's Lactate,Standard formulation,IV infusion,1 L bag,IV fluid,Various,Various,true
-MED0171,Dextrose,Glucose,Dextrose 5%,5%,IV infusion,500 mL bag,IV fluid,Various,Various,true
-MED0173,Dextrose,Glucose,Dextrose 50%,50%,Injection,50 mL syringe,IV fluid,Various,Various,true
-MED0174,Ceftriaxone,Ceftriaxone sodium,Rocephin,500 mg,Powder for injection,1 vial,Antibiotic,Roche,Switzerland,true
-MED0175,Ceftriaxone,Ceftriaxone sodium,Rocephin,1 g,Powder for injection,1 vial,Antibiotic,Roche,Switzerland,true
-MED0176,Ceftriaxone,Ceftriaxone sodium,Rocephin,2 g,Powder for injection,1 vial,Antibiotic,Roche,Switzerland,true
-MED0177,Gentamicin,Gentamicin sulfate,Garamycin,40 mg/mL,Injection,2 mL ampoule,Antibiotic,Organon,United States,true
-MED0178,Gentamicin,Gentamicin sulfate,Garamycin,80 mg/2 mL,Injection,2 mL ampoule,Antibiotic,Organon,United States,true
-MED0179,Meropenem,Meropenem trihydrate,Meronem,500 mg,Powder for injection,1 vial,Antibiotic,Pfizer,United States,true
-MED0180,Meropenem,Meropenem trihydrate,Meronem,1 g,Powder for injection,1 vial,Antibiotic,Pfizer,United States,true
-MED0181,Vancomycin,Vancomycin hydrochloride,Vancocin,500 mg,Powder for injection,1 vial,Antibiotic,ANI Pharmaceuticals,United States,true
-MED0182,Vancomycin,Vancomycin hydrochloride,Vancocin,1 g,Powder for injection,1 vial,Antibiotic,ANI Pharmaceuticals,United States,true
-MED0183,Sertraline,Sertraline hydrochloride,Zoloft,50 mg,Tablet,28 tablets,Antidepressant / SSRI,Pfizer,United States,true
-MED0184,Sertraline,Sertraline hydrochloride,Zoloft,100 mg,Tablet,28 tablets,Antidepressant / SSRI,Pfizer,United States,true
-MED0185,Fluoxetine,Fluoxetine hydrochloride,Prozac,10 mg,Capsule,28 capsules,Antidepressant / SSRI,Eli Lilly,United States,true
-MED0186,Fluoxetine,Fluoxetine hydrochloride,Prozac,20 mg,Capsule,28 capsules,Antidepressant / SSRI,Eli Lilly,United States,true
-MED0187,Risperidone,Risperidone,Risperdal,1 mg,Tablet,30 tablets,Antipsychotic,Janssen,Belgium,true
-MED0188,Risperidone,Risperidone,Risperdal,2 mg,Tablet,30 tablets,Antipsychotic,Janssen,Belgium,true
-MED0189,Risperidone,Risperidone,Risperdal,3 mg,Tablet,30 tablets,Antipsychotic,Janssen,Belgium,true
-MED0190,Diazepam,Diazepam,Valium,2 mg,Tablet,20 tablets,Benzodiazepine,Roche,Switzerland,true
-MED0191,Diazepam,Diazepam,Valium,5 mg,Tablet,20 tablets,Benzodiazepine,Roche,Switzerland,true
-MED0192,Diazepam,Diazepam,Valium,10 mg/2 mL,Injection,2 mL ampoule,Benzodiazepine,Roche,Switzerland,true
-MED0193,Carbamazepine,Carbamazepine,Tegretol,100 mg,Tablet,50 tablets,Antiepileptic,Novartis,Switzerland,true
-MED0194,Carbamazepine,Carbamazepine,Tegretol,200 mg,Tablet,50 tablets,Antiepileptic,Novartis,Switzerland,true
-MED0195,Levetiracetam,Levetiracetam,Keppra,250 mg,Tablet,60 tablets,Antiepileptic,UCB,Belgium,true
-MED0196,Levetiracetam,Levetiracetam,Keppra,500 mg,Tablet,60 tablets,Antiepileptic,UCB,Belgium,true
-MED0197,Levetiracetam,Levetiracetam,Keppra,1000 mg,Tablet,60 tablets,Antiepileptic,UCB,Belgium,true
-MED0198,Allopurinol,Allopurinol,Zyloric,100 mg,Tablet,100 tablets,Gout / Uric acid lowering,GSK,United Kingdom,true
-MED0199,Allopurinol,Allopurinol,Zyloric,300 mg,Tablet,30 tablets,Gout / Uric acid lowering,GSK,United Kingdom,true
+MED0001,Paracetamol,Paracetamol,Panadol,500 mg,Tablet,100 tablets,Analgesics,Haleon,United Kingdom,false
+MED0002,Paracetamol,Paracetamol,Panadol,1 g,Tablet,10 tablets,Analgesics,Haleon,United Kingdom,false
+MED0003,Paracetamol,Paracetamol,Panadol,120 mg/5 mL,Oral suspension,100 mL bottle,Analgesics,Haleon,United Kingdom,false
+MED0004,Paracetamol,Paracetamol,Panadol,250 mg/5 mL,Oral suspension,100 mL bottle,Analgesics,Haleon,United Kingdom,false
+MED0005,Ibuprofen,Ibuprofen,Brufen,200 mg,Tablet,24 tablets,Analgesics,Abbott,United States,false
+MED0006,Ibuprofen,Ibuprofen,Brufen,400 mg,Tablet,30 tablets,Analgesics,Abbott,United States,false
+MED0007,Ibuprofen,Ibuprofen,Brufen,600 mg,Tablet,30 tablets,Analgesics,Abbott,United States,false
+MED0008,Ibuprofen,Ibuprofen,Brufen,100 mg/5 mL,Oral suspension,100 mL bottle,Analgesics,Abbott,United States,false
+MED0009,Amoxicillin,Amoxicillin,Amoxil,250 mg,Capsule,21 capsules,Antibiotics,GSK,United Kingdom,true
+MED0010,Amoxicillin,Amoxicillin,Amoxil,500 mg,Capsule,21 capsules,Antibiotics,GSK,United Kingdom,true
+MED0011,Amoxicillin,Amoxicillin,Amoxil,125 mg/5 mL,Powder for oral suspension,100 mL after reconstitution,Antibiotics,GSK,United Kingdom,true
+MED0012,Amoxicillin,Amoxicillin,Amoxil,250 mg/5 mL,Powder for oral suspension,100 mL after reconstitution,Antibiotics,GSK,United Kingdom,true
+MED0013,Amoxicillin + clavulanic acid,Amoxicillin + clavulanate potassium,Augmentin,625 mg (500/125 mg),Tablet,14 tablets,Antibiotics,GSK,United Kingdom,true
+MED0014,Amoxicillin + clavulanic acid,Amoxicillin + clavulanate potassium,Augmentin,1 g (875/125 mg),Tablet,14 tablets,Antibiotics,GSK,United Kingdom,true
+MED0015,Amoxicillin + clavulanic acid,Amoxicillin + clavulanate potassium,Augmentin,457 mg/5 mL,Powder for oral suspension,70 mL after reconstitution,Antibiotics,GSK,United Kingdom,true
+MED0016,Amoxicillin + clavulanic acid,Amoxicillin + clavulanate potassium,Augmentin,312.5 mg/5 mL,Powder for oral suspension,100 mL after reconstitution,Antibiotics,GSK,United Kingdom,true
+MED0017,Azithromycin,Azithromycin,Zithromax,250 mg,Tablet,6 tablets,Antibiotics,Pfizer,United States,true
+MED0018,Azithromycin,Azithromycin,Zithromax,500 mg,Tablet,3 tablets,Antibiotics,Pfizer,United States,true
+MED0019,Azithromycin,Azithromycin,Zithromax,200 mg/5 mL,Powder for oral suspension,15 mL after reconstitution,Antibiotics,Pfizer,United States,true
+MED0020,Azithromycin,Azithromycin,Zithromax,100 mg/5 mL,Powder for oral suspension,30 mL after reconstitution,Antibiotics,Pfizer,United States,true
+MED0021,Ciprofloxacin,Ciprofloxacin,Cipro,250 mg,Tablet,10 tablets,Antibiotics,Bayer,Germany,true
+MED0022,Ciprofloxacin,Ciprofloxacin,Cipro,500 mg,Tablet,10 tablets,Antibiotics,Bayer,Germany,true
+MED0023,Ciprofloxacin,Ciprofloxacin,Cipro,750 mg,Tablet,5 tablets,Antibiotics,Bayer,Germany,true
+MED0024,Ciprofloxacin,Ciprofloxacin,Cipro,200 mg/100 mL,IV infusion,100 mL bag,Antibiotics,Bayer,Germany,true
+MED0025,Metronidazole,Metronidazole,Flagyl,200 mg,Tablet,21 tablets,Antibiotics,Sanofi,France,true
+MED0026,Metronidazole,Metronidazole,Flagyl,400 mg,Tablet,21 tablets,Antibiotics,Sanofi,France,true
+MED0027,Metronidazole,Metronidazole,Flagyl,500 mg,Tablet,21 tablets,Antibiotics,Sanofi,France,true
+MED0028,Metronidazole,Metronidazole,Flagyl,125 mg/5 mL,Oral suspension,100 mL bottle,Antibiotics,Sanofi,France,true
+MED0029,Cefixime,Cefixime,Suprax,100 mg,Capsule,10 capsules,Antibiotics,Lupin,India,true
+MED0030,Cefixime,Cefixime,Suprax,200 mg,Capsule,10 capsules,Antibiotics,Lupin,India,true
+MED0031,Cefixime,Cefixime,Suprax,400 mg,Tablet,5 tablets,Antibiotics,Lupin,India,true
+MED0032,Cefixime,Cefixime,Suprax,100 mg/5 mL,Powder for oral suspension,50 mL after reconstitution,Antibiotics,Lupin,India,true
+MED0033,Doxycycline,Doxycycline hyclate,Vibramycin,50 mg,Capsule,10 capsules,Antibiotics,Pfizer,United States,true
+MED0034,Doxycycline,Doxycycline hyclate,Vibramycin,100 mg,Capsule,10 capsules,Antibiotics,Pfizer,United States,true
+MED0035,Doxycycline,Doxycycline hyclate,Vibramycin,100 mg,Tablet,10 tablets,Antibiotics,Pfizer,United States,true
+MED0036,Fluconazole,Fluconazole,Diflucan,50 mg,Capsule,7 capsules,Antifungals,Pfizer,United States,true
+MED0037,Fluconazole,Fluconazole,Diflucan,150 mg,Capsule,1 capsule,Antifungals,Pfizer,United States,true
+MED0038,Fluconazole,Fluconazole,Diflucan,200 mg,Capsule,7 capsules,Antifungals,Pfizer,United States,true
+MED0039,Fluconazole,Fluconazole,Diflucan,2 mg/mL,IV infusion,100 mL bag,Antifungals,Pfizer,United States,true
+MED0040,Omeprazole,Omeprazole,Losec,10 mg,Capsule,14 capsules,Gastrointestinal,AstraZeneca,United Kingdom,true
+MED0041,Omeprazole,Omeprazole,Losec,20 mg,Capsule,14 capsules,Gastrointestinal,AstraZeneca,United Kingdom,true
+MED0042,Omeprazole,Omeprazole,Losec,40 mg,Capsule,14 capsules,Gastrointestinal,AstraZeneca,United Kingdom,true
+MED0043,Omeprazole,Omeprazole,Losec,40 mg,Powder for injection,1 vial,Gastrointestinal,AstraZeneca,United Kingdom,true
+MED0044,Pantoprazole,Pantoprazole sodium,Controloc,20 mg,Gastro-resistant tablet,14 tablets,Gastrointestinal,Takeda,Japan,true
+MED0045,Pantoprazole,Pantoprazole sodium,Controloc,40 mg,Gastro-resistant tablet,14 tablets,Gastrointestinal,Takeda,Japan,true
+MED0046,Pantoprazole,Pantoprazole sodium,Controloc,40 mg,Powder for injection,1 vial,Gastrointestinal,Takeda,Japan,true
+MED0047,Metformin,Metformin hydrochloride,Glucophage,500 mg,Tablet,60 tablets,Antidiabetics,Merck,Germany,true
+MED0048,Metformin,Metformin hydrochloride,Glucophage,850 mg,Tablet,60 tablets,Antidiabetics,Merck,Germany,true
+MED0049,Metformin,Metformin hydrochloride,Glucophage,1000 mg,Tablet,60 tablets,Antidiabetics,Merck,Germany,true
+MED0050,Metformin,Metformin hydrochloride,Glucophage,1000 mg,Extended-release tablet,30 tablets,Antidiabetics,Merck,Germany,true
+MED0051,Gliclazide,Gliclazide,Diamicron,30 mg,Modified-release tablet,30 tablets,Antidiabetics,Servier,France,true
+MED0052,Gliclazide,Gliclazide,Diamicron,60 mg,Modified-release tablet,30 tablets,Antidiabetics,Servier,France,true
+MED0053,Gliclazide,Gliclazide,Diamicron,80 mg,Tablet,60 tablets,Antidiabetics,Servier,France,true
+MED0054,Amlodipine,Amlodipine besylate,Norvasc,2.5 mg,Tablet,30 tablets,Antihypertensives,Pfizer,United States,true
+MED0055,Amlodipine,Amlodipine besylate,Norvasc,5 mg,Tablet,30 tablets,Antihypertensives,Pfizer,United States,true
+MED0056,Amlodipine,Amlodipine besylate,Norvasc,10 mg,Tablet,30 tablets,Antihypertensives,Pfizer,United States,true
+MED0057,Losartan,Losartan potassium,Cozaar,25 mg,Tablet,30 tablets,Antihypertensives,Merck,United States,true
+MED0058,Losartan,Losartan potassium,Cozaar,50 mg,Tablet,30 tablets,Antihypertensives,Merck,United States,true
+MED0059,Losartan,Losartan potassium,Cozaar,100 mg,Tablet,30 tablets,Antihypertensives,Merck,United States,true
+MED0060,Enalapril,Enalapril maleate,Renitec,5 mg,Tablet,30 tablets,Antihypertensives,Merck,United States,true
+MED0061,Enalapril,Enalapril maleate,Renitec,10 mg,Tablet,30 tablets,Antihypertensives,Merck,United States,true
+MED0062,Enalapril,Enalapril maleate,Renitec,20 mg,Tablet,30 tablets,Antihypertensives,Merck,United States,true
+MED0063,Atorvastatin,Atorvastatin calcium,Lipitor,10 mg,Tablet,30 tablets,Cardiovascular,Pfizer,United States,true
+MED0064,Atorvastatin,Atorvastatin calcium,Lipitor,20 mg,Tablet,30 tablets,Cardiovascular,Pfizer,United States,true
+MED0065,Atorvastatin,Atorvastatin calcium,Lipitor,40 mg,Tablet,30 tablets,Cardiovascular,Pfizer,United States,true
+MED0066,Atorvastatin,Atorvastatin calcium,Lipitor,80 mg,Tablet,30 tablets,Cardiovascular,Pfizer,United States,true
+MED0067,Aspirin,Acetylsalicylic acid,Aspirin Cardio,75 mg,Enteric-coated tablet,30 tablets,Blood and Coagulation,Bayer,Germany,false
+MED0068,Aspirin,Acetylsalicylic acid,Aspirin Cardio,100 mg,Enteric-coated tablet,30 tablets,Blood and Coagulation,Bayer,Germany,false
+MED0069,Aspirin,Acetylsalicylic acid,Aspirin Cardio,300 mg,Tablet,100 tablets,Blood and Coagulation,Bayer,Germany,false
+MED0070,Cetirizine,Cetirizine hydrochloride,Zyrtec,5 mg,Tablet,30 tablets,Antihistamines,UCB,Belgium,false
+MED0071,Cetirizine,Cetirizine hydrochloride,Zyrtec,10 mg,Tablet,30 tablets,Antihistamines,UCB,Belgium,false
+MED0072,Cetirizine,Cetirizine hydrochloride,Zyrtec,1 mg/mL,Oral solution,75 mL bottle,Antihistamines,UCB,Belgium,false
+MED0073,Loratadine,Loratadine,Claritin,10 mg,Tablet,30 tablets,Antihistamines,Bayer,Germany,false
+MED0074,Loratadine,Loratadine,Claritin,5 mg/5 mL,Syrup,100 mL bottle,Antihistamines,Bayer,Germany,false
+MED0075,Salbutamol,Salbutamol sulfate,Ventolin,100 mcg/actuation,Metered-dose inhaler,200 actuations,Respiratory,GSK,United Kingdom,true
+MED0076,Salbutamol,Salbutamol sulfate,Ventolin,2 mg/5 mL,Syrup,100 mL bottle,Respiratory,GSK,United Kingdom,true
+MED0077,Salbutamol,Salbutamol sulfate,Ventolin,2.5 mg/2.5 mL,Nebulizer solution,20 nebules,Respiratory,GSK,United Kingdom,true
+MED0078,Budesonide + formoterol,Budesonide + formoterol fumarate,Symbicort,80/4.5 mcg per actuation,Inhaler,120 actuations,Respiratory,AstraZeneca,United Kingdom,true
+MED0079,Budesonide + formoterol,Budesonide + formoterol fumarate,Symbicort,160/4.5 mcg per actuation,Inhaler,120 actuations,Respiratory,AstraZeneca,United Kingdom,true
+MED0080,Prednisolone,Prednisolone,Deltacortril,5 mg,Tablet,30 tablets,Hormones and Contraceptives,Pfizer,United States,true
+MED0081,Prednisolone,Prednisolone,Deltacortril,20 mg,Tablet,30 tablets,Hormones and Contraceptives,Pfizer,United States,true
+MED0082,Prednisolone,Prednisolone,Deltacortril,15 mg/5 mL,Oral solution,100 mL bottle,Hormones and Contraceptives,Pfizer,United States,true
+MED0083,Dexamethasone,Dexamethasone,Decadron,0.5 mg,Tablet,100 tablets,Hormones and Contraceptives,Organon,United States,true
+MED0084,Dexamethasone,Dexamethasone,Decadron,4 mg,Tablet,20 tablets,Hormones and Contraceptives,Organon,United States,true
+MED0085,Dexamethasone,Dexamethasone,Decadron,4 mg/mL,Injection,1 mL ampoule,Hormones and Contraceptives,Organon,United States,true
+MED0086,Levothyroxine,Levothyroxine sodium,Eltroxin,25 mcg,Tablet,100 tablets,Hormones and Contraceptives,GSK,United Kingdom,true
+MED0087,Levothyroxine,Levothyroxine sodium,Eltroxin,50 mcg,Tablet,100 tablets,Hormones and Contraceptives,GSK,United Kingdom,true
+MED0088,Levothyroxine,Levothyroxine sodium,Eltroxin,100 mcg,Tablet,100 tablets,Hormones and Contraceptives,GSK,United Kingdom,true
+MED0089,Insulin regular,Human insulin,Actrapid,100 IU/mL,Injection,10 mL vial,Antidiabetics,Novo Nordisk,Denmark,true
+MED0090,Insulin regular,Human insulin,Actrapid,100 IU/mL,Cartridge,3 mL cartridge,Antidiabetics,Novo Nordisk,Denmark,true
+MED0091,Insulin glargine,Insulin glargine,Lantus,100 IU/mL,Injection pen,3 mL pen,Antidiabetics,Sanofi,France,true
+MED0092,Insulin glargine,Insulin glargine,Lantus,100 IU/mL,10 mL vial,10 mL vial,Antidiabetics,Sanofi,France,true
+MED0093,Furosemide,Furosemide,Lasix,20 mg,Tablet,30 tablets,Antihypertensives,Sanofi,France,true
+MED0094,Furosemide,Furosemide,Lasix,40 mg,Tablet,30 tablets,Antihypertensives,Sanofi,France,true
+MED0095,Furosemide,Furosemide,Lasix,10 mg/mL,Injection,2 mL ampoule,Antihypertensives,Sanofi,France,true
+MED0096,Hydrochlorothiazide,Hydrochlorothiazide,Esidrix,12.5 mg,Tablet,30 tablets,Antihypertensives,Novartis,Switzerland,true
+MED0097,Hydrochlorothiazide,Hydrochlorothiazide,Esidrix,25 mg,Tablet,30 tablets,Antihypertensives,Novartis,Switzerland,true
+MED0098,Hydrochlorothiazide,Hydrochlorothiazide,Esidrix,50 mg,Tablet,30 tablets,Antihypertensives,Novartis,Switzerland,true
+MED0099,Spironolactone,Spironolactone,Aldactone,25 mg,Tablet,30 tablets,Antihypertensives,Pfizer,United States,true
+MED0100,Spironolactone,Spironolactone,Aldactone,50 mg,Tablet,30 tablets,Antihypertensives,Pfizer,United States,true
+MED0101,Spironolactone,Spironolactone,Aldactone,100 mg,Tablet,30 tablets,Antihypertensives,Pfizer,United States,true
+MED0102,Warfarin,Warfarin sodium,Coumadin,1 mg,Tablet,30 tablets,Blood and Coagulation,Bristol Myers Squibb,United States,true
+MED0103,Warfarin,Warfarin sodium,Coumadin,2 mg,Tablet,30 tablets,Blood and Coagulation,Bristol Myers Squibb,United States,true
+MED0104,Warfarin,Warfarin sodium,Coumadin,5 mg,Tablet,30 tablets,Blood and Coagulation,Bristol Myers Squibb,United States,true
+MED0105,Enoxaparin,Enoxaparin sodium,Clexane,40 mg/0.4 mL,Prefilled syringe,0.4 mL syringe,Blood and Coagulation,Sanofi,France,true
+MED0106,Enoxaparin,Enoxaparin sodium,Clexane,60 mg/0.6 mL,Prefilled syringe,0.6 mL syringe,Blood and Coagulation,Sanofi,France,true
+MED0107,Enoxaparin,Enoxaparin sodium,Clexane,80 mg/0.8 mL,Prefilled syringe,0.8 mL syringe,Blood and Coagulation,Sanofi,France,true
+MED0108,Paracetamol + caffeine,Paracetamol + caffeine,Panadol Extra,500/65 mg,Tablet,24 tablets,Analgesics,Haleon,United Kingdom,false
+MED0109,Diclofenac,Diclofenac sodium,Voltaren,25 mg,Tablet,20 tablets,Analgesics,Novartis,Switzerland,true
+MED0110,Diclofenac,Diclofenac sodium,Voltaren,50 mg,Enteric-coated tablet,20 tablets,Analgesics,Novartis,Switzerland,true
+MED0111,Diclofenac,Diclofenac sodium,Voltaren,100 mg,Sustained-release tablet,10 tablets,Analgesics,Novartis,Switzerland,true
+MED0112,Diclofenac,Diclofenac sodium,Voltaren,1%,Topical gel,30 g tube,Analgesics,Novartis,Switzerland,false
+MED0113,Naproxen,Naproxen,Naprosyn,250 mg,Tablet,30 tablets,Analgesics,Roche,Switzerland,true
+MED0114,Naproxen,Naproxen,Naprosyn,500 mg,Tablet,20 tablets,Analgesics,Roche,Switzerland,true
+MED0115,Celecoxib,Celecoxib,Celebrex,100 mg,Capsule,20 capsules,Analgesics,Pfizer,United States,true
+MED0116,Celecoxib,Celecoxib,Celebrex,200 mg,Capsule,30 capsules,Analgesics,Pfizer,United States,true
+MED0117,Tramadol,Tramadol hydrochloride,Tramal,50 mg,Capsule,20 capsules,Analgesics,Grünenthal,Germany,true
+MED0118,Tramadol,Tramadol hydrochloride,Tramal,100 mg,Modified-release tablet,10 tablets,Analgesics,Grünenthal,Germany,true
+MED0119,Loperamide,Loperamide hydrochloride,Imodium,2 mg,Capsule,12 capsules,Gastrointestinal,Johnson & Johnson,United States,false
+MED0120,Loperamide,Loperamide hydrochloride,Imodium,1 mg/5 mL,Oral solution,100 mL bottle,Gastrointestinal,Johnson & Johnson,United States,false
+MED0121,Oral rehydration salts,Glucose + electrolytes,ORS,WHO formula,Powder for oral solution,1 sachet,Gastrointestinal,Various,Various,false
+MED0122,Lactulose,Lactulose,Duphalac,3.35 g/5 mL,Oral solution,200 mL bottle,Gastrointestinal,Abbott,United States,false
+MED0123,Bisacodyl,Bisacodyl,Dulcolax,5 mg,Enteric-coated tablet,20 tablets,Gastrointestinal,Sanofi,France,false
+MED0124,Bisacodyl,Bisacodyl,Dulcolax,10 mg,Suppository,6 suppositories,Gastrointestinal,Sanofi,France,false
+MED0125,Albendazole,Albendazole,Zentel,200 mg,Tablet,2 tablets,Antivirals and Antiparasitics,GSK,United Kingdom,false
+MED0126,Albendazole,Albendazole,Zentel,400 mg,Chewable tablet,1 tablet,Antivirals and Antiparasitics,GSK,United Kingdom,false
+MED0127,Albendazole,Albendazole,Zentel,400 mg/10 mL,Oral suspension,10 mL bottle,Antivirals and Antiparasitics,GSK,United Kingdom,false
+MED0128,Mebendazole,Mebendazole,Vermox,100 mg,Tablet,6 tablets,Antivirals and Antiparasitics,Janssen,Belgium,false
+MED0129,Mebendazole,Mebendazole,Vermox,500 mg,Chewable tablet,1 tablet,Antivirals and Antiparasitics,Janssen,Belgium,false
+MED0130,Artemether + lumefantrine,Artemether + lumefantrine,Coartem,20/120 mg,Tablet,24 tablets,Antimalarials,Novartis,Switzerland,true
+MED0131,Artemether + lumefantrine,Artemether + lumefantrine,Coartem,80/480 mg,Tablet,6 tablets,Antimalarials,Novartis,Switzerland,true
+MED0132,Tenofovir disoproxil fumarate,Tenofovir disoproxil fumarate,Viread,300 mg,Tablet,30 tablets,Antivirals and Antiparasitics,Gilead Sciences,United States,true
+MED0133,Dolutegravir,Dolutegravir sodium,Tivicay,50 mg,Tablet,30 tablets,Antivirals and Antiparasitics,ViiV Healthcare,United Kingdom,true
+MED0134,Rifampicin + isoniazid,Rifampicin + isoniazid,Rifinah,150/100 mg,Tablet,60 tablets,Antibiotics,Sanofi,France,true
+MED0135,Rifampicin + isoniazid,Rifampicin + isoniazid,Rifinah,300/150 mg,Tablet,60 tablets,Antibiotics,Sanofi,France,true
+MED0136,Ferrous sulfate + folic acid,Ferrous sulfate + folic acid,Fefol,150 mg + 0.5 mg,Capsule,30 capsules,Vitamins and Supplements,GSK,United Kingdom,false
+MED0137,Folic acid,Folic acid,Folvite,400 mcg,Tablet,30 tablets,Vitamins and Supplements,Pfizer,United States,false
+MED0138,Folic acid,Folic acid,Folvite,1 mg,Tablet,100 tablets,Vitamins and Supplements,Pfizer,United States,false
+MED0139,Folic acid,Folic acid,Folvite,5 mg,Tablet,100 tablets,Vitamins and Supplements,Pfizer,United States,false
+MED0140,Vitamin C,Ascorbic acid,Redoxon,500 mg,Effervescent tablet,10 tablets,Vitamins and Supplements,Bayer,Germany,false
+MED0141,Vitamin C,Ascorbic acid,Redoxon,1000 mg,Effervescent tablet,10 tablets,Vitamins and Supplements,Bayer,Germany,false
+MED0142,Vitamin D3,Cholecalciferol,D-Cure,1000 IU,Capsule,30 capsules,Vitamins and Supplements,Laboratoires SMB,Belgium,false
+MED0143,Vitamin D3,Cholecalciferol,D-Cure,"20,000 IU",Capsule,4 capsules,Vitamins and Supplements,Laboratoires SMB,Belgium,false
+MED0144,Vitamin D3,Cholecalciferol,D-Cure,"50,000 IU",Capsule,4 capsules,Vitamins and Supplements,Laboratoires SMB,Belgium,false
+MED0145,Zinc sulfate,Zinc sulfate monohydrate,Zinc,10 mg elemental zinc,Dispersible tablet,10 tablets,Vitamins and Supplements,Various,Various,false
+MED0146,Zinc sulfate,Zinc sulfate monohydrate,Zinc,20 mg elemental zinc,Dispersible tablet,10 tablets,Vitamins and Supplements,Various,Various,false
+MED0147,Timolol,Timolol maleate,Timoptic,0.25%,Eye drops,5 mL bottle,Ophthalmic and Otic,Merck,United States,true
+MED0148,Timolol,Timolol maleate,Timoptic,0.5%,Eye drops,5 mL bottle,Ophthalmic and Otic,Merck,United States,true
+MED0149,Chloramphenicol,Chloramphenicol,Chloromycetin,0.5%,Eye drops,10 mL bottle,Ophthalmic and Otic,Pfizer,United States,true
+MED0150,Chloramphenicol,Chloramphenicol,Chloromycetin,1%,Eye ointment,5 g tube,Ophthalmic and Otic,Pfizer,United States,true
+MED0151,Latanoprost,Latanoprost,Xalatan,0.005%,Eye drops,2.5 mL bottle,Ophthalmic and Otic,Pfizer,United States,true
+MED0152,Clotrimazole,Clotrimazole,Canesten,1%,Cream,20 g tube,Antifungals,Bayer,Germany,false
+MED0153,Clotrimazole,Clotrimazole,Canesten,100 mg,Vaginal tablet,6 tablets,Antifungals,Bayer,Germany,false
+MED0154,Mupirocin,Mupirocin,Bactroban,2%,Topical ointment,15 g tube,Antibiotics,GSK,United Kingdom,true
+MED0155,Hydrocortisone,Hydrocortisone acetate,Cortaid,0.5%,Cream,15 g tube,Dermatological,Bayer,Germany,false
+MED0156,Hydrocortisone,Hydrocortisone acetate,Cortaid,1%,Cream,15 g tube,Dermatological,Bayer,Germany,false
+MED0157,Permethrin,Permethrin,Lyclear,1%,Lotion,100 mL bottle,Dermatological,Omega Pharma,Belgium,false
+MED0158,Permethrin,Permethrin,Lyclear,5%,Cream,30 g tube,Dermatological,Omega Pharma,Belgium,false
+MED0159,Povidone-iodine,Povidone-iodine,Betadine,10%,Topical solution,100 mL bottle,Antiseptics and Disinfectants,Mundipharma,Switzerland,false
+MED0160,Povidone-iodine,Povidone-iodine,Betadine,7.5%,Surgical scrub,500 mL bottle,Antiseptics and Disinfectants,Mundipharma,Switzerland,false
+MED0161,Chlorhexidine,Chlorhexidine gluconate,Corsodyl,0.2%,Mouthwash,300 mL bottle,Antiseptics and Disinfectants,Haleon,United Kingdom,false
+MED0162,Chlorhexidine,Chlorhexidine gluconate,Corsodyl,4%,Antiseptic wash,500 mL bottle,Antiseptics and Disinfectants,Haleon,United Kingdom,false
+MED0163,Lidocaine,Lidocaine hydrochloride,Xylocaine,1%,Injection,20 mL vial,Emergency and Anesthetics,Aspen Pharmacare,South Africa,true
+MED0164,Lidocaine,Lidocaine hydrochloride,Xylocaine,2%,Injection,20 mL vial,Emergency and Anesthetics,Aspen Pharmacare,South Africa,true
+MED0165,Lidocaine,Lidocaine hydrochloride,Xylocaine,2%,Topical gel,30 g tube,Emergency and Anesthetics,Aspen Pharmacare,South Africa,false
+MED0166,Normal saline,Sodium chloride,0.9% Sodium Chloride,0.9%,IV infusion,100 mL bag,IV Fluids and Electrolytes,Various,Various,true
+MED0167,Normal saline,Sodium chloride,0.9% Sodium Chloride,0.9%,IV infusion,500 mL bag,IV Fluids and Electrolytes,Various,Various,true
+MED0168,Normal saline,Sodium chloride,0.9% Sodium Chloride,0.9%,IV infusion,1 L bag,IV Fluids and Electrolytes,Various,Various,true
+MED0169,Ringer's lactate,Electrolytes,Ringer's Lactate,Standard formulation,IV infusion,500 mL bag,IV Fluids and Electrolytes,Various,Various,true
+MED0170,Ringer's lactate,Electrolytes,Ringer's Lactate,Standard formulation,IV infusion,1 L bag,IV Fluids and Electrolytes,Various,Various,true
+MED0171,Dextrose,Glucose,Dextrose 5%,5%,IV infusion,500 mL bag,IV Fluids and Electrolytes,Various,Various,true
+MED0173,Dextrose,Glucose,Dextrose 50%,50%,Injection,50 mL syringe,IV Fluids and Electrolytes,Various,Various,true
+MED0174,Ceftriaxone,Ceftriaxone sodium,Rocephin,500 mg,Powder for injection,1 vial,Antibiotics,Roche,Switzerland,true
+MED0175,Ceftriaxone,Ceftriaxone sodium,Rocephin,1 g,Powder for injection,1 vial,Antibiotics,Roche,Switzerland,true
+MED0176,Ceftriaxone,Ceftriaxone sodium,Rocephin,2 g,Powder for injection,1 vial,Antibiotics,Roche,Switzerland,true
+MED0177,Gentamicin,Gentamicin sulfate,Garamycin,40 mg/mL,Injection,2 mL ampoule,Antibiotics,Organon,United States,true
+MED0178,Gentamicin,Gentamicin sulfate,Garamycin,80 mg/2 mL,Injection,2 mL ampoule,Antibiotics,Organon,United States,true
+MED0179,Meropenem,Meropenem trihydrate,Meronem,500 mg,Powder for injection,1 vial,Antibiotics,Pfizer,United States,true
+MED0180,Meropenem,Meropenem trihydrate,Meronem,1 g,Powder for injection,1 vial,Antibiotics,Pfizer,United States,true
+MED0181,Vancomycin,Vancomycin hydrochloride,Vancocin,500 mg,Powder for injection,1 vial,Antibiotics,ANI Pharmaceuticals,United States,true
+MED0182,Vancomycin,Vancomycin hydrochloride,Vancocin,1 g,Powder for injection,1 vial,Antibiotics,ANI Pharmaceuticals,United States,true
+MED0183,Sertraline,Sertraline hydrochloride,Zoloft,50 mg,Tablet,28 tablets,Central Nervous System,Pfizer,United States,true
+MED0184,Sertraline,Sertraline hydrochloride,Zoloft,100 mg,Tablet,28 tablets,Central Nervous System,Pfizer,United States,true
+MED0185,Fluoxetine,Fluoxetine hydrochloride,Prozac,10 mg,Capsule,28 capsules,Central Nervous System,Eli Lilly,United States,true
+MED0186,Fluoxetine,Fluoxetine hydrochloride,Prozac,20 mg,Capsule,28 capsules,Central Nervous System,Eli Lilly,United States,true
+MED0187,Risperidone,Risperidone,Risperdal,1 mg,Tablet,30 tablets,Central Nervous System,Janssen,Belgium,true
+MED0188,Risperidone,Risperidone,Risperdal,2 mg,Tablet,30 tablets,Central Nervous System,Janssen,Belgium,true
+MED0189,Risperidone,Risperidone,Risperdal,3 mg,Tablet,30 tablets,Central Nervous System,Janssen,Belgium,true
+MED0190,Diazepam,Diazepam,Valium,2 mg,Tablet,20 tablets,Central Nervous System,Roche,Switzerland,true
+MED0191,Diazepam,Diazepam,Valium,5 mg,Tablet,20 tablets,Central Nervous System,Roche,Switzerland,true
+MED0192,Diazepam,Diazepam,Valium,10 mg/2 mL,Injection,2 mL ampoule,Central Nervous System,Roche,Switzerland,true
+MED0193,Carbamazepine,Carbamazepine,Tegretol,100 mg,Tablet,50 tablets,Central Nervous System,Novartis,Switzerland,true
+MED0194,Carbamazepine,Carbamazepine,Tegretol,200 mg,Tablet,50 tablets,Central Nervous System,Novartis,Switzerland,true
+MED0195,Levetiracetam,Levetiracetam,Keppra,250 mg,Tablet,60 tablets,Central Nervous System,UCB,Belgium,true
+MED0196,Levetiracetam,Levetiracetam,Keppra,500 mg,Tablet,60 tablets,Central Nervous System,UCB,Belgium,true
+MED0197,Levetiracetam,Levetiracetam,Keppra,1000 mg,Tablet,60 tablets,Central Nervous System,UCB,Belgium,true
+MED0198,Allopurinol,Allopurinol,Zyloric,100 mg,Tablet,100 tablets,Analgesics,GSK,United Kingdom,true
+MED0199,Allopurinol,Allopurinol,Zyloric,300 mg,Tablet,30 tablets,Analgesics,GSK,United Kingdom,true
 MED0200,Tamsulosin,Tamsulosin hydrochloride,Flomax,0.2 mg,Modified-release capsule,30 capsules,Urology,Boehringer Ingelheim,Germany,true
 MED0201,Tamsulosin,Tamsulosin hydrochloride,Flomax,0.4 mg,Modified-release capsule,30 capsules,Urology,Boehringer Ingelheim,Germany,true
 MED0202,Sildenafil,Sildenafil citrate,Viagra,25 mg,Tablet,4 tablets,Urology,Pfizer,United States,true
 MED0203,Sildenafil,Sildenafil citrate,Viagra,50 mg,Tablet,4 tablets,Urology,Pfizer,United States,true
 MED0204,Sildenafil,Sildenafil citrate,Viagra,100 mg,Tablet,4 tablets,Urology,Pfizer,United States,true
-MED0205,Oxytocin,Oxytocin,Syntocinon,5 IU/mL,Injection,1 mL ampoule,Obstetric medicine,Novartis,Switzerland,true
-MED0206,Oxytocin,Oxytocin,Syntocinon,10 IU/mL,Injection,1 mL ampoule,Obstetric medicine,Novartis,Switzerland,true
-MED0207,Misoprostol,Misoprostol,Cytotec,100 mcg,Tablet,28 tablets,Gastrointestinal / Obstetric use,Pfizer,United States,true
-MED0208,Misoprostol,Misoprostol,Cytotec,200 mcg,Tablet,28 tablets,Gastrointestinal / Obstetric use,Pfizer,United States,true
-MED0209,Magnesium sulfate,Magnesium sulfate,Magnesium Sulfate,50%,Injection,10 mL ampoule,Electrolyte / Obstetric medicine,Various,Various,true
-MED0210,Adrenaline,Epinephrine,Adrenalin,1 mg/mL,Injection,1 mL ampoule,Emergency medicine,Pfizer,United States,true
-MED0211,Atropine,Atropine sulfate,Atropine,0.6 mg/mL,Injection,1 mL ampoule,Emergency medicine,Various,Various,true
-MED0212,Atropine,Atropine sulfate,Atropine,1 mg/mL,Injection,1 mL ampoule,Emergency medicine,Various,Various,true
-MED0213,Enalapril + hydrochlorothiazide,Enalapril maleate + hydrochlorothiazide,Vaseretic,10/25 mg,Tablet,30 tablets,Antihypertensive,Merck,United States,true
-MED0214,Amlodipine + valsartan,Amlodipine + valsartan,Exforge,5/160 mg,Tablet,28 tablets,Antihypertensive,Novartis,Switzerland,true
-MED0215,Amlodipine + valsartan,Amlodipine + valsartan,Exforge,10/160 mg,Tablet,28 tablets,Antihypertensive,Novartis,Switzerland,true
-MED0216,Rosuvastatin,Rosuvastatin calcium,Crestor,5 mg,Tablet,30 tablets,Lipid-lowering,AstraZeneca,United Kingdom,true
-MED0217,Rosuvastatin,Rosuvastatin calcium,Crestor,10 mg,Tablet,30 tablets,Lipid-lowering,AstraZeneca,United Kingdom,true
-MED0218,Rosuvastatin,Rosuvastatin calcium,Crestor,20 mg,Tablet,30 tablets,Lipid-lowering,AstraZeneca,United Kingdom,true
-MED0219,Clopidogrel,Clopidogrel bisulfate,Plavix,75 mg,Tablet,28 tablets,Antiplatelet,Sanofi,France,true
-MED0220,Montelukast,Montelukast sodium,Singulair,4 mg,Chewable tablet,30 tablets,Respiratory / Leukotriene modifier,Merck,United States,true
-MED0221,Montelukast,Montelukast sodium,Singulair,5 mg,Chewable tablet,30 tablets,Respiratory / Leukotriene modifier,Merck,United States,true
-MED0222,Montelukast,Montelukast sodium,Singulair,10 mg,Tablet,30 tablets,Respiratory / Leukotriene modifier,Merck,United States,true
-MED0223,Ambroxol,Ambroxol hydrochloride,Mucosolvan,15 mg/5 mL,Syrup,100 mL bottle,Mucolytic,Sanofi,France,false
-MED0224,Ambroxol,Ambroxol hydrochloride,Mucosolvan,30 mg,Tablet,20 tablets,Mucolytic,Sanofi,France,false
-MED0225,Bromhexine,Bromhexine hydrochloride,Bisolvon,4 mg/5 mL,Syrup,100 mL bottle,Mucolytic,Sanofi,France,false
-MED0226,Bromhexine,Bromhexine hydrochloride,Bisolvon,8 mg,Tablet,20 tablets,Mucolytic,Sanofi,France,false
-MED0227,Domperidone,Domperidone,Motilium,10 mg,Tablet,30 tablets,Antiemetic,Janssen,Belgium,true
-MED0228,Domperidone,Domperidone,Motilium,1 mg/mL,Oral suspension,100 mL bottle,Antiemetic,Janssen,Belgium,true
-MED0229,Ondansetron,Ondansetron hydrochloride,Zofran,4 mg,Tablet,10 tablets,Antiemetic,GSK,United Kingdom,true
-MED0230,Ondansetron,Ondansetron hydrochloride,Zofran,8 mg,Tablet,10 tablets,Antiemetic,GSK,United Kingdom,true
-MED0231,Ondansetron,Ondansetron hydrochloride,Zofran,2 mg/mL,Injection,2 mL ampoule,Antiemetic,GSK,United Kingdom,true
-MED0232,Famotidine,Famotidine,Pepcid,20 mg,Tablet,30 tablets,Gastrointestinal / H2 blocker,Johnson & Johnson,United States,false
-MED0233,Famotidine,Famotidine,Pepcid,40 mg,Tablet,30 tablets,Gastrointestinal / H2 blocker,Johnson & Johnson,United States,false
-MED0234,Sucralfate,Sucralfate,Carafate,1 g,Tablet,30 tablets,Gastrointestinal mucosal protectant,Allergan,Ireland,true
-MED0235,Miconazole,Miconazole nitrate,Daktarin,2%,Cream,30 g tube,Antifungal,Janssen,Belgium,false
-MED0236,Miconazole,Miconazole nitrate,Daktarin,2%,Oral gel,40 g tube,Antifungal,Janssen,Belgium,false
-MED0237,Nystatin,Nystatin,Mycostatin,"100,000 IU/mL",Oral suspension,30 mL bottle,Antifungal,Bristol Myers Squibb,United States,true
-MED0238,Acyclovir,Aciclovir,Zovirax,200 mg,Tablet,25 tablets,Antiviral,GSK,United Kingdom,true
-MED0239,Acyclovir,Aciclovir,Zovirax,400 mg,Tablet,35 tablets,Antiviral,GSK,United Kingdom,true
-MED0240,Acyclovir,Aciclovir,Zovirax,5%,Cream,5 g tube,Antiviral,GSK,United Kingdom,false
-MED0241,Mometasone,Mometasone furoate,Nasonex,50 mcg/spray,Nasal spray,140 sprays,Allergy / Corticosteroid,Organon,United States,true
-MED0242,Xylometazoline,Xylometazoline hydrochloride,Otrivin,0.05%,Nasal drops,10 mL bottle,Decongestant,Haleon,United Kingdom,false
-MED0243,Xylometazoline,Xylometazoline hydrochloride,Otrivin,0.1%,Nasal spray,10 mL bottle,Decongestant,Haleon,United Kingdom,false
-MED0244,Dapagliflozin,Dapagliflozin propanediol,Forxiga,5 mg,Tablet,28 tablets,Antidiabetic,AstraZeneca,United Kingdom,true
-MED0245,Dapagliflozin,Dapagliflozin propanediol,Forxiga,10 mg,Tablet,30 tablets,Antidiabetic,AstraZeneca,United Kingdom,true
-MED0246,Empagliflozin,Empagliflozin,Jardiance,10 mg,Tablet,30 tablets,Antidiabetic,Boehringer Ingelheim,Germany,true
-MED0247,Empagliflozin,Empagliflozin,Jardiance,25 mg,Tablet,30 tablets,Antidiabetic,Boehringer Ingelheim,Germany,true
-MED0248,Pioglitazone,Pioglitazone hydrochloride,Actos,15 mg,Tablet,30 tablets,Antidiabetic,Takeda,Japan,true
-MED0249,Pioglitazone,Pioglitazone hydrochloride,Actos,30 mg,Tablet,30 tablets,Antidiabetic,Takeda,Japan,true
-MED0250,Bisoprolol,Bisoprolol fumarate,Concor,2.5 mg,Tablet,30 tablets,Beta blocker / Antihypertensive,Merck,Germany,true
-MED0251,Bisoprolol,Bisoprolol fumarate,Concor,5 mg,Tablet,30 tablets,Beta blocker / Antihypertensive,Merck,Germany,true
-MED0252,Bisoprolol,Bisoprolol fumarate,Concor,10 mg,Tablet,30 tablets,Beta blocker / Antihypertensive,Merck,Germany,true
-MED0253,Carvedilol,Carvedilol,Dilatrend,6.25 mg,Tablet,30 tablets,Beta blocker,Roche,Switzerland,true
-MED0254,Carvedilol,Carvedilol,Dilatrend,12.5 mg,Tablet,30 tablets,Beta blocker,Roche,Switzerland,true
-MED0255,Carvedilol,Carvedilol,Dilatrend,25 mg,Tablet,30 tablets,Beta blocker,Roche,Switzerland,true
-MED0256,Isosorbide mononitrate,Isosorbide mononitrate,Imdur,30 mg,Extended-release tablet,30 tablets,Antianginal,AstraZeneca,United Kingdom,true
-MED0257,Isosorbide mononitrate,Isosorbide mononitrate,Imdur,60 mg,Extended-release tablet,30 tablets,Antianginal,AstraZeneca,United Kingdom,true
-MED0258,Rivaroxaban,Rivaroxaban,Xarelto,10 mg,Tablet,10 tablets,Anticoagulant,Bayer,Germany,true
-MED0259,Rivaroxaban,Rivaroxaban,Xarelto,15 mg,Tablet,28 tablets,Anticoagulant,Bayer,Germany,true
-MED0260,Rivaroxaban,Rivaroxaban,Xarelto,20 mg,Tablet,28 tablets,Anticoagulant,Bayer,Germany,true
+MED0205,Oxytocin,Oxytocin,Syntocinon,5 IU/mL,Injection,1 mL ampoule,Hormones and Contraceptives,Novartis,Switzerland,true
+MED0206,Oxytocin,Oxytocin,Syntocinon,10 IU/mL,Injection,1 mL ampoule,Hormones and Contraceptives,Novartis,Switzerland,true
+MED0207,Misoprostol,Misoprostol,Cytotec,100 mcg,Tablet,28 tablets,Gastrointestinal,Pfizer,United States,true
+MED0208,Misoprostol,Misoprostol,Cytotec,200 mcg,Tablet,28 tablets,Gastrointestinal,Pfizer,United States,true
+MED0209,Magnesium sulfate,Magnesium sulfate,Magnesium Sulfate,50%,Injection,10 mL ampoule,IV Fluids and Electrolytes,Various,Various,true
+MED0210,Adrenaline,Epinephrine,Adrenalin,1 mg/mL,Injection,1 mL ampoule,Emergency and Anesthetics,Pfizer,United States,true
+MED0211,Atropine,Atropine sulfate,Atropine,0.6 mg/mL,Injection,1 mL ampoule,Emergency and Anesthetics,Various,Various,true
+MED0212,Atropine,Atropine sulfate,Atropine,1 mg/mL,Injection,1 mL ampoule,Emergency and Anesthetics,Various,Various,true
+MED0213,Enalapril + hydrochlorothiazide,Enalapril maleate + hydrochlorothiazide,Vaseretic,10/25 mg,Tablet,30 tablets,Antihypertensives,Merck,United States,true
+MED0214,Amlodipine + valsartan,Amlodipine + valsartan,Exforge,5/160 mg,Tablet,28 tablets,Antihypertensives,Novartis,Switzerland,true
+MED0215,Amlodipine + valsartan,Amlodipine + valsartan,Exforge,10/160 mg,Tablet,28 tablets,Antihypertensives,Novartis,Switzerland,true
+MED0216,Rosuvastatin,Rosuvastatin calcium,Crestor,5 mg,Tablet,30 tablets,Cardiovascular,AstraZeneca,United Kingdom,true
+MED0217,Rosuvastatin,Rosuvastatin calcium,Crestor,10 mg,Tablet,30 tablets,Cardiovascular,AstraZeneca,United Kingdom,true
+MED0218,Rosuvastatin,Rosuvastatin calcium,Crestor,20 mg,Tablet,30 tablets,Cardiovascular,AstraZeneca,United Kingdom,true
+MED0219,Clopidogrel,Clopidogrel bisulfate,Plavix,75 mg,Tablet,28 tablets,Blood and Coagulation,Sanofi,France,true
+MED0220,Montelukast,Montelukast sodium,Singulair,4 mg,Chewable tablet,30 tablets,Respiratory,Merck,United States,true
+MED0221,Montelukast,Montelukast sodium,Singulair,5 mg,Chewable tablet,30 tablets,Respiratory,Merck,United States,true
+MED0222,Montelukast,Montelukast sodium,Singulair,10 mg,Tablet,30 tablets,Respiratory,Merck,United States,true
+MED0223,Ambroxol,Ambroxol hydrochloride,Mucosolvan,15 mg/5 mL,Syrup,100 mL bottle,Respiratory,Sanofi,France,false
+MED0224,Ambroxol,Ambroxol hydrochloride,Mucosolvan,30 mg,Tablet,20 tablets,Respiratory,Sanofi,France,false
+MED0225,Bromhexine,Bromhexine hydrochloride,Bisolvon,4 mg/5 mL,Syrup,100 mL bottle,Respiratory,Sanofi,France,false
+MED0226,Bromhexine,Bromhexine hydrochloride,Bisolvon,8 mg,Tablet,20 tablets,Respiratory,Sanofi,France,false
+MED0227,Domperidone,Domperidone,Motilium,10 mg,Tablet,30 tablets,Gastrointestinal,Janssen,Belgium,true
+MED0228,Domperidone,Domperidone,Motilium,1 mg/mL,Oral suspension,100 mL bottle,Gastrointestinal,Janssen,Belgium,true
+MED0229,Ondansetron,Ondansetron hydrochloride,Zofran,4 mg,Tablet,10 tablets,Gastrointestinal,GSK,United Kingdom,true
+MED0230,Ondansetron,Ondansetron hydrochloride,Zofran,8 mg,Tablet,10 tablets,Gastrointestinal,GSK,United Kingdom,true
+MED0231,Ondansetron,Ondansetron hydrochloride,Zofran,2 mg/mL,Injection,2 mL ampoule,Gastrointestinal,GSK,United Kingdom,true
+MED0232,Famotidine,Famotidine,Pepcid,20 mg,Tablet,30 tablets,Gastrointestinal,Johnson & Johnson,United States,false
+MED0233,Famotidine,Famotidine,Pepcid,40 mg,Tablet,30 tablets,Gastrointestinal,Johnson & Johnson,United States,false
+MED0234,Sucralfate,Sucralfate,Carafate,1 g,Tablet,30 tablets,Gastrointestinal,Allergan,Ireland,true
+MED0235,Miconazole,Miconazole nitrate,Daktarin,2%,Cream,30 g tube,Antifungals,Janssen,Belgium,false
+MED0236,Miconazole,Miconazole nitrate,Daktarin,2%,Oral gel,40 g tube,Antifungals,Janssen,Belgium,false
+MED0237,Nystatin,Nystatin,Mycostatin,"100,000 IU/mL",Oral suspension,30 mL bottle,Antifungals,Bristol Myers Squibb,United States,true
+MED0238,Acyclovir,Aciclovir,Zovirax,200 mg,Tablet,25 tablets,Antivirals and Antiparasitics,GSK,United Kingdom,true
+MED0239,Acyclovir,Aciclovir,Zovirax,400 mg,Tablet,35 tablets,Antivirals and Antiparasitics,GSK,United Kingdom,true
+MED0240,Acyclovir,Aciclovir,Zovirax,5%,Cream,5 g tube,Antivirals and Antiparasitics,GSK,United Kingdom,false
+MED0241,Mometasone,Mometasone furoate,Nasonex,50 mcg/spray,Nasal spray,140 sprays,Respiratory,Organon,United States,true
+MED0242,Xylometazoline,Xylometazoline hydrochloride,Otrivin,0.05%,Nasal drops,10 mL bottle,Respiratory,Haleon,United Kingdom,false
+MED0243,Xylometazoline,Xylometazoline hydrochloride,Otrivin,0.1%,Nasal spray,10 mL bottle,Respiratory,Haleon,United Kingdom,false
+MED0244,Dapagliflozin,Dapagliflozin propanediol,Forxiga,5 mg,Tablet,28 tablets,Antidiabetics,AstraZeneca,United Kingdom,true
+MED0245,Dapagliflozin,Dapagliflozin propanediol,Forxiga,10 mg,Tablet,30 tablets,Antidiabetics,AstraZeneca,United Kingdom,true
+MED0246,Empagliflozin,Empagliflozin,Jardiance,10 mg,Tablet,30 tablets,Antidiabetics,Boehringer Ingelheim,Germany,true
+MED0247,Empagliflozin,Empagliflozin,Jardiance,25 mg,Tablet,30 tablets,Antidiabetics,Boehringer Ingelheim,Germany,true
+MED0248,Pioglitazone,Pioglitazone hydrochloride,Actos,15 mg,Tablet,30 tablets,Antidiabetics,Takeda,Japan,true
+MED0249,Pioglitazone,Pioglitazone hydrochloride,Actos,30 mg,Tablet,30 tablets,Antidiabetics,Takeda,Japan,true
+MED0250,Bisoprolol,Bisoprolol fumarate,Concor,2.5 mg,Tablet,30 tablets,Antihypertensives,Merck,Germany,true
+MED0251,Bisoprolol,Bisoprolol fumarate,Concor,5 mg,Tablet,30 tablets,Antihypertensives,Merck,Germany,true
+MED0252,Bisoprolol,Bisoprolol fumarate,Concor,10 mg,Tablet,30 tablets,Antihypertensives,Merck,Germany,true
+MED0253,Carvedilol,Carvedilol,Dilatrend,6.25 mg,Tablet,30 tablets,Antihypertensives,Roche,Switzerland,true
+MED0254,Carvedilol,Carvedilol,Dilatrend,12.5 mg,Tablet,30 tablets,Antihypertensives,Roche,Switzerland,true
+MED0255,Carvedilol,Carvedilol,Dilatrend,25 mg,Tablet,30 tablets,Antihypertensives,Roche,Switzerland,true
+MED0256,Isosorbide mononitrate,Isosorbide mononitrate,Imdur,30 mg,Extended-release tablet,30 tablets,Cardiovascular,AstraZeneca,United Kingdom,true
+MED0257,Isosorbide mononitrate,Isosorbide mononitrate,Imdur,60 mg,Extended-release tablet,30 tablets,Cardiovascular,AstraZeneca,United Kingdom,true
+MED0258,Rivaroxaban,Rivaroxaban,Xarelto,10 mg,Tablet,10 tablets,Blood and Coagulation,Bayer,Germany,true
+MED0259,Rivaroxaban,Rivaroxaban,Xarelto,15 mg,Tablet,28 tablets,Blood and Coagulation,Bayer,Germany,true
+MED0260,Rivaroxaban,Rivaroxaban,Xarelto,20 mg,Tablet,28 tablets,Blood and Coagulation,Bayer,Germany,true
 MED0261,Tadalafil,Tadalafil,Cialis,5 mg,Tablet,28 tablets,Urology,Eli Lilly,United States,true
 MED0262,Tadalafil,Tadalafil,Cialis,10 mg,Tablet,4 tablets,Urology,Eli Lilly,United States,true
 MED0263,Tadalafil,Tadalafil,Cialis,20 mg,Tablet,4 tablets,Urology,Eli Lilly,United States,true
 MED0264,Finasteride,Finasteride,Proscar,1 mg,Tablet,28 tablets,Urology,Merck,United States,true
 MED0265,Finasteride,Finasteride,Proscar,5 mg,Tablet,30 tablets,Urology,Merck,United States,true
-MED0266,Ketoconazole,Ketoconazole,Nizoral,2%,Shampoo,100 mL bottle,Antifungal,Janssen,Belgium,false
-MED0267,Ketoconazole,Ketoconazole,Nizoral,200 mg,Tablet,10 tablets,Antifungal,Janssen,Belgium,true
-MED0268,Terbinafine,Terbinafine hydrochloride,Lamisil,1%,Cream,15 g tube,Antifungal,Novartis,Switzerland,false
-MED0269,Terbinafine,Terbinafine hydrochloride,Lamisil,250 mg,Tablet,14 tablets,Antifungal,Novartis,Switzerland,true
-MED0270,Dextromethorphan,Dextromethorphan hydrobromide,Robitussin DM,10 mg/5 mL,Syrup,100 mL bottle,Cough suppressant,Haleon,United Kingdom,false
-MED0271,Guaifenesin,Guaifenesin,Robitussin,100 mg/5 mL,Syrup,100 mL bottle,Expectorant,Haleon,United Kingdom,false
-MED0272,Artificial tears,Carboxymethylcellulose sodium,Refresh Tears,0.5%,Eye drops,15 mL bottle,Ophthalmic lubricant,AbbVie,United States,false
-MED0273,Calcium carbonate + vitamin D3,Calcium carbonate + cholecalciferol,Caltrate,600 mg + 400 IU,Tablet,60 tablets,Mineral / Supplement,Haleon,United Kingdom,false
-MED0274,Multivitamin,Multivitamins and minerals,Centrum,Adult formula,Tablet,30 tablets,Multivitamin,Haleon,United Kingdom,false
-MED0275,Sodium bicarbonate,Sodium bicarbonate,Sodium Bicarbonate,500 mg,Tablet,100 tablets,Antacid / Electrolyte,Various,Various,false
-MED0276,Sodium bicarbonate,Sodium bicarbonate,Sodium Bicarbonate,8.4%,Injection,50 mL vial,Antacid / Electrolyte,Various,Various,true
-MED0277,Potassium chloride,Potassium chloride,Slow-K,600 mg,Modified-release tablet,20 tablets,Electrolyte,Novartis,Switzerland,true
-MED0278,Potassium chloride,Potassium chloride,Slow-K,2 mEq/mL,Injection concentrate,10 mL ampoule,Electrolyte,Novartis,Switzerland,true
-MED0279,Cyanocobalamin,Vitamin B12,Vitamin B12,500 mcg,Tablet,30 tablets,Vitamin / Hematinic,Various,Various,false
-MED0280,Cyanocobalamin,Vitamin B12,Vitamin B12,1000 mcg/mL,Injection,1 mL ampoule,Vitamin / Hematinic,Various,Various,true
-MED0281,Iron sucrose,Iron sucrose complex,Venofer,20 mg/mL,Injection,5 mL vial,Iron replacement,Vifor Pharma,Switzerland,true
-MED0282,Tranexamic acid,Tranexamic acid,Cyklokapron,500 mg,Tablet,30 tablets,Hemostatic,Pfizer,United States,true
-MED0283,Tranexamic acid,Tranexamic acid,Cyklokapron,100 mg/mL,Injection,5 mL ampoule,Hemostatic,Pfizer,United States,true
-MED0284,Hydroxychloroquine,Hydroxychloroquine sulfate,Plaquenil,200 mg,Tablet,30 tablets,DMARD / Antimalarial,Sanofi,France,true
-MED0285,Hydroxychloroquine,Hydroxychloroquine sulfate,Plaquenil,400 mg,Tablet,30 tablets,DMARD / Antimalarial,Sanofi,France,true
-MED0286,Methotrexate,Methotrexate,Trexall,2.5 mg,Tablet,24 tablets,Immunomodulator / DMARD,Pfizer,United States,true
-MED0287,Methotrexate,Methotrexate,Trexall,10 mg,Tablet,10 tablets,Immunomodulator / DMARD,Pfizer,United States,true
-MED0288,Azathioprine,Azathioprine,Imuran,50 mg,Tablet,50 tablets,Immunosuppressant,Aspen Pharmacare,South Africa,true
-MED0289,Colchicine,Colchicine,Colcrys,0.5 mg,Tablet,30 tablets,Gout,Takeda,Japan,true
-MED0290,Colchicine,Colchicine,Colcrys,0.6 mg,Tablet,30 tablets,Gout,Takeda,Japan,true
-MED0291,Meloxicam,Meloxicam,Mobic,7.5 mg,Tablet,10 tablets,NSAID,Boehringer Ingelheim,Germany,true
-MED0292,Meloxicam,Meloxicam,Mobic,15 mg,Tablet,10 tablets,NSAID,Boehringer Ingelheim,Germany,true
-MED0293,Etoricoxib,Etoricoxib,Arcoxia,60 mg,Tablet,7 tablets,NSAID / COX-2 inhibitor,Merck,United States,true
-MED0294,Etoricoxib,Etoricoxib,Arcoxia,90 mg,Tablet,7 tablets,NSAID / COX-2 inhibitor,Merck,United States,true
-MED0295,Etoricoxib,Etoricoxib,Arcoxia,120 mg,Tablet,7 tablets,NSAID / COX-2 inhibitor,Merck,United States,true
-MED0296,Pregabalin,Pregabalin,Lyrica,75 mg,Capsule,56 capsules,Neuropathic pain,Pfizer,United States,true
-MED0297,Pregabalin,Pregabalin,Lyrica,150 mg,Capsule,56 capsules,Neuropathic pain,Pfizer,United States,true
-MED0298,Gabapentin,Gabapentin,Neurontin,100 mg,Capsule,90 capsules,Neuropathic pain,Pfizer,United States,true
-MED0299,Gabapentin,Gabapentin,Neurontin,300 mg,Capsule,90 capsules,Neuropathic pain,Pfizer,United States,true
-MED0300,Sumatriptan,Sumatriptan succinate,Imigran,50 mg,Tablet,6 tablets,Migraine,GSK,United Kingdom,true
-MED0301,Sumatriptan,Sumatriptan succinate,Imigran,100 mg,Tablet,6 tablets,Migraine,GSK,United Kingdom,true
-MED0302,Tropicamide,Tropicamide,Mydriacyl,0.5%,Eye drops,15 mL bottle,Ophthalmic diagnostic,Alcon,Switzerland,true
-MED0303,Tropicamide,Tropicamide,Mydriacyl,1%,Eye drops,15 mL bottle,Ophthalmic diagnostic,Alcon,Switzerland,true
-MED0304,Ofloxacin,Ofloxacin,Ocuflox,0.3%,Eye drops,5 mL bottle,Ophthalmic antibiotic,Allergan,Ireland,true
-MED0305,Silver sulfadiazine,Silver sulfadiazine,Flamazine,1%,Cream,50 g tube,Burn treatment,Smith & Nephew,United Kingdom,true
-MED0306,Zinc oxide,Zinc oxide,Sudocrem,15.25%,Cream,60 g tub,Skin protectant,Teva,Israel,false
-MED0307,Petrolatum,White soft paraffin,Vaseline,100%,Ointment,100 g tub,Emollient,Unilever,United Kingdom,false
-MED0308,Coal tar,Coal tar,Polytar,4%,Shampoo,150 mL bottle,Dermatology,Thornton & Ross,United Kingdom,false
-MED0309,Adapalene,Adapalene,Differin,0.1%,Gel,30 g tube,Dermatology / Acne,Galderma,Switzerland,true
-MED0310,Adapalene,Adapalene,Differin,0.3%,Gel,30 g tube,Dermatology / Acne,Galderma,Switzerland,true
-MED0311,Benzoyl peroxide,Benzoyl peroxide,Benzac,2.5%,Gel,30 g tube,Dermatology / Acne,Galderma,Switzerland,false
-MED0312,Benzoyl peroxide,Benzoyl peroxide,Benzac,5%,Gel,30 g tube,Dermatology / Acne,Galderma,Switzerland,false
-MED0313,Minoxidil,Minoxidil,Regaine,2%,Topical solution,60 mL bottle,Dermatology / Hair loss,Johnson & Johnson,United States,false
-MED0314,Minoxidil,Minoxidil,Regaine,5%,Topical solution,60 mL bottle,Dermatology / Hair loss,Johnson & Johnson,United States,false
-MED0315,Fluticasone propionate,Fluticasone propionate,Flixotide,50 mcg/actuation,Inhaler,120 actuations,Respiratory / Corticosteroid,GSK,United Kingdom,true
-MED0316,Fluticasone propionate,Fluticasone propionate,Flixotide,125 mcg/actuation,Inhaler,120 actuations,Respiratory / Corticosteroid,GSK,United Kingdom,true
-MED0317,Tiotropium,Tiotropium bromide,Spiriva,18 mcg,Inhalation capsule,30 capsules,Respiratory / LAMA,Boehringer Ingelheim,Germany,true
-MED0318,Ipratropium bromide,Ipratropium bromide,Atrovent,20 mcg/actuation,Inhaler,200 actuations,Respiratory / Bronchodilator,Boehringer Ingelheim,Germany,true
-MED0319,Vitamin B complex,B vitamins,B-Complex,Standard formulation,Tablet,100 tablets,Vitamin / Supplement,Various,Various,false
-MED0320,Calcium gluconate,Calcium gluconate,Calcium Gluconate,10%,Injection,10 mL ampoule,Electrolyte / Emergency,Various,Various,true
-MED0321,Heparin,Heparin sodium,Heparin,5000 IU/mL,Injection,5 mL vial,Anticoagulant,Pfizer,United States,true
-MED0322,Clarithromycin,Clarithromycin,Klacid,250 mg,Tablet,14 tablets,Antibiotic,Abbott,United States,true
-MED0323,Clarithromycin,Clarithromycin,Klacid,500 mg,Tablet,14 tablets,Antibiotic,Abbott,United States,true
-MED0324,Levofloxacin,Levofloxacin,Tavanic,250 mg,Tablet,10 tablets,Antibiotic,Sanofi,France,true
-MED0325,Levofloxacin,Levofloxacin,Tavanic,500 mg,Tablet,7 tablets,Antibiotic,Sanofi,France,true
-MED0326,Levofloxacin,Levofloxacin,Tavanic,750 mg,Tablet,5 tablets,Antibiotic,Sanofi,France,true
-MED0327,Cotrimoxazole,Sulfamethoxazole + trimethoprim,Bactrim,400/80 mg,Tablet,20 tablets,Antibiotic,Roche,Switzerland,true
-MED0328,Cotrimoxazole,Sulfamethoxazole + trimethoprim,Bactrim,800/160 mg,Tablet,20 tablets,Antibiotic,Roche,Switzerland,true
-MED0329,Cotrimoxazole,Sulfamethoxazole + trimethoprim,Bactrim,200/40 mg per 5 mL,Oral suspension,100 mL bottle,Antibiotic,Roche,Switzerland,true
-MED0330,Ethambutol,Ethambutol hydrochloride,Myambutol,100 mg,Tablet,100 tablets,Antituberculosis,Lupin,India,true
-MED0331,Ethambutol,Ethambutol hydrochloride,Myambutol,400 mg,Tablet,100 tablets,Antituberculosis,Lupin,India,true
-MED0332,Isoniazid,Isoniazid,Nydrazid,100 mg,Tablet,100 tablets,Antituberculosis,Lupin,India,true
-MED0333,Isoniazid,Isoniazid,Nydrazid,300 mg,Tablet,100 tablets,Antituberculosis,Lupin,India,true
-MED0334,Pyrazinamide,Pyrazinamide,Tebrazid,250 mg,Tablet,100 tablets,Antituberculosis,Lupin,India,true
-MED0335,Pyrazinamide,Pyrazinamide,Tebrazid,500 mg,Tablet,100 tablets,Antituberculosis,Lupin,India,true
-MED0336,Cefuroxime,Cefuroxime axetil,Zinnat,125 mg,Tablet,10 tablets,Antibiotic,GSK,United Kingdom,true
-MED0337,Cefuroxime,Cefuroxime axetil,Zinnat,250 mg,Tablet,10 tablets,Antibiotic,GSK,United Kingdom,true
-MED0338,Cefuroxime,Cefuroxime axetil,Zinnat,500 mg,Tablet,10 tablets,Antibiotic,GSK,United Kingdom,true
-MED0339,Flucloxacillin,Flucloxacillin sodium,Floxapen,250 mg,Capsule,28 capsules,Antibiotic,GSK,United Kingdom,true
-MED0340,Flucloxacillin,Flucloxacillin sodium,Floxapen,500 mg,Capsule,28 capsules,Antibiotic,GSK,United Kingdom,true
-MED0341,Clindamycin,Clindamycin hydrochloride,Dalacin C,150 mg,Capsule,16 capsules,Antibiotic,Pfizer,United States,true
-MED0342,Clindamycin,Clindamycin hydrochloride,Dalacin C,300 mg,Capsule,16 capsules,Antibiotic,Pfizer,United States,true
-MED0343,Nitrofurantoin,Nitrofurantoin,Macrobid,50 mg,Capsule,30 capsules,Urinary anti-infective,Alvogen,United States,true
-MED0344,Nitrofurantoin,Nitrofurantoin,Macrobid,100 mg,Modified-release capsule,14 capsules,Urinary anti-infective,Alvogen,United States,true
-MED0345,Rifampicin,Rifampicin,Rifadin,150 mg,Capsule,100 capsules,Antituberculosis,Sanofi,France,true
-MED0346,Rifampicin,Rifampicin,Rifadin,300 mg,Capsule,100 capsules,Antituberculosis,Sanofi,France,true
-MED0347,Cefadroxil,Cefadroxil,Duricef,500 mg,Capsule,20 capsules,Antibiotic,Bristol Myers Squibb,United States,true
-MED0348,Praziquantel,Praziquantel,Biltricide,600 mg,Tablet,6 tablets,Anthelmintic,Bayer,Germany,true
-MED0349,Tinidazole,Tinidazole,Fasigyn,500 mg,Tablet,4 tablets,Antiprotozoal,Pfizer,United States,true
-MED0350,Chlorpheniramine,Chlorpheniramine maleate,Piriton,4 mg,Tablet,30 tablets,Antihistamine,GSK,United Kingdom,false
-MED0351,Chlorpheniramine,Chlorpheniramine maleate,Piriton,2 mg/5 mL,Syrup,100 mL bottle,Antihistamine,GSK,United Kingdom,false
-MED0352,Promethazine,Promethazine hydrochloride,Phenergan,25 mg,Tablet,20 tablets,Antihistamine / Antiemetic,Sanofi,France,true
-MED0353,Promethazine,Promethazine hydrochloride,Phenergan,5 mg/5 mL,Syrup,100 mL bottle,Antihistamine / Antiemetic,Sanofi,France,true
-MED0354,Meclizine,Meclizine hydrochloride,Antivert,12.5 mg,Tablet,30 tablets,Antiemetic / Antivertigo,Pfizer,United States,false
-MED0355,Meclizine,Meclizine hydrochloride,Antivert,25 mg,Tablet,30 tablets,Antiemetic / Antivertigo,Pfizer,United States,false
-MED0356,Hyoscine butylbromide,Hyoscine butylbromide,Buscopan,10 mg,Tablet,20 tablets,Antispasmodic,Sanofi,France,true
-MED0357,Hyoscine butylbromide,Hyoscine butylbromide,Buscopan,20 mg/mL,Injection,1 mL ampoule,Antispasmodic,Sanofi,France,true
-MED0358,Drotaverine,Drotaverine hydrochloride,No-Spa,40 mg,Tablet,24 tablets,Antispasmodic,Sanofi,France,true
-MED0359,Drotaverine,Drotaverine hydrochloride,No-Spa,80 mg,Tablet,24 tablets,Antispasmodic,Sanofi,France,true
-MED0360,Mebeverine,Mebeverine hydrochloride,Duspatalin,135 mg,Tablet,30 tablets,Antispasmodic,Abbott,United States,true
-MED0361,Mebeverine,Mebeverine hydrochloride,Duspatalin,200 mg,Modified-release capsule,30 capsules,Antispasmodic,Abbott,United States,true
-MED0362,Ursodeoxycholic acid,Ursodeoxycholic acid,Ursofalk,250 mg,Capsule,50 capsules,Hepatobiliary,Dr. Falk Pharma,Germany,true
-MED0363,Ursodeoxycholic acid,Ursodeoxycholic acid,Ursofalk,500 mg,Tablet,50 tablets,Hepatobiliary,Dr. Falk Pharma,Germany,true
-MED0364,Epoetin alfa,Epoetin alfa,Eprex,4000 IU/mL,Injection,1 mL prefilled syringe,Hematology,Janssen,Belgium,true
-MED0365,Filgrastim,Filgrastim,Neupogen,300 mcg/0.5 mL,Prefilled syringe,0.5 mL syringe,Hematology,Amgen,United States,true
-MED0366,Letrozole,Letrozole,Femara,2.5 mg,Tablet,30 tablets,Oncology / Hormone therapy,Novartis,Switzerland,true
-MED0367,Tamoxifen,Tamoxifen citrate,Nolvadex,10 mg,Tablet,30 tablets,Oncology / Hormone therapy,AstraZeneca,United Kingdom,true
-MED0368,Tamoxifen,Tamoxifen citrate,Nolvadex,20 mg,Tablet,30 tablets,Oncology / Hormone therapy,AstraZeneca,United Kingdom,true
-MED0369,Imatinib,Imatinib mesylate,Glivec,100 mg,Tablet,60 tablets,Oncology,Novartis,Switzerland,true
-MED0370,Imatinib,Imatinib mesylate,Glivec,400 mg,Tablet,30 tablets,Oncology,Novartis,Switzerland,true
-MED0371,Capecitabine,Capecitabine,Xeloda,150 mg,Tablet,60 tablets,Oncology,Roche,Switzerland,true
-MED0372,Capecitabine,Capecitabine,Xeloda,500 mg,Tablet,120 tablets,Oncology,Roche,Switzerland,true
-MED0373,Tacrolimus,Tacrolimus,Prograf,0.5 mg,Capsule,50 capsules,Immunosuppressant,Astellas,Japan,true
-MED0374,Tacrolimus,Tacrolimus,Prograf,1 mg,Capsule,50 capsules,Immunosuppressant,Astellas,Japan,true
-MED0375,Tacrolimus,Tacrolimus,Prograf,5 mg,Capsule,50 capsules,Immunosuppressant,Astellas,Japan,true
-MED0376,Ciclosporin,Ciclosporin,Neoral,25 mg,Capsule,50 capsules,Immunosuppressant,Novartis,Switzerland,true
-MED0377,Ciclosporin,Ciclosporin,Neoral,100 mg,Capsule,50 capsules,Immunosuppressant,Novartis,Switzerland,true
-MED0378,Rituximab,Rituximab,MabThera,100 mg/10 mL,Concentrate for infusion,10 mL vial,Biologic / Immunology,Roche,Switzerland,true
-MED0379,Rituximab,Rituximab,MabThera,500 mg/50 mL,Concentrate for infusion,50 mL vial,Biologic / Immunology,Roche,Switzerland,true
-MED0380,Adalimumab,Adalimumab,Humira,40 mg/0.4 mL,Prefilled syringe,0.4 mL syringe,Biologic / Immunology,AbbVie,United States,true
-MED0381,Medroxyprogesterone acetate,Medroxyprogesterone acetate,Depo-Provera,150 mg/mL,Injection,1 mL vial,Contraceptive,Pfizer,United States,true
-MED0382,Ethinylestradiol + levonorgestrel,Ethinylestradiol + levonorgestrel,Microgynon 30,30 mcg/150 mcg,Tablet,21 tablets,Contraceptive,Bayer,Germany,true
-MED0383,Levonorgestrel,Levonorgestrel,Postinor-2,1.5 mg,Tablet,1 tablet,Emergency contraceptive,Gedeon Richter,Hungary,false
-MED0384,Methylprednisolone,Methylprednisolone,Medrol,4 mg,Tablet,30 tablets,Corticosteroid,Pfizer,United States,true
-MED0385,Methylprednisolone,Methylprednisolone,Medrol,16 mg,Tablet,30 tablets,Corticosteroid,Pfizer,United States,true
-MED0386,Amitriptyline,Amitriptyline hydrochloride,Elavil,10 mg,Tablet,30 tablets,Antidepressant / TCA,Various,Various,true
-MED0387,Amitriptyline,Amitriptyline hydrochloride,Elavil,25 mg,Tablet,30 tablets,Antidepressant / TCA,Various,Various,true
-MED0388,Haloperidol,Haloperidol,Haldol,2 mg/mL,Oral solution,100 mL bottle,Antipsychotic,Janssen,Belgium,true
-MED0389,Haloperidol,Haloperidol,Haldol,5 mg,Tablet,30 tablets,Antipsychotic,Janssen,Belgium,true
-MED0390,Aripiprazole,Aripiprazole,Abilify,10 mg,Tablet,28 tablets,Antipsychotic,Otsuka,Japan,true
-MED0391,Aripiprazole,Aripiprazole,Abilify,15 mg,Tablet,28 tablets,Antipsychotic,Otsuka,Japan,true
+MED0266,Ketoconazole,Ketoconazole,Nizoral,2%,Shampoo,100 mL bottle,Antifungals,Janssen,Belgium,false
+MED0267,Ketoconazole,Ketoconazole,Nizoral,200 mg,Tablet,10 tablets,Antifungals,Janssen,Belgium,true
+MED0268,Terbinafine,Terbinafine hydrochloride,Lamisil,1%,Cream,15 g tube,Antifungals,Novartis,Switzerland,false
+MED0269,Terbinafine,Terbinafine hydrochloride,Lamisil,250 mg,Tablet,14 tablets,Antifungals,Novartis,Switzerland,true
+MED0270,Dextromethorphan,Dextromethorphan hydrobromide,Robitussin DM,10 mg/5 mL,Syrup,100 mL bottle,Respiratory,Haleon,United Kingdom,false
+MED0271,Guaifenesin,Guaifenesin,Robitussin,100 mg/5 mL,Syrup,100 mL bottle,Respiratory,Haleon,United Kingdom,false
+MED0272,Artificial tears,Carboxymethylcellulose sodium,Refresh Tears,0.5%,Eye drops,15 mL bottle,Ophthalmic and Otic,AbbVie,United States,false
+MED0273,Calcium carbonate + vitamin D3,Calcium carbonate + cholecalciferol,Caltrate,600 mg + 400 IU,Tablet,60 tablets,Vitamins and Supplements,Haleon,United Kingdom,false
+MED0274,Multivitamin,Multivitamins and minerals,Centrum,Adult formula,Tablet,30 tablets,Vitamins and Supplements,Haleon,United Kingdom,false
+MED0275,Sodium bicarbonate,Sodium bicarbonate,Sodium Bicarbonate,500 mg,Tablet,100 tablets,Gastrointestinal,Various,Various,false
+MED0276,Sodium bicarbonate,Sodium bicarbonate,Sodium Bicarbonate,8.4%,Injection,50 mL vial,IV Fluids and Electrolytes,Various,Various,true
+MED0277,Potassium chloride,Potassium chloride,Slow-K,600 mg,Modified-release tablet,20 tablets,IV Fluids and Electrolytes,Novartis,Switzerland,true
+MED0278,Potassium chloride,Potassium chloride,Slow-K,2 mEq/mL,Injection concentrate,10 mL ampoule,IV Fluids and Electrolytes,Novartis,Switzerland,true
+MED0279,Cyanocobalamin,Vitamin B12,Vitamin B12,500 mcg,Tablet,30 tablets,Vitamins and Supplements,Various,Various,false
+MED0280,Cyanocobalamin,Vitamin B12,Vitamin B12,1000 mcg/mL,Injection,1 mL ampoule,Vitamins and Supplements,Various,Various,true
+MED0281,Iron sucrose,Iron sucrose complex,Venofer,20 mg/mL,Injection,5 mL vial,Vitamins and Supplements,Vifor Pharma,Switzerland,true
+MED0282,Tranexamic acid,Tranexamic acid,Cyklokapron,500 mg,Tablet,30 tablets,Blood and Coagulation,Pfizer,United States,true
+MED0283,Tranexamic acid,Tranexamic acid,Cyklokapron,100 mg/mL,Injection,5 mL ampoule,Blood and Coagulation,Pfizer,United States,true
+MED0284,Hydroxychloroquine,Hydroxychloroquine sulfate,Plaquenil,200 mg,Tablet,30 tablets,Antimalarials,Sanofi,France,true
+MED0285,Hydroxychloroquine,Hydroxychloroquine sulfate,Plaquenil,400 mg,Tablet,30 tablets,Antimalarials,Sanofi,France,true
+MED0286,Methotrexate,Methotrexate,Trexall,2.5 mg,Tablet,24 tablets,Oncology and Immunology,Pfizer,United States,true
+MED0287,Methotrexate,Methotrexate,Trexall,10 mg,Tablet,10 tablets,Oncology and Immunology,Pfizer,United States,true
+MED0288,Azathioprine,Azathioprine,Imuran,50 mg,Tablet,50 tablets,Oncology and Immunology,Aspen Pharmacare,South Africa,true
+MED0289,Colchicine,Colchicine,Colcrys,0.5 mg,Tablet,30 tablets,Analgesics,Takeda,Japan,true
+MED0290,Colchicine,Colchicine,Colcrys,0.6 mg,Tablet,30 tablets,Analgesics,Takeda,Japan,true
+MED0291,Meloxicam,Meloxicam,Mobic,7.5 mg,Tablet,10 tablets,Analgesics,Boehringer Ingelheim,Germany,true
+MED0292,Meloxicam,Meloxicam,Mobic,15 mg,Tablet,10 tablets,Analgesics,Boehringer Ingelheim,Germany,true
+MED0293,Etoricoxib,Etoricoxib,Arcoxia,60 mg,Tablet,7 tablets,Analgesics,Merck,United States,true
+MED0294,Etoricoxib,Etoricoxib,Arcoxia,90 mg,Tablet,7 tablets,Analgesics,Merck,United States,true
+MED0295,Etoricoxib,Etoricoxib,Arcoxia,120 mg,Tablet,7 tablets,Analgesics,Merck,United States,true
+MED0296,Pregabalin,Pregabalin,Lyrica,75 mg,Capsule,56 capsules,Analgesics,Pfizer,United States,true
+MED0297,Pregabalin,Pregabalin,Lyrica,150 mg,Capsule,56 capsules,Analgesics,Pfizer,United States,true
+MED0298,Gabapentin,Gabapentin,Neurontin,100 mg,Capsule,90 capsules,Analgesics,Pfizer,United States,true
+MED0299,Gabapentin,Gabapentin,Neurontin,300 mg,Capsule,90 capsules,Analgesics,Pfizer,United States,true
+MED0300,Sumatriptan,Sumatriptan succinate,Imigran,50 mg,Tablet,6 tablets,Analgesics,GSK,United Kingdom,true
+MED0301,Sumatriptan,Sumatriptan succinate,Imigran,100 mg,Tablet,6 tablets,Analgesics,GSK,United Kingdom,true
+MED0302,Tropicamide,Tropicamide,Mydriacyl,0.5%,Eye drops,15 mL bottle,Ophthalmic and Otic,Alcon,Switzerland,true
+MED0303,Tropicamide,Tropicamide,Mydriacyl,1%,Eye drops,15 mL bottle,Ophthalmic and Otic,Alcon,Switzerland,true
+MED0304,Ofloxacin,Ofloxacin,Ocuflox,0.3%,Eye drops,5 mL bottle,Ophthalmic and Otic,Allergan,Ireland,true
+MED0305,Silver sulfadiazine,Silver sulfadiazine,Flamazine,1%,Cream,50 g tube,Dermatological,Smith & Nephew,United Kingdom,true
+MED0306,Zinc oxide,Zinc oxide,Sudocrem,15.25%,Cream,60 g tub,Dermatological,Teva,Israel,false
+MED0307,Petrolatum,White soft paraffin,Vaseline,100%,Ointment,100 g tub,Dermatological,Unilever,United Kingdom,false
+MED0308,Coal tar,Coal tar,Polytar,4%,Shampoo,150 mL bottle,Dermatological,Thornton & Ross,United Kingdom,false
+MED0309,Adapalene,Adapalene,Differin,0.1%,Gel,30 g tube,Dermatological,Galderma,Switzerland,true
+MED0310,Adapalene,Adapalene,Differin,0.3%,Gel,30 g tube,Dermatological,Galderma,Switzerland,true
+MED0311,Benzoyl peroxide,Benzoyl peroxide,Benzac,2.5%,Gel,30 g tube,Dermatological,Galderma,Switzerland,false
+MED0312,Benzoyl peroxide,Benzoyl peroxide,Benzac,5%,Gel,30 g tube,Dermatological,Galderma,Switzerland,false
+MED0313,Minoxidil,Minoxidil,Regaine,2%,Topical solution,60 mL bottle,Dermatological,Johnson & Johnson,United States,false
+MED0314,Minoxidil,Minoxidil,Regaine,5%,Topical solution,60 mL bottle,Dermatological,Johnson & Johnson,United States,false
+MED0315,Fluticasone propionate,Fluticasone propionate,Flixotide,50 mcg/actuation,Inhaler,120 actuations,Respiratory,GSK,United Kingdom,true
+MED0316,Fluticasone propionate,Fluticasone propionate,Flixotide,125 mcg/actuation,Inhaler,120 actuations,Respiratory,GSK,United Kingdom,true
+MED0317,Tiotropium,Tiotropium bromide,Spiriva,18 mcg,Inhalation capsule,30 capsules,Respiratory,Boehringer Ingelheim,Germany,true
+MED0318,Ipratropium bromide,Ipratropium bromide,Atrovent,20 mcg/actuation,Inhaler,200 actuations,Respiratory,Boehringer Ingelheim,Germany,true
+MED0319,Vitamin B complex,B vitamins,B-Complex,Standard formulation,Tablet,100 tablets,Vitamins and Supplements,Various,Various,false
+MED0320,Calcium gluconate,Calcium gluconate,Calcium Gluconate,10%,Injection,10 mL ampoule,IV Fluids and Electrolytes,Various,Various,true
+MED0321,Heparin,Heparin sodium,Heparin,5000 IU/mL,Injection,5 mL vial,Blood and Coagulation,Pfizer,United States,true
+MED0322,Clarithromycin,Clarithromycin,Klacid,250 mg,Tablet,14 tablets,Antibiotics,Abbott,United States,true
+MED0323,Clarithromycin,Clarithromycin,Klacid,500 mg,Tablet,14 tablets,Antibiotics,Abbott,United States,true
+MED0324,Levofloxacin,Levofloxacin,Tavanic,250 mg,Tablet,10 tablets,Antibiotics,Sanofi,France,true
+MED0325,Levofloxacin,Levofloxacin,Tavanic,500 mg,Tablet,7 tablets,Antibiotics,Sanofi,France,true
+MED0326,Levofloxacin,Levofloxacin,Tavanic,750 mg,Tablet,5 tablets,Antibiotics,Sanofi,France,true
+MED0327,Cotrimoxazole,Sulfamethoxazole + trimethoprim,Bactrim,400/80 mg,Tablet,20 tablets,Antibiotics,Roche,Switzerland,true
+MED0328,Cotrimoxazole,Sulfamethoxazole + trimethoprim,Bactrim,800/160 mg,Tablet,20 tablets,Antibiotics,Roche,Switzerland,true
+MED0329,Cotrimoxazole,Sulfamethoxazole + trimethoprim,Bactrim,200/40 mg per 5 mL,Oral suspension,100 mL bottle,Antibiotics,Roche,Switzerland,true
+MED0330,Ethambutol,Ethambutol hydrochloride,Myambutol,100 mg,Tablet,100 tablets,Antibiotics,Lupin,India,true
+MED0331,Ethambutol,Ethambutol hydrochloride,Myambutol,400 mg,Tablet,100 tablets,Antibiotics,Lupin,India,true
+MED0332,Isoniazid,Isoniazid,Nydrazid,100 mg,Tablet,100 tablets,Antibiotics,Lupin,India,true
+MED0333,Isoniazid,Isoniazid,Nydrazid,300 mg,Tablet,100 tablets,Antibiotics,Lupin,India,true
+MED0334,Pyrazinamide,Pyrazinamide,Tebrazid,250 mg,Tablet,100 tablets,Antibiotics,Lupin,India,true
+MED0335,Pyrazinamide,Pyrazinamide,Tebrazid,500 mg,Tablet,100 tablets,Antibiotics,Lupin,India,true
+MED0336,Cefuroxime,Cefuroxime axetil,Zinnat,125 mg,Tablet,10 tablets,Antibiotics,GSK,United Kingdom,true
+MED0337,Cefuroxime,Cefuroxime axetil,Zinnat,250 mg,Tablet,10 tablets,Antibiotics,GSK,United Kingdom,true
+MED0338,Cefuroxime,Cefuroxime axetil,Zinnat,500 mg,Tablet,10 tablets,Antibiotics,GSK,United Kingdom,true
+MED0339,Flucloxacillin,Flucloxacillin sodium,Floxapen,250 mg,Capsule,28 capsules,Antibiotics,GSK,United Kingdom,true
+MED0340,Flucloxacillin,Flucloxacillin sodium,Floxapen,500 mg,Capsule,28 capsules,Antibiotics,GSK,United Kingdom,true
+MED0341,Clindamycin,Clindamycin hydrochloride,Dalacin C,150 mg,Capsule,16 capsules,Antibiotics,Pfizer,United States,true
+MED0342,Clindamycin,Clindamycin hydrochloride,Dalacin C,300 mg,Capsule,16 capsules,Antibiotics,Pfizer,United States,true
+MED0343,Nitrofurantoin,Nitrofurantoin,Macrobid,50 mg,Capsule,30 capsules,Antibiotics,Alvogen,United States,true
+MED0344,Nitrofurantoin,Nitrofurantoin,Macrobid,100 mg,Modified-release capsule,14 capsules,Antibiotics,Alvogen,United States,true
+MED0345,Rifampicin,Rifampicin,Rifadin,150 mg,Capsule,100 capsules,Antibiotics,Sanofi,France,true
+MED0346,Rifampicin,Rifampicin,Rifadin,300 mg,Capsule,100 capsules,Antibiotics,Sanofi,France,true
+MED0347,Cefadroxil,Cefadroxil,Duricef,500 mg,Capsule,20 capsules,Antibiotics,Bristol Myers Squibb,United States,true
+MED0348,Praziquantel,Praziquantel,Biltricide,600 mg,Tablet,6 tablets,Antivirals and Antiparasitics,Bayer,Germany,true
+MED0349,Tinidazole,Tinidazole,Fasigyn,500 mg,Tablet,4 tablets,Antivirals and Antiparasitics,Pfizer,United States,true
+MED0350,Chlorpheniramine,Chlorpheniramine maleate,Piriton,4 mg,Tablet,30 tablets,Antihistamines,GSK,United Kingdom,false
+MED0351,Chlorpheniramine,Chlorpheniramine maleate,Piriton,2 mg/5 mL,Syrup,100 mL bottle,Antihistamines,GSK,United Kingdom,false
+MED0352,Promethazine,Promethazine hydrochloride,Phenergan,25 mg,Tablet,20 tablets,Antihistamines,Sanofi,France,true
+MED0353,Promethazine,Promethazine hydrochloride,Phenergan,5 mg/5 mL,Syrup,100 mL bottle,Antihistamines,Sanofi,France,true
+MED0354,Meclizine,Meclizine hydrochloride,Antivert,12.5 mg,Tablet,30 tablets,Gastrointestinal,Pfizer,United States,false
+MED0355,Meclizine,Meclizine hydrochloride,Antivert,25 mg,Tablet,30 tablets,Gastrointestinal,Pfizer,United States,false
+MED0356,Hyoscine butylbromide,Hyoscine butylbromide,Buscopan,10 mg,Tablet,20 tablets,Gastrointestinal,Sanofi,France,true
+MED0357,Hyoscine butylbromide,Hyoscine butylbromide,Buscopan,20 mg/mL,Injection,1 mL ampoule,Gastrointestinal,Sanofi,France,true
+MED0358,Drotaverine,Drotaverine hydrochloride,No-Spa,40 mg,Tablet,24 tablets,Gastrointestinal,Sanofi,France,true
+MED0359,Drotaverine,Drotaverine hydrochloride,No-Spa,80 mg,Tablet,24 tablets,Gastrointestinal,Sanofi,France,true
+MED0360,Mebeverine,Mebeverine hydrochloride,Duspatalin,135 mg,Tablet,30 tablets,Gastrointestinal,Abbott,United States,true
+MED0361,Mebeverine,Mebeverine hydrochloride,Duspatalin,200 mg,Modified-release capsule,30 capsules,Gastrointestinal,Abbott,United States,true
+MED0362,Ursodeoxycholic acid,Ursodeoxycholic acid,Ursofalk,250 mg,Capsule,50 capsules,Gastrointestinal,Dr. Falk Pharma,Germany,true
+MED0363,Ursodeoxycholic acid,Ursodeoxycholic acid,Ursofalk,500 mg,Tablet,50 tablets,Gastrointestinal,Dr. Falk Pharma,Germany,true
+MED0364,Epoetin alfa,Epoetin alfa,Eprex,4000 IU/mL,Injection,1 mL prefilled syringe,Blood and Coagulation,Janssen,Belgium,true
+MED0365,Filgrastim,Filgrastim,Neupogen,300 mcg/0.5 mL,Prefilled syringe,0.5 mL syringe,Blood and Coagulation,Amgen,United States,true
+MED0366,Letrozole,Letrozole,Femara,2.5 mg,Tablet,30 tablets,Oncology and Immunology,Novartis,Switzerland,true
+MED0367,Tamoxifen,Tamoxifen citrate,Nolvadex,10 mg,Tablet,30 tablets,Oncology and Immunology,AstraZeneca,United Kingdom,true
+MED0368,Tamoxifen,Tamoxifen citrate,Nolvadex,20 mg,Tablet,30 tablets,Oncology and Immunology,AstraZeneca,United Kingdom,true
+MED0369,Imatinib,Imatinib mesylate,Glivec,100 mg,Tablet,60 tablets,Oncology and Immunology,Novartis,Switzerland,true
+MED0370,Imatinib,Imatinib mesylate,Glivec,400 mg,Tablet,30 tablets,Oncology and Immunology,Novartis,Switzerland,true
+MED0371,Capecitabine,Capecitabine,Xeloda,150 mg,Tablet,60 tablets,Oncology and Immunology,Roche,Switzerland,true
+MED0372,Capecitabine,Capecitabine,Xeloda,500 mg,Tablet,120 tablets,Oncology and Immunology,Roche,Switzerland,true
+MED0373,Tacrolimus,Tacrolimus,Prograf,0.5 mg,Capsule,50 capsules,Oncology and Immunology,Astellas,Japan,true
+MED0374,Tacrolimus,Tacrolimus,Prograf,1 mg,Capsule,50 capsules,Oncology and Immunology,Astellas,Japan,true
+MED0375,Tacrolimus,Tacrolimus,Prograf,5 mg,Capsule,50 capsules,Oncology and Immunology,Astellas,Japan,true
+MED0376,Ciclosporin,Ciclosporin,Neoral,25 mg,Capsule,50 capsules,Oncology and Immunology,Novartis,Switzerland,true
+MED0377,Ciclosporin,Ciclosporin,Neoral,100 mg,Capsule,50 capsules,Oncology and Immunology,Novartis,Switzerland,true
+MED0378,Rituximab,Rituximab,MabThera,100 mg/10 mL,Concentrate for infusion,10 mL vial,Oncology and Immunology,Roche,Switzerland,true
+MED0379,Rituximab,Rituximab,MabThera,500 mg/50 mL,Concentrate for infusion,50 mL vial,Oncology and Immunology,Roche,Switzerland,true
+MED0380,Adalimumab,Adalimumab,Humira,40 mg/0.4 mL,Prefilled syringe,0.4 mL syringe,Oncology and Immunology,AbbVie,United States,true
+MED0381,Medroxyprogesterone acetate,Medroxyprogesterone acetate,Depo-Provera,150 mg/mL,Injection,1 mL vial,Hormones and Contraceptives,Pfizer,United States,true
+MED0382,Ethinylestradiol + levonorgestrel,Ethinylestradiol + levonorgestrel,Microgynon 30,30 mcg/150 mcg,Tablet,21 tablets,Hormones and Contraceptives,Bayer,Germany,true
+MED0383,Levonorgestrel,Levonorgestrel,Postinor-2,1.5 mg,Tablet,1 tablet,Hormones and Contraceptives,Gedeon Richter,Hungary,false
+MED0384,Methylprednisolone,Methylprednisolone,Medrol,4 mg,Tablet,30 tablets,Hormones and Contraceptives,Pfizer,United States,true
+MED0385,Methylprednisolone,Methylprednisolone,Medrol,16 mg,Tablet,30 tablets,Hormones and Contraceptives,Pfizer,United States,true
+MED0386,Amitriptyline,Amitriptyline hydrochloride,Elavil,10 mg,Tablet,30 tablets,Central Nervous System,Various,Various,true
+MED0387,Amitriptyline,Amitriptyline hydrochloride,Elavil,25 mg,Tablet,30 tablets,Central Nervous System,Various,Various,true
+MED0388,Haloperidol,Haloperidol,Haldol,2 mg/mL,Oral solution,100 mL bottle,Central Nervous System,Janssen,Belgium,true
+MED0389,Haloperidol,Haloperidol,Haldol,5 mg,Tablet,30 tablets,Central Nervous System,Janssen,Belgium,true
+MED0390,Aripiprazole,Aripiprazole,Abilify,10 mg,Tablet,28 tablets,Central Nervous System,Otsuka,Japan,true
+MED0391,Aripiprazole,Aripiprazole,Abilify,15 mg,Tablet,28 tablets,Central Nervous System,Otsuka,Japan,true
 MED0392,Calamine,Calamine,Calamine Lotion,8%,Lotion,100 mL bottle,Dermatological,Various,Various,false
-MED0393,Urea,Urea,Urea Cream,10%,Cream,100 g tub,Emollient / Keratolytic,Various,Various,false
-MED0394,Urea,Urea,Urea Cream,20%,Cream,100 g tub,Emollient / Keratolytic,Various,Various,false
-MED0395,Fusidic acid,Fusidic acid,Fucidin,2%,Cream,15 g tube,Topical antibiotic,LEO Pharma,Denmark,true
-MED0396,Ketorolac,Ketorolac tromethamine,Acular,0.5%,Eye drops,5 mL bottle,Ophthalmic NSAID,Allergan,Ireland,true
-MED0397,Dorzolamide + timolol,Dorzolamide + timolol,Cosopt,2%/0.5%,Eye drops,5 mL bottle,Ophthalmic / Glaucoma,Merck,United States,true
-MED0398,Bimatoprost,Bimatoprost,Lumigan,0.01%,Eye drops,3 mL bottle,Ophthalmic / Glaucoma,AbbVie,United States,true
-MED0399,Methyl salicylate + menthol,Methyl salicylate + menthol,Deep Heat,Rubefacient formula,Cream,35 g tube,Topical analgesic,Mentholatum,United Kingdom,false
-MED0400,Oral zinc,Zinc sulfate,Zinc,20 mg elemental zinc,Dispersible tablet,10 tablets,Mineral / Supplement,Various,Various,false
-MED0401,Iron polymaltose,Iron(III) hydroxide polymaltose complex,Maltofer,100 mg elemental iron,Chewable tablet,30 tablets,Hematinic,Vifor Pharma,Switzerland,false
-MED0402,Dextrose + sodium chloride,Glucose + sodium chloride,Dextrose Saline,5% + 0.9%,IV infusion,500 mL bag,IV fluid,Various,Various,true
-MED0403,Sterile water,Water for injection,Water for Injection,Sterile,Injection diluent,10 mL ampoule,Diluent,Various,Various,false
-MED0404,Pyridoxine,Pyridoxine hydrochloride,Vitamin B6,25 mg,Tablet,100 tablets,Vitamin,Various,Various,false
-MED0405,Pyridoxine,Pyridoxine hydrochloride,Vitamin B6,50 mg,Tablet,100 tablets,Vitamin,Various,Various,false
-MED0406,Thiamine,Thiamine hydrochloride,Vitamin B1,50 mg,Tablet,100 tablets,Vitamin,Various,Various,false
-MED0407,Thiamine,Thiamine hydrochloride,Vitamin B1,100 mg,Tablet,100 tablets,Vitamin,Various,Various,false
-MED0408,Vitamin E,Alpha-tocopherol,Vitamin E,400 IU,Capsule,30 capsules,Vitamin / Supplement,Various,Various,false
-MED0409,Senna,Sennosides,Senokot,7.5 mg,Tablet,20 tablets,Laxative,Reckitt,United Kingdom,false
-MED0410,Senna,Sennosides,Senokot,7.5 mg/5 mL,Syrup,100 mL bottle,Laxative,Reckitt,United Kingdom,false
-MED0411,Polyethylene glycol,Macrogol 3350,Movicol,13.7 g,Powder for oral solution,20 sachets,Laxative,Norgine,United Kingdom,false
-MED0412,Sodium alginate + sodium bicarbonate,Sodium alginate + sodium bicarbonate,Gaviscon,Standard formulation,Oral suspension,200 mL bottle,Gastrointestinal / Reflux,Reckitt,United Kingdom,false
-MED0413,Benzydamine,Benzydamine hydrochloride,Difflam,0.15%,Mouthwash,300 mL bottle,Oral anti-inflammatory,Reckitt,United Kingdom,false
-MED0414,Budesonide,Budesonide,Pulmicort,0.5 mg/2 mL,Nebulizer suspension,20 nebules,Respiratory / Corticosteroid,AstraZeneca,United Kingdom,true
-MED0415,Cholecalciferol,Vitamin D3,Vitamin D3,400 IU/drop,Oral drops,10 mL bottle,Vitamin / Supplement,Various,Various,false
-MED0416,Ferrous sulfate,Ferrous sulfate,Ferrous Sulfate,200 mg,Tablet,100 tablets,Hematinic,Various,Various,false
-MED0417,Ferrous sulfate,Ferrous sulfate,Ferrous Sulfate,325 mg,Tablet,100 tablets,Hematinic,Various,Various,false
-MED0418,Nifedipine,Nifedipine,Adalat Retard,10 mg,Capsule,30 capsules,Antihypertensive,Bayer,Germany,true
-MED0419,Nifedipine,Nifedipine,Adalat Retard,20 mg,Modified-release tablet,30 tablets,Antihypertensive,Bayer,Germany,true
-MED0420,Nifedipine,Nifedipine,Adalat Retard,30 mg,Extended-release tablet,30 tablets,Antihypertensive,Bayer,Germany,true
-MED0421,Digoxin,Digoxin,Lanoxin,0.125 mg,Tablet,30 tablets,Cardiac glycoside,Aspen Pharmacare,South Africa,true
-MED0422,Digoxin,Digoxin,Lanoxin,0.25 mg,Tablet,30 tablets,Cardiac glycoside,Aspen Pharmacare,South Africa,true
-MED0423,Amiodarone,Amiodarone hydrochloride,Cordarone,100 mg,Tablet,30 tablets,Antiarrhythmic,Sanofi,France,true
-MED0424,Amiodarone,Amiodarone hydrochloride,Cordarone,200 mg,Tablet,30 tablets,Antiarrhythmic,Sanofi,France,true
-MED0425,Amiodarone,Amiodarone hydrochloride,Cordarone,50 mg/mL,Injection,3 mL ampoule,Antiarrhythmic,Sanofi,France,true
-MED0426,Nitroglycerin,Glyceryl trinitrate,Nitrolingual,0.4 mg/spray,Sublingual spray,200 sprays,Antianginal,Pohl-Boskamp,Germany,true
-MED0427,Lansoprazole,Lansoprazole,Prevacid,15 mg,Capsule,28 capsules,Gastrointestinal / PPI,Takeda,Japan,true
-MED0428,Lansoprazole,Lansoprazole,Prevacid,30 mg,Capsule,28 capsules,Gastrointestinal / PPI,Takeda,Japan,true
-MED0429,Rabeprazole,Rabeprazole sodium,Pariet,10 mg,Tablet,14 tablets,Gastrointestinal / PPI,Eisai,Japan,true
-MED0430,Rabeprazole,Rabeprazole sodium,Pariet,20 mg,Tablet,14 tablets,Gastrointestinal / PPI,Eisai,Japan,true
-MED0431,Desloratadine,Desloratadine,Aerius,5 mg,Tablet,30 tablets,Antihistamine,Organon,United States,false
-MED0432,Desloratadine,Desloratadine,Aerius,0.5 mg/mL,Oral solution,100 mL bottle,Antihistamine,Organon,United States,false
-MED0433,Levocetirizine,Levocetirizine dihydrochloride,Xyzal,5 mg,Tablet,30 tablets,Antihistamine,UCB,Belgium,false
-MED0434,Cinnarizine,Cinnarizine,Stugeron,25 mg,Tablet,50 tablets,Antivertigo,Janssen,Belgium,true
-MED0435,Betahistine,Betahistine dihydrochloride,Serc,16 mg,Tablet,30 tablets,Antivertigo,Abbott,United States,true
-MED0436,Betahistine,Betahistine dihydrochloride,Serc,24 mg,Tablet,30 tablets,Antivertigo,Abbott,United States,true
-MED0437,Tizanidine,Tizanidine hydrochloride,Sirdalud,2 mg,Tablet,30 tablets,Muscle relaxant,Novartis,Switzerland,true
-MED0438,Tizanidine,Tizanidine hydrochloride,Sirdalud,4 mg,Tablet,30 tablets,Muscle relaxant,Novartis,Switzerland,true
-MED0439,Baclofen,Baclofen,Lioresal,10 mg,Tablet,50 tablets,Muscle relaxant,Novartis,Switzerland,true
-MED0440,Baclofen,Baclofen,Lioresal,25 mg,Tablet,50 tablets,Muscle relaxant,Novartis,Switzerland,true
-MED0441,Rizatriptan,Rizatriptan benzoate,Maxalt,10 mg,Tablet,6 tablets,Migraine,Merck,United States,true
-MED0442,Lamotrigine,Lamotrigine,Lamictal,25 mg,Tablet,30 tablets,Antiepileptic,GSK,United Kingdom,true
-MED0443,Lamotrigine,Lamotrigine,Lamictal,100 mg,Tablet,30 tablets,Antiepileptic,GSK,United Kingdom,true
-MED0444,Quetiapine,Quetiapine fumarate,Seroquel,25 mg,Tablet,30 tablets,Antipsychotic,AstraZeneca,United Kingdom,true
-MED0445,Quetiapine,Quetiapine fumarate,Seroquel,100 mg,Tablet,30 tablets,Antipsychotic,AstraZeneca,United Kingdom,true
-MED0446,Quetiapine,Quetiapine fumarate,Seroquel,200 mg,Extended-release tablet,60 tablets,Antipsychotic,AstraZeneca,United Kingdom,true
-MED0447,Olanzapine,Olanzapine,Zyprexa,5 mg,Tablet,28 tablets,Antipsychotic,Eli Lilly,United States,true
-MED0448,Olanzapine,Olanzapine,Zyprexa,10 mg,Tablet,28 tablets,Antipsychotic,Eli Lilly,United States,true
-MED0449,Lithium carbonate,Lithium carbonate,Priadel,200 mg,Modified-release tablet,100 tablets,Mood stabilizer,Essential Pharma,United Kingdom,true
-MED0450,Lithium carbonate,Lithium carbonate,Priadel,400 mg,Modified-release tablet,100 tablets,Mood stabilizer,Essential Pharma,United Kingdom,true
-MED0451,Levodopa + carbidopa,Levodopa + carbidopa,Sinemet,100/25 mg,Tablet,100 tablets,Antiparkinsonian,Merck,United States,true
-MED0452,Levodopa + carbidopa,Levodopa + carbidopa,Sinemet,250/25 mg,Tablet,100 tablets,Antiparkinsonian,Merck,United States,true
-MED0453,Donepezil,Donepezil hydrochloride,Aricept,5 mg,Tablet,28 tablets,Dementia therapy,Eisai,Japan,true
-MED0454,Donepezil,Donepezil hydrochloride,Aricept,10 mg,Tablet,28 tablets,Dementia therapy,Eisai,Japan,true
-MED0455,Memantine,Memantine hydrochloride,Ebixa,10 mg,Tablet,28 tablets,Dementia therapy,Lundbeck,Denmark,true
-MED0456,Memantine,Memantine hydrochloride,Ebixa,20 mg,Tablet,28 tablets,Dementia therapy,Lundbeck,Denmark,true
-MED0457,Cabergoline,Cabergoline,Dostinex,0.5 mg,Tablet,2 tablets,Endocrine,Pfizer,United States,true
-MED0458,Estradiol,Estradiol valerate,Progynova,1 mg,Tablet,28 tablets,Hormone therapy,Bayer,Germany,true
-MED0459,Estradiol,Estradiol valerate,Progynova,2 mg,Tablet,28 tablets,Hormone therapy,Bayer,Germany,true
-MED0460,Progesterone,Micronized progesterone,Utrogestan,100 mg,Capsule,30 capsules,Hormone therapy,Besins Healthcare,Belgium,true
-MED0461,Progesterone,Micronized progesterone,Utrogestan,200 mg,Capsule,15 capsules,Hormone therapy,Besins Healthcare,Belgium,true
-MED0462,Ranitidine,Ranitidine hydrochloride,Zantac,150 mg,Tablet,30 tablets,Gastrointestinal / H2 blocker,GSK,United Kingdom,false
-MED0463,Piroxicam,Piroxicam,Feldene,10 mg,Capsule,20 capsules,NSAID,Pfizer,United States,true
-MED0464,Piroxicam,Piroxicam,Feldene,20 mg,Capsule,20 capsules,NSAID,Pfizer,United States,true
-MED0465,Econazole,Econazole nitrate,Pevaryl,1%,Cream,30 g tube,Antifungal,Janssen,Belgium,false
-MED0466,Ezetimibe,Ezetimibe,Ezetrol,10 mg,Tablet,28 tablets,Lipid-lowering,Merck,United States,true
+MED0393,Urea,Urea,Urea Cream,10%,Cream,100 g tub,Dermatological,Various,Various,false
+MED0394,Urea,Urea,Urea Cream,20%,Cream,100 g tub,Dermatological,Various,Various,false
+MED0395,Fusidic acid,Fusidic acid,Fucidin,2%,Cream,15 g tube,Antibiotics,LEO Pharma,Denmark,true
+MED0396,Ketorolac,Ketorolac tromethamine,Acular,0.5%,Eye drops,5 mL bottle,Ophthalmic and Otic,Allergan,Ireland,true
+MED0397,Dorzolamide + timolol,Dorzolamide + timolol,Cosopt,2%/0.5%,Eye drops,5 mL bottle,Ophthalmic and Otic,Merck,United States,true
+MED0398,Bimatoprost,Bimatoprost,Lumigan,0.01%,Eye drops,3 mL bottle,Ophthalmic and Otic,AbbVie,United States,true
+MED0399,Methyl salicylate + menthol,Methyl salicylate + menthol,Deep Heat,Rubefacient formula,Cream,35 g tube,Analgesics,Mentholatum,United Kingdom,false
+MED0400,Oral zinc,Zinc sulfate,Zinc,20 mg elemental zinc,Dispersible tablet,10 tablets,Vitamins and Supplements,Various,Various,false
+MED0401,Iron polymaltose,Iron(III) hydroxide polymaltose complex,Maltofer,100 mg elemental iron,Chewable tablet,30 tablets,Vitamins and Supplements,Vifor Pharma,Switzerland,false
+MED0402,Dextrose + sodium chloride,Glucose + sodium chloride,Dextrose Saline,5% + 0.9%,IV infusion,500 mL bag,IV Fluids and Electrolytes,Various,Various,true
+MED0403,Sterile water,Water for injection,Water for Injection,Sterile,Injection diluent,10 mL ampoule,IV Fluids and Electrolytes,Various,Various,false
+MED0404,Pyridoxine,Pyridoxine hydrochloride,Vitamin B6,25 mg,Tablet,100 tablets,Vitamins and Supplements,Various,Various,false
+MED0405,Pyridoxine,Pyridoxine hydrochloride,Vitamin B6,50 mg,Tablet,100 tablets,Vitamins and Supplements,Various,Various,false
+MED0406,Thiamine,Thiamine hydrochloride,Vitamin B1,50 mg,Tablet,100 tablets,Vitamins and Supplements,Various,Various,false
+MED0407,Thiamine,Thiamine hydrochloride,Vitamin B1,100 mg,Tablet,100 tablets,Vitamins and Supplements,Various,Various,false
+MED0408,Vitamin E,Alpha-tocopherol,Vitamin E,400 IU,Capsule,30 capsules,Vitamins and Supplements,Various,Various,false
+MED0409,Senna,Sennosides,Senokot,7.5 mg,Tablet,20 tablets,Gastrointestinal,Reckitt,United Kingdom,false
+MED0410,Senna,Sennosides,Senokot,7.5 mg/5 mL,Syrup,100 mL bottle,Gastrointestinal,Reckitt,United Kingdom,false
+MED0411,Polyethylene glycol,Macrogol 3350,Movicol,13.7 g,Powder for oral solution,20 sachets,Gastrointestinal,Norgine,United Kingdom,false
+MED0412,Sodium alginate + sodium bicarbonate,Sodium alginate + sodium bicarbonate,Gaviscon,Standard formulation,Oral suspension,200 mL bottle,Gastrointestinal,Reckitt,United Kingdom,false
+MED0413,Benzydamine,Benzydamine hydrochloride,Difflam,0.15%,Mouthwash,300 mL bottle,Analgesics,Reckitt,United Kingdom,false
+MED0414,Budesonide,Budesonide,Pulmicort,0.5 mg/2 mL,Nebulizer suspension,20 nebules,Respiratory,AstraZeneca,United Kingdom,true
+MED0415,Cholecalciferol,Vitamin D3,Vitamin D3,400 IU/drop,Oral drops,10 mL bottle,Vitamins and Supplements,Various,Various,false
+MED0416,Ferrous sulfate,Ferrous sulfate,Ferrous Sulfate,200 mg,Tablet,100 tablets,Vitamins and Supplements,Various,Various,false
+MED0417,Ferrous sulfate,Ferrous sulfate,Ferrous Sulfate,325 mg,Tablet,100 tablets,Vitamins and Supplements,Various,Various,false
+MED0418,Nifedipine,Nifedipine,Adalat Retard,10 mg,Capsule,30 capsules,Antihypertensives,Bayer,Germany,true
+MED0419,Nifedipine,Nifedipine,Adalat Retard,20 mg,Modified-release tablet,30 tablets,Antihypertensives,Bayer,Germany,true
+MED0420,Nifedipine,Nifedipine,Adalat Retard,30 mg,Extended-release tablet,30 tablets,Antihypertensives,Bayer,Germany,true
+MED0421,Digoxin,Digoxin,Lanoxin,0.125 mg,Tablet,30 tablets,Cardiovascular,Aspen Pharmacare,South Africa,true
+MED0422,Digoxin,Digoxin,Lanoxin,0.25 mg,Tablet,30 tablets,Cardiovascular,Aspen Pharmacare,South Africa,true
+MED0423,Amiodarone,Amiodarone hydrochloride,Cordarone,100 mg,Tablet,30 tablets,Cardiovascular,Sanofi,France,true
+MED0424,Amiodarone,Amiodarone hydrochloride,Cordarone,200 mg,Tablet,30 tablets,Cardiovascular,Sanofi,France,true
+MED0425,Amiodarone,Amiodarone hydrochloride,Cordarone,50 mg/mL,Injection,3 mL ampoule,Cardiovascular,Sanofi,France,true
+MED0426,Nitroglycerin,Glyceryl trinitrate,Nitrolingual,0.4 mg/spray,Sublingual spray,200 sprays,Cardiovascular,Pohl-Boskamp,Germany,true
+MED0427,Lansoprazole,Lansoprazole,Prevacid,15 mg,Capsule,28 capsules,Gastrointestinal,Takeda,Japan,true
+MED0428,Lansoprazole,Lansoprazole,Prevacid,30 mg,Capsule,28 capsules,Gastrointestinal,Takeda,Japan,true
+MED0429,Rabeprazole,Rabeprazole sodium,Pariet,10 mg,Tablet,14 tablets,Gastrointestinal,Eisai,Japan,true
+MED0430,Rabeprazole,Rabeprazole sodium,Pariet,20 mg,Tablet,14 tablets,Gastrointestinal,Eisai,Japan,true
+MED0431,Desloratadine,Desloratadine,Aerius,5 mg,Tablet,30 tablets,Antihistamines,Organon,United States,false
+MED0432,Desloratadine,Desloratadine,Aerius,0.5 mg/mL,Oral solution,100 mL bottle,Antihistamines,Organon,United States,false
+MED0433,Levocetirizine,Levocetirizine dihydrochloride,Xyzal,5 mg,Tablet,30 tablets,Antihistamines,UCB,Belgium,false
+MED0434,Cinnarizine,Cinnarizine,Stugeron,25 mg,Tablet,50 tablets,Central Nervous System,Janssen,Belgium,true
+MED0435,Betahistine,Betahistine dihydrochloride,Serc,16 mg,Tablet,30 tablets,Central Nervous System,Abbott,United States,true
+MED0436,Betahistine,Betahistine dihydrochloride,Serc,24 mg,Tablet,30 tablets,Central Nervous System,Abbott,United States,true
+MED0437,Tizanidine,Tizanidine hydrochloride,Sirdalud,2 mg,Tablet,30 tablets,Analgesics,Novartis,Switzerland,true
+MED0438,Tizanidine,Tizanidine hydrochloride,Sirdalud,4 mg,Tablet,30 tablets,Analgesics,Novartis,Switzerland,true
+MED0439,Baclofen,Baclofen,Lioresal,10 mg,Tablet,50 tablets,Analgesics,Novartis,Switzerland,true
+MED0440,Baclofen,Baclofen,Lioresal,25 mg,Tablet,50 tablets,Analgesics,Novartis,Switzerland,true
+MED0441,Rizatriptan,Rizatriptan benzoate,Maxalt,10 mg,Tablet,6 tablets,Analgesics,Merck,United States,true
+MED0442,Lamotrigine,Lamotrigine,Lamictal,25 mg,Tablet,30 tablets,Central Nervous System,GSK,United Kingdom,true
+MED0443,Lamotrigine,Lamotrigine,Lamictal,100 mg,Tablet,30 tablets,Central Nervous System,GSK,United Kingdom,true
+MED0444,Quetiapine,Quetiapine fumarate,Seroquel,25 mg,Tablet,30 tablets,Central Nervous System,AstraZeneca,United Kingdom,true
+MED0445,Quetiapine,Quetiapine fumarate,Seroquel,100 mg,Tablet,30 tablets,Central Nervous System,AstraZeneca,United Kingdom,true
+MED0446,Quetiapine,Quetiapine fumarate,Seroquel,200 mg,Extended-release tablet,60 tablets,Central Nervous System,AstraZeneca,United Kingdom,true
+MED0447,Olanzapine,Olanzapine,Zyprexa,5 mg,Tablet,28 tablets,Central Nervous System,Eli Lilly,United States,true
+MED0448,Olanzapine,Olanzapine,Zyprexa,10 mg,Tablet,28 tablets,Central Nervous System,Eli Lilly,United States,true
+MED0449,Lithium carbonate,Lithium carbonate,Priadel,200 mg,Modified-release tablet,100 tablets,Central Nervous System,Essential Pharma,United Kingdom,true
+MED0450,Lithium carbonate,Lithium carbonate,Priadel,400 mg,Modified-release tablet,100 tablets,Central Nervous System,Essential Pharma,United Kingdom,true
+MED0451,Levodopa + carbidopa,Levodopa + carbidopa,Sinemet,100/25 mg,Tablet,100 tablets,Central Nervous System,Merck,United States,true
+MED0452,Levodopa + carbidopa,Levodopa + carbidopa,Sinemet,250/25 mg,Tablet,100 tablets,Central Nervous System,Merck,United States,true
+MED0453,Donepezil,Donepezil hydrochloride,Aricept,5 mg,Tablet,28 tablets,Central Nervous System,Eisai,Japan,true
+MED0454,Donepezil,Donepezil hydrochloride,Aricept,10 mg,Tablet,28 tablets,Central Nervous System,Eisai,Japan,true
+MED0455,Memantine,Memantine hydrochloride,Ebixa,10 mg,Tablet,28 tablets,Central Nervous System,Lundbeck,Denmark,true
+MED0456,Memantine,Memantine hydrochloride,Ebixa,20 mg,Tablet,28 tablets,Central Nervous System,Lundbeck,Denmark,true
+MED0457,Cabergoline,Cabergoline,Dostinex,0.5 mg,Tablet,2 tablets,Hormones and Contraceptives,Pfizer,United States,true
+MED0458,Estradiol,Estradiol valerate,Progynova,1 mg,Tablet,28 tablets,Hormones and Contraceptives,Bayer,Germany,true
+MED0459,Estradiol,Estradiol valerate,Progynova,2 mg,Tablet,28 tablets,Hormones and Contraceptives,Bayer,Germany,true
+MED0460,Progesterone,Micronized progesterone,Utrogestan,100 mg,Capsule,30 capsules,Hormones and Contraceptives,Besins Healthcare,Belgium,true
+MED0461,Progesterone,Micronized progesterone,Utrogestan,200 mg,Capsule,15 capsules,Hormones and Contraceptives,Besins Healthcare,Belgium,true
+MED0462,Ranitidine,Ranitidine hydrochloride,Zantac,150 mg,Tablet,30 tablets,Gastrointestinal,GSK,United Kingdom,false
+MED0463,Piroxicam,Piroxicam,Feldene,10 mg,Capsule,20 capsules,Analgesics,Pfizer,United States,true
+MED0464,Piroxicam,Piroxicam,Feldene,20 mg,Capsule,20 capsules,Analgesics,Pfizer,United States,true
+MED0465,Econazole,Econazole nitrate,Pevaryl,1%,Cream,30 g tube,Antifungals,Janssen,Belgium,false
+MED0466,Ezetimibe,Ezetimibe,Ezetrol,10 mg,Tablet,28 tablets,Cardiovascular,Merck,United States,true
 MED0467,Diltiazem,Diltiazem hydrochloride,Cardizem,60 mg,Tablet,30 tablets,Cardiovascular,Bausch Health,Canada,true
 MED0468,Diltiazem,Diltiazem hydrochloride,Cardizem,120 mg,Extended-release capsule,30 capsules,Cardiovascular,Bausch Health,Canada,true
-MED0469,Atenolol,Atenolol,Tenormin,25 mg,Tablet,28 tablets,Beta blocker,AstraZeneca,United Kingdom,true
-MED0470,Atenolol,Atenolol,Tenormin,50 mg,Tablet,28 tablets,Beta blocker,AstraZeneca,United Kingdom,true
-MED0471,Atenolol,Atenolol,Tenormin,100 mg,Tablet,28 tablets,Beta blocker,AstraZeneca,United Kingdom,true
-MED0472,Propranolol,Propranolol hydrochloride,Inderal,10 mg,Tablet,50 tablets,Beta blocker,AstraZeneca,United Kingdom,true
-MED0473,Propranolol,Propranolol hydrochloride,Inderal,40 mg,Tablet,50 tablets,Beta blocker,AstraZeneca,United Kingdom,true
-MED0474,Propranolol,Propranolol hydrochloride,Inderal,80 mg,Tablet,50 tablets,Beta blocker,AstraZeneca,United Kingdom,true
-MED0475,Vitamin A,Retinyl palmitate,Vitamin A,"100,000 IU",Capsule,1 capsule,Vitamin,Various,Various,false
-MED0476,Vitamin A,Retinyl palmitate,Vitamin A,"200,000 IU",Capsule,1 capsule,Vitamin,Various,Various,false
-MED0477,Calcium carbonate,Calcium carbonate,Caltrate,500 mg,Chewable tablet,60 tablets,Mineral / Supplement,Haleon,United Kingdom,false
-MED0478,Calcium carbonate,Calcium carbonate,Caltrate,600 mg,Tablet,60 tablets,Mineral / Supplement,Haleon,United Kingdom,false
-MED0479,Magnesium hydroxide,Magnesium hydroxide,Milk of Magnesia,400 mg/5 mL,Oral suspension,200 mL bottle,Antacid / Laxative,Bayer,Germany,false
-MED0480,Docusate sodium,Docusate sodium,Colace,100 mg,Capsule,30 capsules,Stool softener,Perrigo,United States,false
-MED0481,Saccharomyces boulardii,Saccharomyces boulardii,Enterogermina,250 mg,Capsule,10 capsules,Probiotic,Sanofi,France,false
-MED0482,Oral electrolyte solution,Glucose + electrolytes,ORS solution,Standard formulation,Oral solution,500 mL bottle,Rehydration,Various,Various,false
-MED0483,Ethanol,Ethanol,Alcohol 70%,70%,Topical solution,500 mL bottle,Antiseptic,Various,Various,false
-MED0484,Hydrogen peroxide,Hydrogen peroxide,Hydrogen Peroxide,3%,Topical solution,100 mL bottle,Antiseptic,Various,Various,false
-MED0485,Sodium hypochlorite,Sodium hypochlorite,Dakin's Solution,0.5%,Topical solution,500 mL bottle,Antiseptic,Various,Various,false
-MED0486,Clobetasol,Clobetasol propionate,Dermovate,0.05%,Cream,25 g tube,Topical corticosteroid,GSK,United Kingdom,true
-MED0487,Fluticasone furoate,Fluticasone furoate,Avamys,27.5 mcg/spray,Nasal spray,120 sprays,Allergy / Corticosteroid,GSK,United Kingdom,true
-MED0488,Oxymetazoline,Oxymetazoline hydrochloride,Afrin,0.05%,Nasal spray,15 mL bottle,Decongestant,Bayer,Germany,false
-MED0489,Dextrose,Glucose,Dextrose 10%,10%,IV infusion,500 mL bag,IV fluid,Various,Various,true
-MED0490,Cefotaxime,Cefotaxime sodium,Claforan,500 mg,Powder for injection,1 vial,Antibiotic,Sanofi,France,true
-MED0491,Cefotaxime,Cefotaxime sodium,Claforan,1 g,Powder for injection,1 vial,Antibiotic,Sanofi,France,true
-MED0492,Cefotaxime,Cefotaxime sodium,Claforan,2 g,Powder for injection,1 vial,Antibiotic,Sanofi,France,true
-MED0493,Piperacillin + tazobactam,Piperacillin sodium + tazobactam sodium,Tazocin,2 g/0.25 g,Powder for injection,1 vial,Antibiotic,Pfizer,United States,true
-MED0494,Piperacillin + tazobactam,Piperacillin sodium + tazobactam sodium,Tazocin,4 g/0.5 g,Powder for injection,1 vial,Antibiotic,Pfizer,United States,true
-MED0495,Cefpodoxime,Cefpodoxime proxetil,Orelox,100 mg,Tablet,10 tablets,Antibiotic,Sanofi,France,true
-MED0496,Cefpodoxime,Cefpodoxime proxetil,Orelox,200 mg,Tablet,10 tablets,Antibiotic,Sanofi,France,true
-MED0497,Primaquine,Primaquine phosphate,Primaquine,7.5 mg,Tablet,14 tablets,Antimalarial,Various,Various,true
-MED0498,Primaquine,Primaquine phosphate,Primaquine,15 mg,Tablet,14 tablets,Antimalarial,Various,Various,true
-MED0499,Quinine,Quinine sulfate,Qualaquin,300 mg,Tablet,100 tablets,Antimalarial,Various,Various,true
-MED0500,Pyrantel pamoate,Pyrantel pamoate,Combantrin,250 mg,Tablet,3 tablets,Anthelmintic,Johnson & Johnson,United States,false
+MED0469,Atenolol,Atenolol,Tenormin,25 mg,Tablet,28 tablets,Antihypertensives,AstraZeneca,United Kingdom,true
+MED0470,Atenolol,Atenolol,Tenormin,50 mg,Tablet,28 tablets,Antihypertensives,AstraZeneca,United Kingdom,true
+MED0471,Atenolol,Atenolol,Tenormin,100 mg,Tablet,28 tablets,Antihypertensives,AstraZeneca,United Kingdom,true
+MED0472,Propranolol,Propranolol hydrochloride,Inderal,10 mg,Tablet,50 tablets,Antihypertensives,AstraZeneca,United Kingdom,true
+MED0473,Propranolol,Propranolol hydrochloride,Inderal,40 mg,Tablet,50 tablets,Antihypertensives,AstraZeneca,United Kingdom,true
+MED0474,Propranolol,Propranolol hydrochloride,Inderal,80 mg,Tablet,50 tablets,Antihypertensives,AstraZeneca,United Kingdom,true
+MED0475,Vitamin A,Retinyl palmitate,Vitamin A,"100,000 IU",Capsule,1 capsule,Vitamins and Supplements,Various,Various,false
+MED0476,Vitamin A,Retinyl palmitate,Vitamin A,"200,000 IU",Capsule,1 capsule,Vitamins and Supplements,Various,Various,false
+MED0477,Calcium carbonate,Calcium carbonate,Caltrate,500 mg,Chewable tablet,60 tablets,Vitamins and Supplements,Haleon,United Kingdom,false
+MED0478,Calcium carbonate,Calcium carbonate,Caltrate,600 mg,Tablet,60 tablets,Vitamins and Supplements,Haleon,United Kingdom,false
+MED0479,Magnesium hydroxide,Magnesium hydroxide,Milk of Magnesia,400 mg/5 mL,Oral suspension,200 mL bottle,Gastrointestinal,Bayer,Germany,false
+MED0480,Docusate sodium,Docusate sodium,Colace,100 mg,Capsule,30 capsules,Gastrointestinal,Perrigo,United States,false
+MED0481,Saccharomyces boulardii,Saccharomyces boulardii,Enterogermina,250 mg,Capsule,10 capsules,Gastrointestinal,Sanofi,France,false
+MED0482,Oral electrolyte solution,Glucose + electrolytes,ORS solution,Standard formulation,Oral solution,500 mL bottle,Gastrointestinal,Various,Various,false
+MED0483,Ethanol,Ethanol,Alcohol 70%,70%,Topical solution,500 mL bottle,Antiseptics and Disinfectants,Various,Various,false
+MED0484,Hydrogen peroxide,Hydrogen peroxide,Hydrogen Peroxide,3%,Topical solution,100 mL bottle,Antiseptics and Disinfectants,Various,Various,false
+MED0485,Sodium hypochlorite,Sodium hypochlorite,Dakin's Solution,0.5%,Topical solution,500 mL bottle,Antiseptics and Disinfectants,Various,Various,false
+MED0486,Clobetasol,Clobetasol propionate,Dermovate,0.05%,Cream,25 g tube,Dermatological,GSK,United Kingdom,true
+MED0487,Fluticasone furoate,Fluticasone furoate,Avamys,27.5 mcg/spray,Nasal spray,120 sprays,Respiratory,GSK,United Kingdom,true
+MED0488,Oxymetazoline,Oxymetazoline hydrochloride,Afrin,0.05%,Nasal spray,15 mL bottle,Respiratory,Bayer,Germany,false
+MED0489,Dextrose,Glucose,Dextrose 10%,10%,IV infusion,500 mL bag,IV Fluids and Electrolytes,Various,Various,true
+MED0490,Cefotaxime,Cefotaxime sodium,Claforan,500 mg,Powder for injection,1 vial,Antibiotics,Sanofi,France,true
+MED0491,Cefotaxime,Cefotaxime sodium,Claforan,1 g,Powder for injection,1 vial,Antibiotics,Sanofi,France,true
+MED0492,Cefotaxime,Cefotaxime sodium,Claforan,2 g,Powder for injection,1 vial,Antibiotics,Sanofi,France,true
+MED0493,Piperacillin + tazobactam,Piperacillin sodium + tazobactam sodium,Tazocin,2 g/0.25 g,Powder for injection,1 vial,Antibiotics,Pfizer,United States,true
+MED0494,Piperacillin + tazobactam,Piperacillin sodium + tazobactam sodium,Tazocin,4 g/0.5 g,Powder for injection,1 vial,Antibiotics,Pfizer,United States,true
+MED0495,Cefpodoxime,Cefpodoxime proxetil,Orelox,100 mg,Tablet,10 tablets,Antibiotics,Sanofi,France,true
+MED0496,Cefpodoxime,Cefpodoxime proxetil,Orelox,200 mg,Tablet,10 tablets,Antibiotics,Sanofi,France,true
+MED0497,Primaquine,Primaquine phosphate,Primaquine,7.5 mg,Tablet,14 tablets,Antimalarials,Various,Various,true
+MED0498,Primaquine,Primaquine phosphate,Primaquine,15 mg,Tablet,14 tablets,Antimalarials,Various,Various,true
+MED0499,Quinine,Quinine sulfate,Qualaquin,300 mg,Tablet,100 tablets,Antimalarials,Various,Various,true
+MED0500,Pyrantel pamoate,Pyrantel pamoate,Combantrin,250 mg,Tablet,3 tablets,Antivirals and Antiparasitics,Johnson & Johnson,United States,false

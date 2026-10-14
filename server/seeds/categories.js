@@ -13,6 +13,15 @@ const CATEGORIES = [
   ['Vitamins and Supplements', 'Vitamins, minerals and nutritional supplements'],
   ['Ophthalmic and Otic', 'Eye and ear preparations'],
   ['Medical Supplies', 'Consumables and devices sold over the counter'],
+  ['Antivirals and Antiparasitics', 'Antivirals, antiretrovirals, dewormers and antiprotozoals'],
+  ['Central Nervous System', 'Antidepressants, antipsychotics, antiepileptics and other CNS medicines'],
+  ['Hormones and Contraceptives', 'Contraceptives, hormone therapy, thyroid and corticosteroid medicines'],
+  ['Oncology and Immunology', 'Cancer medicines, biologics and immunosuppressants'],
+  ['Blood and Coagulation', 'Anticoagulants, antiplatelets, hemostatics and blood-cell stimulants'],
+  ['IV Fluids and Electrolytes', 'Infusion fluids, electrolytes and diluents'],
+  ['Emergency and Anesthetics', 'Emergency medicines and local anesthetics'],
+  ['Urology', 'Prostate, erectile dysfunction and other urology medicines'],
+  ['Antiseptics and Disinfectants', 'Skin and wound antiseptics and disinfectants'],
 ];
 
 const COSMETIC_CATEGORIES = [
