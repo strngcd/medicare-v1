@@ -18,6 +18,16 @@ export function SkeletonRows({ rows = 5, columns = 4 }) {
   );
 }
 
+/** Centered spinner for a page or panel that is still loading. */
+export function PageLoader({ label = 'Loading…' }) {
+  return (
+    <div className="page-loader" role="status">
+      <span className="spinner spinner-lg" aria-hidden="true" />
+      <span className="muted">{label}</span>
+    </div>
+  );
+}
+
 export function EmptyState({ icon: Icon = Inbox, title, message, action, learnHow }) {
   return (
     <div className="state">

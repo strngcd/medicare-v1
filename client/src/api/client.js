@@ -45,7 +45,30 @@ function buildUrl(path, params) {
   return url.pathname + url.search;
 }
 
-export async function request(method, path, { params, body, idempotencyKey, raw = false } = {}) {
+/* In-flight request tracking so the shell can show a global loading indicator. */
+let pending = 0;
+const activityListeners = new Set();
+function setPending(delta) {
+  pending = Math.max(0, pending + delta);
+  activityListeners.forEach((listener) => listener(pending));
+}
+/** Subscribes to the number of in-flight API requests; returns an unsubscribe function. */
+export function onActivity(listener) {
+  activityListeners.add(listener);
+  listener(pending);
+  return () => activityListeners.delete(listener);
+}
+
+export async function request(method, path, options = {}) {
+  setPending(1);
+  try {
+    return await send(method, path, options);
+  } finally {
+    setPending(-1);
+  }
+}
+
+async function send(method, path, { params, body, idempotencyKey, raw = false }) {
   const headers = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (!['GET', 'HEAD'].includes(method)) {
