@@ -9,6 +9,7 @@ import App from './App.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import { ThemeSync } from './context/ThemeContext.jsx';
+import { GlobalProgress } from './components/shell/GlobalProgress.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')).render(
       <ToastProvider>
         <AuthProvider>
           <ThemeSync />
+          <GlobalProgress />
           <App />
         </AuthProvider>
       </ToastProvider>

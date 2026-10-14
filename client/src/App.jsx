@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './layouts/AppLayout.jsx';
 import { RequireAuth, GuestOnly, RequirePermission, useHomePath } from './permissions/guards.jsx';
 import { useAuth } from './context/AuthContext.jsx';
-import { SkeletonRows } from './components/ui/index.js';
+import { PageLoader } from './components/ui/index.js';
 import LoginPage from './pages/auth/LoginPage.jsx';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage.jsx';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage.jsx';
@@ -30,7 +30,7 @@ export default function App() {
             key={route.path}
             path={route.path}
             element={(
-              <Suspense fallback={<SkeletonRows rows={6} />}>
+              <Suspense fallback={<PageLoader />}>
                 {route.home ? (
                   <Home route={route} />
                 ) : route.any ? (
