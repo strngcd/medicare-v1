@@ -332,6 +332,18 @@ describe('disposing of stock', () => {
     expect(rows[0].description).toMatch(/\(in date\)$/);
   });
 
+  test('can be recorded without counting as a loss', async () => {
+    const { inventory, batch } = await stockOf({ expiryDate: daysFromToday(400), quantity: 4 });
+    const res = await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({ notes: 'Returned to supplier for credit', recordAsLoss: false });
+    expect(res.status).toBe(201);
+    expect(res.body.data).toMatchObject({ quantityDisposed: 4, recordedAsLoss: false, lossValue: '0.00' });
+
+    const moves = await movementsFor(batch.id);
+    expect(moves[moves.length - 1]).toMatchObject({ movement_type: 'DISPOSED', quantity_change: -4, quantity_after: 0 });
+    const losses = await admin.get(`/api/v1/reports/losses?branchId=${branch.id}&range=TODAY`);
+    expect(losses.body.data.summary).toMatchObject({ entryCount: 0, totalLossValue: '0.00' });
+  });
+
   test('can archive in the same step and shows up in the loss and profit reports', async () => {
     const { inventory } = await stockOf({ expiryDate: daysFromToday(-1), quantity: 5 });
     await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({ archive: true });

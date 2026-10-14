@@ -367,12 +367,12 @@ async function createAdjustment(auth, actor, input, idempotencyKey) {
 /**
  * Writes off all remaining stock of a batch row: expired, expiring, or in
  * date with a reason (damaged, recalled...). The units leave inventory through a DISPOSED adjustment, valued at the batch's
- * purchase price and reported as a stock loss. Optionally archives the row.
+ * purchase price and, unless recordAsLoss is false, reported as a stock loss. Optionally archives the row.
  */
-async function disposeStock(auth, actor, id, { notes, archive }, idempotencyKey) {
+async function disposeStock(auth, actor, id, { notes, archive, recordAsLoss = true }, idempotencyKey) {
   const { today, warningDays } = await statusContext();
   const result = await runIdempotent(
-    { userId: auth.userId, scope: `inventory.dispose:${id}`, key: idempotencyKey, payload: { notes, archive } },
+    { userId: auth.userId, scope: `inventory.dispose:${id}`, key: idempotencyKey, payload: { notes, archive, recordAsLoss } },
     async (client) => {
       const row = await ledger.lockInventoryById(client, id);
       if (!row) throw AppError.notFound('Inventory record not found.');
@@ -415,8 +415,9 @@ async function disposeStock(auth, actor, id, { notes, archive }, idempotencyKey)
         movementType: 'DISPOSED',
         referenceType: 'INVENTORY_ADJUSTMENT',
         referenceId: adjustment.id,
-        reason: notes ? `${label}: ${notes}` : label,
+        reason: `${notes ? `${label}: ${notes}` : label}${recordAsLoss ? '' : ' (not recorded as a loss)'}`,
         userId: auth.userId,
+        countsAsLoss: recordAsLoss,
       });
       if (archive) await repo.setArchived(client, row.id, auth.userId);
       await recordAudit(client, actor, {
@@ -424,11 +425,11 @@ async function disposeStock(auth, actor, id, { notes, archive }, idempotencyKey)
         entityType: 'INVENTORY_ADJUSTMENT',
         entityId: adjustment.id,
         branchId: row.branch_id,
-        description: `${adjustmentNumber}: ${quantity} units of ${row.medicine_name} batch ${row.batch_number} disposed (${condition})`,
+        description: `${adjustmentNumber}: ${quantity} units of ${row.medicine_name} batch ${row.batch_number} disposed (${condition}${recordAsLoss ? '' : ', not recorded as a loss'})`,
         previousValues: { quantity },
-        newValues: { quantity: 0, expiryDate: row.expiry_date, lossValue, archived: Boolean(archive), notes: notes ?? null },
+        newValues: { quantity: 0, expiryDate: row.expiry_date, lossValue: recordAsLoss ? lossValue : '0.00', recordedAsLoss: recordAsLoss, archived: Boolean(archive), notes: notes ?? null },
       });
-      return { id: adjustment.id, adjustmentNumber, inventoryId: row.id, quantityDisposed: quantity, lossValue };
+      return { id: adjustment.id, adjustmentNumber, inventoryId: row.id, quantityDisposed: quantity, recordedAsLoss: recordAsLoss, lossValue: recordAsLoss ? lossValue : '0.00' };
     },
   );
   return { ...result, body: filterFinancialFields(result.body, auth) };

@@ -27,7 +27,7 @@ const PERMISSION_DEFINITIONS = [
   ['INVENTORY_ADD_STOCK', 'INVENTORY', 'Add stock outside of purchasing'],
   ['INVENTORY_ADJUST', 'INVENTORY', 'Adjust inventory quantities, minimum stock and selling prices'],
   ['INVENTORY_VIEW_MOVEMENTS', 'INVENTORY', 'View the stock movement ledger'],
-  ['INVENTORY_DISPOSE', 'INVENTORY', 'Dispose of expired and expiring stock (recorded as a loss)'],
+  ['INVENTORY_DISPOSE', 'INVENTORY', 'Dispose of stock (optionally recorded as a loss)'],
   ['INVENTORY_BATCH_ARCHIVE', 'INVENTORY', 'Archive empty batches'],
   ['INVENTORY_BATCH_RESTORE', 'INVENTORY', 'Restore archived batches'],
   ['SALES_OVERRIDE_FEFO', 'INVENTORY', 'Override FEFO batch allocation during a sale'],

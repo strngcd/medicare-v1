@@ -167,7 +167,7 @@ meaning no expiry: never expiring, sold after dated stock). Medicines always nee
 | POST | `/inventory/adjustments/preview` | INVENTORY_ADJUST | `{ inventoryId, reason, quantityChange, notes? }` |
 | POST | `/inventory/adjustments` | INVENTORY_ADJUST | Same body + optional `expectedQuantityBefore` (`STOCK_CHANGED` if stale). STK number. |
 | PATCH | `/inventory/:id/minimum-stock` · `/selling-price` | INVENTORY_ADJUST | Audited. |
-| POST | `/inventory/:id/dispose` | INVENTORY_DISPOSE | `{ notes?, archive? }`. Writes off all remaining units as a loss (STK number). Expired or expiring batches need no reason; in-date batches require `notes`. Idempotent. |
+| POST | `/inventory/:id/dispose` | INVENTORY_DISPOSE | `{ notes?, archive?, recordAsLoss? }`. Removes all remaining units (STK number); counted as a loss unless `recordAsLoss: false`. Expired or expiring batches need no reason; in-date batches require `notes`. Idempotent. |
 | POST | `/inventory/fefo-preview` | SALES_CREATE or INVENTORY_VIEW | Non-binding allocation preview. |
 | GET | `/inventory/movements[/:id]` | INVENTORY_VIEW_MOVEMENTS | Immutable ledger; filters `batchId, medicineId, movementType, referenceType, referenceId, dateFrom, dateTo`. |
 | GET | `/batches[/:id]` | INVENTORY_VIEW_BATCHES | |

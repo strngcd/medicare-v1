@@ -364,7 +364,9 @@ const LOSS_MOVEMENT_TYPES = ['EXPIRED', 'DAMAGED', 'LOST', 'DISPOSED'];
 
 function lossFilter({ timezone, dateFrom, dateTo, branchIds, movementType }) {
   const params = [timezone, dateFrom, dateTo, branchIds || null, movementType ? [movementType] : LOSS_MOVEMENT_TYPES];
+  // Disposals recorded "not as a loss" leave the ledger but not these figures.
   const where = `sm.quantity_change < 0
+      AND sm.counts_as_loss
       AND sm.movement_type = ANY($5::text[])
       AND (sm.created_at AT TIME ZONE $1)::date BETWEEN $2::date AND $3::date
       AND ($4::uuid[] IS NULL OR sm.branch_id = ANY($4::uuid[]))`;
