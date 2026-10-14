@@ -35,7 +35,7 @@ module.exports = {
   },
   async dispose(req, res) {
     const result = await service.disposeStock(req.auth, actorFromRequest(req), req.valid.params.id, req.valid.body, readIdempotencyKey(req));
-    sendIdempotent(res, result, 'Stock disposed and recorded as a loss.');
+    sendIdempotent(res, result, result.body.recordedAsLoss ? 'Stock disposed and recorded as a loss.' : 'Stock disposed (not recorded as a loss).');
   },
   async archive(req, res) {
     sendData(res, await service.setInventoryArchived(req.auth, actorFromRequest(req), req.valid.params.id, true), { message: 'Batch archived.' });

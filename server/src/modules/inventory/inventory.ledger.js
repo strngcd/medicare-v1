@@ -68,7 +68,7 @@ async function ensureInventoryRow(client, { branchId, batchId, sellingPrice, min
  */
 async function applyMovement(
   client,
-  { branchId, batchId, change, movementType, referenceType, referenceId, reason = null, userId },
+  { branchId, batchId, change, movementType, referenceType, referenceId, reason = null, userId, countsAsLoss = true },
 ) {
   if (!Number.isInteger(change) || change === 0) {
     throw new Error(`Invalid stock movement quantity: ${change}`);
@@ -104,9 +104,9 @@ async function applyMovement(
   );
   const { rows } = await query(
     `INSERT INTO stock_movements (branch_id, batch_id, movement_type, quantity_change, quantity_before,
-       quantity_after, reference_type, reference_id, reason, created_by)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
-    [branchId, batchId, movementType, change, quantityBefore, quantityAfter, referenceType, referenceId, reason, userId],
+       quantity_after, reference_type, reference_id, reason, created_by, counts_as_loss)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+    [branchId, batchId, movementType, change, quantityBefore, quantityAfter, referenceType, referenceId, reason, userId, countsAsLoss],
     client,
   );
   return { quantityBefore, quantityAfter, movementId: rows[0].id, inventoryId: row.id };
