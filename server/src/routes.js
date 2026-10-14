@@ -13,6 +13,7 @@ router.get('/health', (req, res) => {
 
 // Public: the sign-in page shows the pharmacy name and logo (nothing else).
 router.get('/branding', require('./modules/settings/settings.controller').branding);
+router.get('/branding/logo', require('./modules/settings/settings.controller').logo);
 
 router.use('/auth', require('./modules/auth/auth.routes'));
 router.use('/users', require('./modules/users/users.routes'));

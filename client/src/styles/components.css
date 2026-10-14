@@ -594,3 +594,20 @@
 .audit-sublist > div { display: flex; gap: 8px; }
 .audit-sublist dt { color: var(--text-subtle); }
 .audit-sublist dd { margin: 0; }
+
+/* ------------------------------------------------------------- File input */
+.file-input { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.file-input-name { overflow-wrap: anywhere; }
+.logo-preview {
+  width: 96px;
+  height: 96px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+.logo-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.logo-preview svg { width: 28px; height: 28px; color: var(--text-subtle); }

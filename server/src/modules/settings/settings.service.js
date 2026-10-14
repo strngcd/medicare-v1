@@ -6,6 +6,8 @@ const { camelize } = require('../../utils/camelize');
 const { businessToday } = require('../../utils/time');
 const { PREFIXES } = require('../documents/documentNumbers');
 const { version } = require('../../../package.json');
+const AppError = require('../../errors/AppError');
+const files = require('../files/files');
 const repo = require('./settings.repository');
 
 const TAX_FIELDS = ['taxEnabled', 'taxName', 'taxRate', 'taxMode'];
@@ -51,6 +53,32 @@ async function updateSettings(auth, actor, changes) {
   });
 }
 
+/** Replaces (file) or removes (null) the pharmacy logo. */
+async function setLogo(auth, actor, file) {
+  return withTransaction(async (client) => {
+    const before = await repo.get(client, { forUpdate: true });
+    if (!file && !before.logo_file_id) return toDto(before);
+    const stored = file ? await files.insertFile(client, file, auth.userId) : null;
+    await repo.setLogo(client, stored ? stored.id : null, auth.userId);
+    await recordAudit(client, actor, {
+      action: 'SETTINGS_UPDATED',
+      entityType: 'SYSTEM_SETTINGS',
+      description: stored ? `Pharmacy logo uploaded (${stored.file_name})` : 'Pharmacy logo removed',
+      previousValues: { logoFileId: before.logo_file_id },
+      newValues: { logoFileId: stored ? stored.id : null },
+    });
+    return toDto(await repo.get(client));
+  });
+}
+
+/** The current logo file, for the public branding endpoint. */
+async function getLogo() {
+  const settings = await repo.get();
+  const file = settings.logo_file_id ? await files.findFile(settings.logo_file_id) : null;
+  if (!file) throw AppError.notFound('No logo has been uploaded.');
+  return file;
+}
+
 /** Non-sensitive system facts only (no infrastructure details or secrets). */
 async function getSystemInfo() {
   const info = await repo.systemInfo();
@@ -77,4 +105,4 @@ async function getBranding() {
   return { pharmacyName: settings.pharmacy_name, logoUrl: settings.logo_url };
 }
 
-module.exports = { getSettings, updateSettings, getSystemInfo, getBranding };
+module.exports = { getSettings, updateSettings, setLogo, getLogo, getSystemInfo, getBranding };

@@ -8,7 +8,7 @@ import { useListState } from '../../hooks/useListState.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
-import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput, Modal, TextInput, Checkbox, InlineAlert, FilterToolbar } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, Button, StatusBadge, EmptyState, SelectInput, Modal, TextInput, Checkbox, InlineAlert, FilterToolbar, FileInput } from '../../components/ui/index.js';
 import { formatDateTime } from '../../utils/format.js';
 
 const ROLES = [
@@ -45,6 +45,10 @@ function CreateStaffModal({ onClose, onCreated }) {
   const roles = assignableRoles(user);
   const [form, setForm] = useState({ fullName: '', email: '', phone: '', employeeId: '', jobTitle: '', hireDate: '', roleCode: roles[roles.length - 1].value, branchIds: [] });
   const [created, setCreated] = useState(null);
+  const [cv, setCv] = useState(null);
+  const [cvError, setCvError] = useState(null);
+  const [cvUploadError, setCvUploadError] = useState(null);
+  const [uploadingCv, setUploadingCv] = useState(false);
   const action = useAction();
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
@@ -52,22 +56,36 @@ function CreateStaffModal({ onClose, onCreated }) {
     const payload = { ...form, branchIds: form.roleCode === 'OWNER' ? [] : form.branchIds };
     for (const key of ['phone', 'employeeId', 'jobTitle', 'hireDate']) if (!payload[key]) payload[key] = null;
     const result = await action.run(() => api.post('/users', payload), { success: 'Staff account created.' });
-    if (result) setCreated(result.data);
+    if (!result) return;
+    if (cv) {
+      // The account exists either way; a failed CV upload can be retried from the profile.
+      setUploadingCv(true);
+      try {
+        result.data.user = (await api.upload(`/users/${result.data.user.id}/cv`, cv)).data;
+      } catch (err) {
+        setCvUploadError(err.message);
+      } finally {
+        setUploadingCv(false);
+      }
+    }
+    setCreated(result.data);
   };
+  const busy = action.running || uploadingCv;
 
   if (created) {
     return (
       <Modal open title="Staff account created" onClose={() => onCreated(created.user)}
         footer={<Button onClick={() => onCreated(created.user)}>Open staff profile</Button>}>
         <p><strong>{created.user.fullName}</strong> ({created.user.role.name}) can now set their own password.</p>
+        {cvUploadError && <InlineAlert tone="warning">The CV could not be uploaded ({cvUploadError}). You can upload it from the staff profile.</InlineAlert>}
         <SetupLinkNotice link={created.setupLink} />
       </Modal>
     );
   }
 
   return (
-    <Modal open size="lg" title="New staff member" onClose={onClose} closeDisabled={action.running}
-      footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button onClick={save} loading={action.running}>Create account</Button></>}>
+    <Modal open size="lg" title="New staff member" onClose={onClose} closeDisabled={busy}
+      footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button><Button onClick={save} loading={busy}>Create account</Button></>}>
       <div className="form-grid">
         <TextInput label="Full name" required value={form.fullName} onChange={set('fullName')} error={action.fieldErrors.fullName} />
         <TextInput label="Email" type="email" required value={form.email} onChange={set('email')} error={action.fieldErrors.email || (action.error && action.error.code === 'DUPLICATE_EMAIL' ? action.error.message : undefined)} />
@@ -76,6 +94,9 @@ function CreateStaffModal({ onClose, onCreated }) {
         <TextInput label="Job title" value={form.jobTitle} onChange={set('jobTitle')} />
         <TextInput label="Hire date" type="date" value={form.hireDate} onChange={set('hireDate')} />
         <SelectInput label="Role" required value={form.roleCode} options={roles} onChange={set('roleCode')} />
+        <FileInput label="CV (optional)" accept="application/pdf" typeLabel="PDF file" maxBytes={5 * 1024 * 1024} hint="PDF, up to 5 MB."
+          value={cv} error={cvError} buttonLabel={cv ? 'Change file' : 'Choose PDF'} disabled={busy}
+          onChange={(file, message) => { setCv(file); setCvError(message); }} />
       </div>
       {form.roleCode !== 'OWNER' ? (
         <div className="stack-sm">

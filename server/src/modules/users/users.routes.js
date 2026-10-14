@@ -1,7 +1,8 @@
 const express = require('express');
 const authenticate = require('../../middleware/authenticate');
 const validate = require('../../middleware/validate');
-const { requirePermission } = require('../../middleware/authorize');
+const { requirePermission, requireAnyPermission } = require('../../middleware/authorize');
+const { rawUpload } = require('../files/files');
 const { PERMISSIONS: P } = require('../../permissions/catalog');
 const { idParam } = require('../../validators/common');
 const controller = require('./users.controller');
@@ -20,6 +21,15 @@ router.get('/', requirePermission(P.STAFF_VIEW), validate({ query: v.listUsersQu
 router.post('/', requirePermission(P.STAFF_CREATE), validate({ body: v.createUserBody }), controller.create);
 router.get('/:id', requirePermission(P.STAFF_VIEW), validate({ params: idParam }), controller.get);
 router.patch('/:id', requirePermission(P.STAFF_EDIT), validate({ params: idParam, body: v.updateUserBody }), controller.update);
+router.get('/:id/cv', requirePermission(P.STAFF_VIEW), validate({ params: idParam }), controller.downloadCv);
+router.put(
+  '/:id/cv',
+  requireAnyPermission(P.STAFF_CREATE, P.STAFF_EDIT),
+  validate({ params: idParam }),
+  rawUpload('STAFF_CV'),
+  controller.uploadCv,
+);
+router.delete('/:id/cv', requireAnyPermission(P.STAFF_CREATE, P.STAFF_EDIT), validate({ params: idParam }), controller.removeCv);
 router.post('/:id/setup-link', requirePermission(P.STAFF_CREATE), validate({ params: idParam }), controller.resendSetupLink);
 router.patch(
   '/:id/role',

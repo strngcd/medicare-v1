@@ -1,8 +1,19 @@
 const service = require('./users.service');
 const { actorFromRequest } = require('../audit/audit.recorder');
 const { sendData, sendCreated, sendPage } = require('../../utils/response');
+const files = require('../files/files');
 
 module.exports = {
+  async uploadCv(req, res) {
+    const file = files.readUpload(req, 'STAFF_CV');
+    sendData(res, await service.setCv(req.auth, actorFromRequest(req), req.valid.params.id, file), { message: 'CV uploaded.' });
+  },
+  async removeCv(req, res) {
+    sendData(res, await service.setCv(req.auth, actorFromRequest(req), req.valid.params.id, null), { message: 'CV removed.' });
+  },
+  async downloadCv(req, res) {
+    files.sendFile(res, await service.getCv(req.auth, req.valid.params.id), { download: req.query.download === '1' });
+  },
   async list(req, res) {
     sendPage(res, await service.listUsers(req.auth, req.valid.query));
   },

@@ -1,18 +1,61 @@
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { UserX, UserCheck, Link2 } from 'lucide-react';
+import { UserX, UserCheck, Link2, FileText, Download, Trash2 } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useAction } from '../../hooks/useAction.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import {
   PageHeader, Panel, Button, StatusBadge, Details, Tabs, DataTable, ErrorState, SkeletonRows, EmptyState, Pagination,
-  TextInput, Checkbox, InlineAlert, ConfirmDialog, Badge, LearnHow,
+  TextInput, Checkbox, InlineAlert, ConfirmDialog, Badge, LearnHow, FileInput, formatFileSize,
 } from '../../components/ui/index.js';
 import { assignableRoles, SetupLinkNotice } from './StaffPage.jsx';
 import { formatDate, formatDateTime, humanize } from '../../utils/format.js';
 
-function ProfileTab({ staff, editable, onSaved }) {
+const CV_MAX_BYTES = 5 * 1024 * 1024;
+
+/** The staff member's CV (PDF): view, download, replace or remove. */
+function CvSection({ staff, editable, onSaved }) {
+  const [error, setError] = useState(null);
+  const upload = useAction();
+  const remove = useAction();
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const cvUrl = `/api/v1/users/${staff.id}/cv`;
+  const choose = async (file, message) => {
+    setError(message);
+    if (file && await upload.run(() => api.upload(`/users/${staff.id}/cv`, file), { success: 'CV uploaded.' })) onSaved();
+  };
+  const removeCv = async () => {
+    const result = await remove.run(() => api.delete(`/users/${staff.id}/cv`), { success: 'CV removed.' });
+    setConfirmRemove(false);
+    if (result) onSaved();
+  };
+  return (
+    <div className="stack-sm">
+      <span className="field-label">CV</span>
+      {staff.cv ? (
+        <div className="row-wrap">
+          <FileText aria-hidden="true" className="muted" />
+          <span className="cell-strong" style={{ overflowWrap: 'anywhere' }}>{staff.cv.fileName}</span>
+          <span className="small muted">{formatFileSize(staff.cv.sizeBytes)} · uploaded {formatDate(staff.cv.uploadedAt)}</span>
+          <a className="btn btn-secondary btn-sm" href={cvUrl} target="_blank" rel="noopener noreferrer">View</a>
+          <a className="btn btn-ghost btn-sm" href={`${cvUrl}?download=1`}><Download aria-hidden="true" /> Download</a>
+          {editable && <Button variant="ghost" size="sm" icon={Trash2} onClick={() => setConfirmRemove(true)}>Remove</Button>}
+        </div>
+      ) : <span className="muted small">No CV uploaded.</span>}
+      {editable && (
+        <FileInput accept="application/pdf" typeLabel="PDF file" maxBytes={CV_MAX_BYTES} hint="PDF, up to 5 MB."
+          buttonLabel={upload.running ? 'Uploading…' : staff.cv ? 'Replace CV' : 'Upload CV'}
+          error={error || (upload.error && upload.error.message)} disabled={upload.running} onChange={choose} />
+      )}
+      <ConfirmDialog open={confirmRemove} title="Remove CV" tone="danger" confirmLabel="Remove" loading={remove.running}
+        message={`The CV will no longer be attached to ${staff.fullName}'s profile.`}
+        onConfirm={removeCv} onClose={() => setConfirmRemove(false)} />
+    </div>
+  );
+}
+
+function ProfileTab({ staff, editable, cvEditable, onSaved }) {
   const [form, setForm] = useState({
     fullName: staff.fullName, email: staff.email, phone: staff.phone || '', employeeId: staff.employeeId || '', jobTitle: staff.jobTitle || '', hireDate: staff.hireDate || '',
   });
@@ -34,6 +77,7 @@ function ProfileTab({ staff, editable, onSaved }) {
           { label: 'Hire date', value: formatDate(staff.hireDate) },
           { label: 'Last sign-in', value: formatDateTime(staff.lastLoginAt) },
         ]} />
+        <div style={{ marginTop: 16 }}><CvSection staff={staff} editable={cvEditable} onSaved={onSaved} /></div>
       </div>
     );
   }
@@ -49,6 +93,7 @@ function ProfileTab({ staff, editable, onSaved }) {
         <TextInput label="Hire date" type="date" value={form.hireDate} onChange={set('hireDate')} />
       </div>
       <div className="form-actions"><Button onClick={save} loading={action.running}>Save profile</Button></div>
+      <CvSection staff={staff} editable={cvEditable} onSaved={onSaved} />
     </div>
   );
 }
@@ -237,7 +282,7 @@ export default function StaffDetailPage() {
       {setupLink && <SetupLinkNotice link={setupLink} />}
       <Panel flush>
         <Tabs tabs={tabs} active={tab} onChange={setTab} />
-        {tab === 'profile' && <ProfileTab staff={s} editable={manageable && can('STAFF_EDIT')} onSaved={refresh} />}
+        {tab === 'profile' && <ProfileTab staff={s} editable={manageable && can('STAFF_EDIT')} cvEditable={(self || outranks) && (can('STAFF_EDIT') || can('STAFF_CREATE'))} onSaved={refresh} />}
         {tab === 'access' && <RoleAndBranchesTab key={s.updatedAt} staff={s} canRole={manageable && can('STAFF_CHANGE_ROLE')} canBranches={manageable && can('STAFF_MANAGE_BRANCHES')} onSaved={refresh} />}
         {tab === 'permissions' && <PermissionsTab staffId={s.id} />}
         {tab === 'activity' && <ActivityTab staffId={s.id} />}

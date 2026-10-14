@@ -6,7 +6,9 @@ const USER_COLUMNS = `
   u.id, u.full_name, u.email, u.phone, u.status, u.employee_id, u.job_title, u.hire_date,
   u.last_login_at, u.last_selected_branch_id, u.deactivated_at, u.deactivated_by,
   u.created_at, u.updated_at, (u.password_hash IS NOT NULL) AS has_password,
-  r.code AS role_code, r.name AS role_name, r.rank AS role_rank`;
+  r.code AS role_code, r.name AS role_name, r.rank AS role_rank,
+  (SELECT json_build_object('id', f.id, 'fileName', f.file_name, 'sizeBytes', f.size_bytes, 'uploadedAt', f.created_at)
+     FROM stored_files f WHERE f.id = u.cv_file_id) AS cv`;
 
 const BRANCHES_JSON = `
   COALESCE((SELECT json_agg(json_build_object('id', b.id, 'name', b.name, 'code', b.code, 'status', b.status)
@@ -252,7 +254,18 @@ async function listActivity(userId, { limit, offset }) {
   return { rows, total: rows.length ? rows[0].total_count : 0 };
 }
 
+async function setCv(client, id, fileId) {
+  await query('UPDATE users SET cv_file_id = $2 WHERE id = $1', [id, fileId], client);
+}
+
+async function findCvFileId(id, client) {
+  const { rows } = await query('SELECT cv_file_id FROM users WHERE id = $1', [id], client);
+  return rows[0] ? rows[0].cv_file_id : null;
+}
+
 module.exports = {
+  setCv,
+  findCvFileId,
   list,
   findById,
   findRoleByCode,

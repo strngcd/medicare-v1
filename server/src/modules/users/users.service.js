@@ -11,6 +11,7 @@ const { describePermissions } = require('../../permissions/effectivePermissions'
 const { canAccessBranch, assertBranchAccess } = require('../../permissions/branchAccess');
 const { ROLES } = require('../../permissions/catalog');
 const { issuePasswordToken } = require('../auth/auth.service');
+const files = require('../files/files');
 const repo = require('./users.repository');
 
 const SORTABLE = {
@@ -528,7 +529,44 @@ async function updatePreferences(auth, changes) {
   });
 }
 
+// ---------------------------------------------------------------------------
+// CV (PDF stored in the database)
+// ---------------------------------------------------------------------------
+
+/** Uploads (file) or removes (null) a staff member's CV. */
+async function setCv(auth, actor, id, file) {
+  return withTransaction(async (client) => {
+    const target = await loadVisibleUser(auth, id, client, { forUpdate: true });
+    // Attaching a document grants nothing, so staff managers may keep their own CV too.
+    if (target.id !== auth.userId) assertCanManage(auth, target);
+    const previousFileId = await repo.findCvFileId(id, client);
+    if (!file && !previousFileId) return toDto(target);
+
+    const stored = file ? await files.insertFile(client, file, auth.userId) : null;
+    await repo.setCv(client, id, stored ? stored.id : null);
+    await recordAudit(client, actor, {
+      action: 'USER_UPDATED',
+      entityType: 'USER',
+      entityId: id,
+      description: stored ? `CV uploaded for ${target.full_name} (${stored.file_name})` : `CV removed for ${target.full_name}`,
+      previousValues: { cvFileId: previousFileId },
+      newValues: { cvFileId: stored ? stored.id : null },
+    });
+    return toDto(await repo.findById(id, client));
+  });
+}
+
+async function getCv(auth, id) {
+  await loadVisibleUser(auth, id);
+  const fileId = await repo.findCvFileId(id);
+  const file = fileId ? await files.findFile(fileId) : null;
+  if (!file) throw AppError.notFound('No CV has been uploaded for this staff member.');
+  return file;
+}
+
 module.exports = {
+  setCv,
+  getCv,
   listUsers,
   getUser,
   getUserPermissions,

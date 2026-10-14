@@ -1,13 +1,13 @@
 const { query } = require('../../database/db');
 const { NUMBER_COLUMNS } = require('../documents/documentNumbers');
+const { logoUrlSql } = require('../files/files');
 
 const COLUMNS = `
-  pharmacy_name, logo_url, phone, email, address, city, country, website, currency_code,
+  pharmacy_name, ${logoUrlSql('system_settings')} AS logo_url, logo_file_id, phone, email, address, city, country, website, currency_code,
   expiry_warning_days, default_markup_percent, tax_enabled, tax_name, tax_rate, tax_mode, updated_by, updated_at`;
 
 const FIELD_COLUMNS = {
   pharmacyName: 'pharmacy_name',
-  logoUrl: 'logo_url',
   phone: 'phone',
   email: 'email',
   address: 'address',
@@ -40,6 +40,10 @@ async function update(client, changes, userId) {
   await query(`UPDATE system_settings SET ${sets.join(', ')} WHERE id = 1`, params, client);
 }
 
+async function setLogo(client, fileId, userId) {
+  await query('UPDATE system_settings SET logo_file_id = $1, updated_by = $2 WHERE id = 1', [fileId, userId], client);
+}
+
 async function systemInfo() {
   const latest = Object.entries(NUMBER_COLUMNS).map(([type, [table, column]]) =>
     `(SELECT '${type}' AS document_type, ${column} AS number, created_at FROM ${table} ORDER BY created_at DESC LIMIT 1)`);
@@ -66,4 +70,4 @@ async function listAdministrators(client, excludeUserId) {
   return rows.map((r) => r.id);
 }
 
-module.exports = { get, update, systemInfo, listAdministrators };
+module.exports = { get, update, setLogo, systemInfo, listAdministrators };
