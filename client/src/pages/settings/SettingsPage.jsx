@@ -5,8 +5,9 @@ import { useApi } from '../../hooks/useApi.js';
 import { useAction } from '../../hooks/useAction.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import {
-  PageHeader, Panel, Button, TextInput, SelectInput, TextArea, Checkbox, InlineAlert, Details, ErrorState, SkeletonRows, Tabs, DataTable, LearnHow,
+  PageHeader, Panel, Button, TextInput, SelectInput, TextArea, Checkbox, InlineAlert, Details, ErrorState, SkeletonRows, Tabs, DataTable, LearnHow, FileInput,
 } from '../../components/ui/index.js';
+import { ImageIcon, Trash2 } from 'lucide-react';
 import { PreferencesForm } from '../profile/ProfilePage.jsx';
 import { Receipt } from '../../components/sales/Receipt.jsx';
 import { formatDateTime, humanize } from '../../utils/format.js';
@@ -43,6 +44,55 @@ function GlobalSection({ settings, fields, onSaved, children }) {
       {children({ form, setForm, errors: action.fieldErrors, editable })}
       {!editable && <InlineAlert tone="info">You can view these settings. Changing them requires the Settings edit permission.</InlineAlert>}
       {editable && <div className="form-actions"><Button onClick={save} loading={action.running}>Save</Button></div>}
+    </div>
+  );
+}
+
+const LOGO_TYPES = 'image/png,image/jpeg,image/webp';
+
+/** Uploads the pharmacy logo as soon as a valid image is chosen. */
+function LogoSection({ settings, onSaved }) {
+  const { can, refresh } = useAuth();
+  const editable = can('SETTINGS_EDIT');
+  const [error, setError] = useState(null);
+  const upload = useAction();
+  const remove = useAction();
+  const done = (result) => {
+    if (!result) return;
+    onSaved(result.data);
+    refresh();
+  };
+  const choose = async (file, message) => {
+    setError(message);
+    if (file) done(await upload.run(() => api.upload('/settings/logo', file), { success: 'Logo uploaded.' }));
+  };
+  return (
+    <div className="row" style={{ alignItems: 'flex-start', gap: 16 }}>
+      <div className="logo-preview">
+        {settings.logoUrl ? <img src={settings.logoUrl} alt="Pharmacy logo" /> : <ImageIcon aria-hidden="true" />}
+      </div>
+      <div className="stack-sm" style={{ minWidth: 0 }}>
+        <FileInput
+          label="Logo"
+          accept={LOGO_TYPES}
+          typeLabel="PNG, JPG or WebP image"
+          showName={false}
+          maxBytes={2 * 1024 * 1024}
+          hint="PNG, JPG or WebP, up to 2 MB. Shown on the sign-in page and receipts."
+          error={error || (upload.error && upload.error.message)}
+          buttonLabel={upload.running ? 'Uploading…' : settings.logoUrl ? 'Replace logo' : 'Upload logo'}
+          disabled={!editable || upload.running || remove.running}
+          onChange={choose}
+        />
+        {editable && settings.logoUrl && (
+          <div>
+            <Button variant="ghost" size="sm" icon={Trash2} loading={remove.running}
+              onClick={async () => done(await remove.run(() => api.delete('/settings/logo'), { success: 'Logo removed.' }))}>
+              Remove logo
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -135,15 +185,18 @@ export default function SettingsPage() {
   else if (needsGlobal && !s) body = <SkeletonRows rows={5} />;
   else if (section === 'pharmacy') {
     body = (
-      <GlobalSection settings={s} fields={['pharmacyName', 'logoUrl', 'phone', 'email', 'address', 'city', 'country', 'website', 'currencyCode']} onSaved={settings.setData}>
-        {({ form, setForm, errors, editable }) => (
-          <div className="form-grid">
-            {[['pharmacyName', 'Pharmacy name'], ['logoUrl', 'Logo URL'], ['phone', 'Phone'], ['email', 'Email'], ['address', 'Address'], ['city', 'City'], ['country', 'Country'], ['website', 'Website'], ['currencyCode', 'Currency (ISO code)']].map(([k, label]) => (
-              <TextInput key={k} label={label} disabled={!editable} value={form[k] || ''} onChange={(e) => setForm({ ...form, [k]: e.target.value })} error={errors[k]} />
-            ))}
-          </div>
-        )}
-      </GlobalSection>
+      <div className="stack">
+        <LogoSection settings={s} onSaved={settings.setData} />
+        <GlobalSection settings={s} fields={['pharmacyName', 'phone', 'email', 'address', 'city', 'country', 'website', 'currencyCode']} onSaved={settings.setData}>
+          {({ form, setForm, errors, editable }) => (
+            <div className="form-grid">
+              {[['pharmacyName', 'Pharmacy name'], ['phone', 'Phone'], ['email', 'Email'], ['address', 'Address'], ['city', 'City'], ['country', 'Country'], ['website', 'Website'], ['currencyCode', 'Currency (ISO code)']].map(([k, label]) => (
+                <TextInput key={k} label={label} disabled={!editable} value={form[k] || ''} onChange={(e) => setForm({ ...form, [k]: e.target.value })} error={errors[k]} />
+              ))}
+            </div>
+          )}
+        </GlobalSection>
+      </div>
     );
   } else if (section === 'tax') {
     body = (

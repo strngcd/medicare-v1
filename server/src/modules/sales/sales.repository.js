@@ -1,4 +1,5 @@
 const { query } = require('../../database/db');
+const { logoUrlSql } = require('../files/files');
 const { whereBuilder } = require('../../utils/pagination');
 
 const SALE_COLUMNS = `
@@ -203,7 +204,7 @@ async function countRefunds(client, saleId) {
 
 async function receiptContext(branchId) {
   const { rows } = await query(
-    `SELECT ss.pharmacy_name, ss.logo_url, ss.phone AS pharmacy_phone, ss.email AS pharmacy_email,
+    `SELECT ss.pharmacy_name, ${logoUrlSql('ss')} AS logo_url, ss.phone AS pharmacy_phone, ss.email AS pharmacy_email,
             ss.address AS pharmacy_address, ss.city AS pharmacy_city, ss.country AS pharmacy_country,
             ss.website, ss.currency_code,
             br.name AS branch_name, br.code AS branch_code, br.address AS branch_address,

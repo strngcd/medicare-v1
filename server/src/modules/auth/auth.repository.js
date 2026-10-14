@@ -1,4 +1,5 @@
 const { query } = require('../../database/db');
+const { logoUrlSql } = require('../files/files');
 
 async function findUserForLogin(email, client) {
   const { rows } = await query(
@@ -148,7 +149,7 @@ async function updatePasswordHash(client, userId, passwordHash) {
 /** Operational settings every signed-in user needs (POS totals, branding). */
 async function findPublicSettings(client) {
   const { rows } = await query(
-    `SELECT pharmacy_name, logo_url, currency_code, expiry_warning_days, default_markup_percent, tax_enabled, tax_name, tax_rate, tax_mode
+    `SELECT pharmacy_name, ${logoUrlSql('system_settings')} AS logo_url, currency_code, expiry_warning_days, default_markup_percent, tax_enabled, tax_name, tax_rate, tax_mode
        FROM system_settings WHERE id = 1`,
     [],
     client,

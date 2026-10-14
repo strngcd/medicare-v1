@@ -46,7 +46,11 @@ Validation errors (`422`) list field messages in `error.details.fields`
 - `medicar_csrf` — readable token; send it back as `X-CSRF-Token` on every
   `POST`/`PUT`/`PATCH`/`DELETE`
 
-State-changing requests must use `Content-Type: application/json`.
+State-changing requests must use `Content-Type: application/json`, except file
+uploads: those `PUT` the raw file as the body with its own type (`image/png`,
+`image/jpeg`, `image/webp` or `application/pdf`) and the file name, URL-encoded,
+in `X-File-Name`. The server checks the file's real type from its bytes. Files
+are stored in the database and are never modified; a replacement is a new file.
 
 ### Branch scope
 
@@ -105,6 +109,8 @@ Permission codes are listed per endpoint ("any of" where noted).
 | POST | `/users/:id/deactivate` | STAFF_DEACTIVATE | Revokes sessions. |
 | POST | `/users/:id/reactivate` | STAFF_REACTIVATE | |
 | POST | `/users/:id/setup-link` | STAFF_CREATE | Reissues the setup link for an account without a password. |
+| GET | `/users/:id/cv` | STAFF_VIEW | The staff member's CV (PDF, inline; `?download=1` for attachment). Staff records carry `cv` metadata or `null`. |
+| PUT, DELETE | `/users/:id/cv` | STAFF_CREATE or STAFF_EDIT | Upload (PDF, max 5 MB) or remove the CV. Needs authority over the user (or self). |
 | GET | `/users/:id/activity` | STAFF_VIEW + AUDIT_LOG_VIEW | Audit entries by the user. |
 | GET, PATCH | `/users/me` | signed in | Self-service: `fullName`, `phone` only. |
 | GET, PATCH | `/users/me/preferences` | signed in | `{ theme, pageSize, uiDensity, lastSelectedBranchId }`. |
@@ -244,6 +250,8 @@ excludes tax; COGS uses `purchase_price_at_sale` of the exact batches sold.
 | GET | `/audit-logs/actions` | AUDIT_LOG_VIEW | Distinct action codes. |
 | GET | `/login-history` | LOGIN_HISTORY_VIEW | |
 | GET, PATCH | `/settings` | SETTINGS_VIEW / SETTINGS_EDIT | Global pharmacy, tax and expiry settings. |
+| PUT, DELETE | `/settings/logo` | SETTINGS_EDIT | Upload (PNG/JPG/WebP, max 2 MB) or remove the pharmacy logo. `logoUrl` in settings, branding and receipts points to it. |
+| GET | `/branding/logo` | public | The current logo image (shown on the sign-in page). |
 | GET | `/system/info` | SETTINGS_VIEW | Version, schema, business date, numbering state. |
 | GET | `/help` · `/help/search?q=` · `/help/:idOrSlug` | signed in | Published articles only. |
 | GET | `/search?q=&branchId=` | signed in | Global search; each group requires its own view permission. |
@@ -257,7 +265,7 @@ Authorization: `PERMISSION_DENIED`, `BRANCH_ACCESS_DENIED`, `INSUFFICIENT_AUTHOR
 `SELF_MODIFICATION_NOT_ALLOWED`, `OWNER_PERMISSIONS_FIXED`, `LAST_OWNER`.
 
 General: `VALIDATION_ERROR`, `RESOURCE_NOT_FOUND`, `ROUTE_NOT_FOUND`, `MALFORMED_REQUEST`,
-`UNSUPPORTED_CONTENT_TYPE`, `INVALID_STATUS_TRANSITION`, `CONCURRENT_UPDATE`,
+`UNSUPPORTED_CONTENT_TYPE`, `FILE_REQUIRED`, `FILE_TOO_LARGE`, `FILE_TYPE_NOT_ALLOWED`, `INVALID_STATUS_TRANSITION`, `CONCURRENT_UPDATE`,
 `IDEMPOTENCY_KEY_REUSED`, `INVALID_IDEMPOTENCY_KEY`, `INTERNAL_ERROR`.
 
 Domain: `DUPLICATE_EMAIL`, `DUPLICATE_EMPLOYEE_ID`, `DUPLICATE_BARCODE`,

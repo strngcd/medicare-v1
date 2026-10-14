@@ -68,9 +68,14 @@ export async function request(method, path, options = {}) {
   }
 }
 
-async function send(method, path, { params, body, idempotencyKey, raw = false }) {
+async function send(method, path, { params, body, file, idempotencyKey, raw = false }) {
   const headers = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (file) {
+    // Uploads send the raw file with its own type; the server checks the bytes.
+    headers['Content-Type'] = file.type || 'application/octet-stream';
+    headers['X-File-Name'] = encodeURIComponent(file.name);
+  }
   if (!['GET', 'HEAD'].includes(method)) {
     const csrf = readCookie(CSRF_COOKIE);
     if (csrf) headers['X-CSRF-Token'] = csrf;
@@ -83,7 +88,7 @@ async function send(method, path, { params, body, idempotencyKey, raw = false })
       method,
       headers,
       credentials: 'same-origin',
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: file || (body !== undefined ? JSON.stringify(body) : undefined),
     });
   } catch {
     throw new ApiError({ status: 0, code: 'NETWORK_ERROR', message: 'Cannot reach the server. Check your connection and try again.' });
@@ -117,6 +122,8 @@ export const api = {
   patch: (path, body, options) => request('PATCH', path, { body: body ?? {}, ...options }),
   put: (path, body, options) => request('PUT', path, { body: body ?? {}, ...options }),
   delete: (path, options) => request('DELETE', path, options),
+  /** Uploads one File as the raw request body (PUT). */
+  upload: (path, file) => request('PUT', path, { file }),
   /** Downloads a file response (exports). */
   async download(path, params, fallbackName) {
     const response = await request('GET', path, { params, raw: true });

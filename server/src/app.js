@@ -21,8 +21,8 @@ function createApp() {
   app.use(helmet({
     contentSecurityPolicy: {
       directives: {
-        // Allow the configurable pharmacy logo to be an https image.
-        'img-src': ["'self'", 'data:', 'https:'],
+        // Logos are uploaded and served by the API; blob: is the upload preview.
+        'img-src': ["'self'", 'data:', 'blob:'],
       },
     },
   }));

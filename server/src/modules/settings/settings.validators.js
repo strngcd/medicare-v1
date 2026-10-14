@@ -7,7 +7,6 @@ const optionalUrl = z.preprocess(
 
 const updateSettingsBody = z.object({
   pharmacyName: requiredText(120).optional(),
-  logoUrl: optionalUrl,
   phone: optionalText(40),
   email: z.preprocess((v) => (v === '' ? null : v), z.string().trim().toLowerCase().email().max(254).nullable().optional()),
   address: optionalText(500),
