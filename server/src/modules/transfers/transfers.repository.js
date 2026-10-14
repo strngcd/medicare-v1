@@ -27,8 +27,8 @@ async function list({ branchIds, status, sourceBranchId, destinationBranchId, da
   if (sourceBranchId) w.add('t.source_branch_id = ?', sourceBranchId);
   if (destinationBranchId) w.add('t.destination_branch_id = ?', destinationBranchId);
   if (search) w.add('t.transfer_number ILIKE ?', `%${search}%`);
-  if (dateFrom) w.add('(t.created_at AT TIME ZONE ?)::date >= ?::date', timezone, dateFrom);
-  if (dateTo) w.add('(t.created_at AT TIME ZONE ?)::date <= ?::date', timezone, dateTo);
+  if (dateFrom) w.add('t.created_at >= (?::date AT TIME ZONE ?)', dateFrom, timezone);
+  if (dateTo) w.add('t.created_at < ((?::date + 1) AT TIME ZONE ?)', dateTo, timezone);
   const { rows } = await query(
     `SELECT ${COLUMNS},
             (SELECT count(*) FROM transfer_items ti WHERE ti.transfer_id = t.id)::int AS item_count,

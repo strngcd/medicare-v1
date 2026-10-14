@@ -20,8 +20,8 @@ async function listAudit(f) {
   if (f.entityType) w.add('a.entity_type = ?', f.entityType);
   if (f.entityId) w.add('a.entity_id = ?', f.entityId);
   if (f.search) w.add('a.description ILIKE ?', `%${f.search}%`);
-  if (f.dateFrom) w.add('(a."timestamp" AT TIME ZONE ?)::date >= ?::date', f.timezone, f.dateFrom);
-  if (f.dateTo) w.add('(a."timestamp" AT TIME ZONE ?)::date <= ?::date', f.timezone, f.dateTo);
+  if (f.dateFrom) w.add('a."timestamp" >= (?::date AT TIME ZONE ?)', f.dateFrom, f.timezone);
+  if (f.dateTo) w.add('a."timestamp" < ((?::date + 1) AT TIME ZONE ?)', f.dateTo, f.timezone);
   const { rows } = await query(
     `SELECT ${AUDIT_COLUMNS}, count(*) OVER() AS total_count
        FROM audit_logs a LEFT JOIN users u ON u.id = a.user_id LEFT JOIN branches b ON b.id = a.branch_id
@@ -62,8 +62,8 @@ async function listLoginHistory(f) {
   if (f.eventType) w.add('h.event_type = ?', f.eventType);
   if (f.success !== undefined) w.add('h.success = ?', f.success);
   if (f.failureCategory) w.add('h.failure_category = ?', f.failureCategory);
-  if (f.dateFrom) w.add('(h.created_at AT TIME ZONE ?)::date >= ?::date', f.timezone, f.dateFrom);
-  if (f.dateTo) w.add('(h.created_at AT TIME ZONE ?)::date <= ?::date', f.timezone, f.dateTo);
+  if (f.dateFrom) w.add('h.created_at >= (?::date AT TIME ZONE ?)', f.dateFrom, f.timezone);
+  if (f.dateTo) w.add('h.created_at < ((?::date + 1) AT TIME ZONE ?)', f.dateTo, f.timezone);
   const { rows } = await query(
     `SELECT h.id, h.user_id, u.full_name AS user_name, u.email AS user_email, h.event_type, h.success,
             h.ip_address, h.user_agent, h.branch_id, b.name AS branch_name, h.failure_category, h.created_at,

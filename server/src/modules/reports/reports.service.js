@@ -1,4 +1,5 @@
 const config = require('../../config');
+const AppError = require('../../errors/AppError');
 const { camelize } = require('../../utils/camelize');
 const { money, round2, toMoneyString } = require('../../utils/money');
 const { businessToday } = require('../../utils/time');
@@ -103,6 +104,23 @@ function shapeSalesSummary(raw) {
   };
 }
 
+// Exports contain every matching row in one query. Past this size a file is
+// refused with a clear message rather than silently cut short.
+const MAX_EXPORT_ROWS = config.exportMaxRows;
+const EXPORT_FETCH_LIMIT = MAX_EXPORT_ROWS + 1;
+const EXPORT_PARAMS = Object.freeze({ page: 1, limit: EXPORT_FETCH_LIMIT, offset: 0 });
+
+function exportRows(rows) {
+  if (rows.length > MAX_EXPORT_ROWS) {
+    throw new AppError(
+      'EXPORT_TOO_LARGE',
+      `This export has more than ${MAX_EXPORT_ROWS.toLocaleString('en-US')} rows. Narrow the date range or filters and export in parts.`,
+      422,
+    );
+  }
+  return rows;
+}
+
 // ---------------------------------------------------------------------------
 // Reports
 // ---------------------------------------------------------------------------
@@ -120,7 +138,7 @@ async function salesReport(auth, query, { exportAll = false } = {}) {
   const listQuery = { ...query, dateFrom: range.dateFrom, dateTo: range.dateTo };
   const list = exportAll ? null : await salesService.listSales(auth, listQuery);
   const rows = exportAll
-    ? await collectAllPages((page) => salesService.listSales(auth, { ...listQuery, page, limit: 100 }))
+    ? exportRows((await salesService.listSales(auth, listQuery, { exportLimit: EXPORT_FETCH_LIMIT })).rows)
     : list.rows;
 
   return restrictColumns({
@@ -192,7 +210,7 @@ async function inventoryReport(auth, query, { exportAll = false } = {}) {
   const branchIds = resolveBranchScope(auth, query.branchId);
   const today = businessToday();
   const warningDays = await getExpiryWarningDays();
-  const params = exportAll ? { page: 1, limit: 10000, offset: 0 } : parseListParams(query, { sortable: { d: '1' }, defaultSort: 'd' });
+  const params = exportAll ? EXPORT_PARAMS : parseListParams(query, { sortable: { d: '1' }, defaultSort: 'd' });
   const [positions, totals] = await Promise.all([
     repo.inventoryPositions({ today, warningDays, branchIds, categoryId: query.categoryId, productType: query.productType, status: query.status, limit: params.limit, offset: params.offset }),
     cached(['inventory-totals', cacheScope(auth, branchIds), today], () => repo.inventoryTotals({ today, warningDays, branchIds })),
@@ -212,7 +230,7 @@ async function inventoryReport(auth, query, { exportAll = false } = {}) {
       { key: 'status', label: 'Status' },
       { key: 'inventoryValue', label: 'Value (cost)' },
     ],
-    rows: positions.rows.map((r) => {
+    rows: (exportAll ? exportRows(positions.rows) : positions.rows).map((r) => {
       const dto = camelize(r);
       delete dto.totalCount;
       return dto;
@@ -257,7 +275,7 @@ async function refundReport(auth, query, { exportAll = false } = {}) {
   const listQuery = range ? { ...query, dateFrom: range.dateFrom, dateTo: range.dateTo } : query;
   const [summary, rows, list] = await Promise.all([
     refundsService.refundSummary(auth, listQuery),
-    exportAll ? collectAllPages((page) => refundsService.listRefunds(auth, { ...listQuery, page, limit: 100 })) : null,
+    exportAll ? refundsService.listRefunds(auth, listQuery, { exportLimit: EXPORT_FETCH_LIMIT }).then((r) => exportRows(r.rows)) : null,
     exportAll ? null : refundsService.listRefunds(auth, listQuery),
   ]);
   return {
@@ -289,7 +307,7 @@ async function lossReport(auth, query, { exportAll = false } = {}) {
     branchIds: resolveBranchScope(auth, query.branchId),
     movementType: query.movementType,
   };
-  const params = exportAll ? { page: 1, limit: 10000, offset: 0 } : parseListParams(query, { sortable: { d: '1' }, defaultSort: 'd' });
+  const params = exportAll ? EXPORT_PARAMS : parseListParams(query, { sortable: { d: '1' }, defaultSort: 'd' });
   const [summary, list] = await Promise.all([
     repo.stockLossSummary(filters),
     repo.stockLosses(filters, { limit: params.limit, offset: params.offset }),
@@ -311,7 +329,7 @@ async function lossReport(auth, query, { exportAll = false } = {}) {
       { key: 'createdByName', label: 'By' },
       { key: 'reason', label: 'Reason' },
     ],
-    rows: list.rows.map((r) => {
+    rows: (exportAll ? exportRows(list.rows) : list.rows).map((r) => {
       const dto = camelize(r);
       delete dto.totalCount;
       return dto;
@@ -328,7 +346,7 @@ async function purchaseReport(auth, query, { exportAll = false } = {}) {
   });
   const listQuery = { ...query, dateFrom: range.dateFrom, dateTo: range.dateTo };
   const rows = exportAll
-    ? await collectAllPages((page) => purchasesService.listPurchases(auth, { ...listQuery, page, limit: 100 }))
+    ? exportRows((await purchasesService.listPurchases(auth, listQuery, {}, { exportLimit: EXPORT_FETCH_LIMIT })).rows)
     : null;
   const list = exportAll ? null : await purchasesService.listPurchases(auth, listQuery);
   const report = {
@@ -355,7 +373,7 @@ async function purchaseReport(auth, query, { exportAll = false } = {}) {
 async function supplierReport(auth, query, { exportAll = false } = {}) {
   const range = resolveDateRange({ range: query.range || (query.dateFrom ? 'CUSTOM' : 'YEAR'), ...query });
   const branchIds = resolveBranchScope(auth, query.branchId);
-  const params = exportAll ? { page: 1, limit: 10000, offset: 0 } : parseListParams(query, { sortable: { d: '1' }, defaultSort: 'd' });
+  const params = exportAll ? EXPORT_PARAMS : parseListParams(query, { sortable: { d: '1' }, defaultSort: 'd' });
   const { rows, total } = await repo.supplierSummary({
     dateFrom: range.dateFrom, dateTo: range.dateTo, branchIds, search: query.search, limit: params.limit, offset: params.offset,
   });
@@ -372,7 +390,7 @@ async function supplierReport(auth, query, { exportAll = false } = {}) {
       { key: 'balance', label: 'Balance' },
       { key: 'lastPurchaseDate', label: 'Last purchase' },
     ],
-    rows: rows.map((r) => {
+    rows: (exportAll ? exportRows(rows) : rows).map((r) => {
       const dto = camelize(r);
       delete dto.totalCount;
       return dto;
@@ -382,16 +400,6 @@ async function supplierReport(auth, query, { exportAll = false } = {}) {
   return canViewCost(auth) ? report : hidePurchaseAmounts(report, auth);
 }
 
-/** Pages through a list service (100 rows per page) up to a safety cap. */
-async function collectAllPages(fetchPage, maxRows = 10000) {
-  const rows = [];
-  for (let page = 1; rows.length < maxRows; page += 1) {
-    const result = await fetchPage(page);
-    rows.push(...result.rows);
-    if (result.rows.length < 100) break;
-  }
-  return rows.slice(0, maxRows);
-}
 
 module.exports = {
   salesReport,

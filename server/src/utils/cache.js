@@ -3,8 +3,13 @@
  *
  * Keys must include everything that affects the response for the caller
  * (branch scope, permission flags, filters) so cached data never crosses an
- * authorization boundary. Any successful write bumps a global version that
- * is part of every key, so cached aggregates are never stale.
+ * authorization boundary.
+ *
+ * Every successful write moves the data version on. By default an entry
+ * computed before the latest write is never served (reports stay exact).
+ * Callers may accept a short staleness window (`maxStaleMs`): the dashboard
+ * then recomputes at most once per window during busy selling instead of
+ * after every single sale.
  */
 const MAX_ENTRIES = 500;
 const TTL_MS = 60 * 1000;
@@ -12,30 +17,41 @@ const TTL_MS = 60 * 1000;
 let version = 0;
 const store = new Map();
 
+/** Data changed: entries from before now are stale (but may still serve a staleness window). */
+function markWrite() {
+  version += 1;
+}
+
+/** Drops everything immediately (e.g. after a database reset). */
 function bumpVersion() {
   version += 1;
   store.clear();
 }
 
-async function cached(keyParts, compute) {
-  const key = JSON.stringify([version, keyParts]);
+async function cached(keyParts, compute, { maxStaleMs = 0 } = {}) {
+  const key = JSON.stringify(keyParts);
+  const now = Date.now();
   const hit = store.get(key);
-  if (hit && hit.expires > Date.now()) return hit.value;
+  if (hit && now - hit.computedAt < TTL_MS && (hit.version === version || now - hit.computedAt < maxStaleMs)) {
+    return hit.value;
+  }
 
+  const computedFor = version;
   const value = await compute();
-  if (store.size >= MAX_ENTRIES) store.delete(store.keys().next().value);
-  store.set(key, { value, expires: Date.now() + TTL_MS });
+  if (!store.has(key) && store.size >= MAX_ENTRIES) store.delete(store.keys().next().value);
+  // A write during the computation already made this result stale for exact readers.
+  store.set(key, { value, version: computedFor, computedAt: now });
   return value;
 }
 
-/** Express middleware: invalidate the cache after any successful write. */
+/** Express middleware: mark data as changed after any successful write. */
 function invalidateOnWrite(req, res, next) {
   if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
     res.on('finish', () => {
-      if (res.statusCode < 400) bumpVersion();
+      if (res.statusCode < 400) markWrite();
     });
   }
   next();
 }
 
-module.exports = { cached, bumpVersion, invalidateOnWrite, _store: store };
+module.exports = { cached, bumpVersion, markWrite, invalidateOnWrite, _store: store };

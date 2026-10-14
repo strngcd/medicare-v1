@@ -19,7 +19,7 @@ async function seedAll(client, { catalog = true } = {}) {
   await seedHelpArticles(client);
   if (catalog) {
     const result = await seedMedicineCatalog(client);
-    console.log(`Medicine catalog: ${result.created} added, ${result.total - result.created} already present.`);
+    console.log(`Medicine catalog: ${result.created} added, ${result.adopted} matched to existing medicines, ${result.total - result.created - result.adopted} already present.`);
   }
 }
 

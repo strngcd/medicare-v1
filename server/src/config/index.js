@@ -32,6 +32,13 @@ const config = Object.freeze({
   isProduction,
   port: readInt('PORT', 4000),
   databaseUrl,
+  // Safety limits on every pooled connection, so one stuck request cannot hold
+  // stock-row locks or connections indefinitely (0 disables a limit).
+  database: Object.freeze({
+    statementTimeoutMs: readInt('DB_STATEMENT_TIMEOUT_MS', 30000),
+    lockTimeoutMs: readInt('DB_LOCK_TIMEOUT_MS', 10000),
+    idleInTransactionTimeoutMs: readInt('DB_IDLE_IN_TRANSACTION_TIMEOUT_MS', 60000),
+  }),
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
   appBaseUrl: process.env.APP_BASE_URL || 'http://localhost:5173',
   businessTimezone: process.env.BUSINESS_TIMEZONE || 'Africa/Addis_Ababa',
@@ -54,6 +61,8 @@ const config = Object.freeze({
     from: process.env.SMTP_FROM || 'Medicar <no-reply@example.com>',
   }),
   pagination: Object.freeze({ defaultLimit: 25, maxLimit: 100 }),
+  // Largest report export; bigger ones are refused with a clear message (never cut short).
+  exportMaxRows: readInt('EXPORT_MAX_ROWS', 100000),
 });
 
 module.exports = config;

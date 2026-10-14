@@ -1,4 +1,5 @@
 const AppError = require('../../errors/AppError');
+const { query } = require('../../database/db');
 const { randomCode } = require('../documents/documentNumbers');
 
 /**
@@ -25,8 +26,27 @@ function resolveBatchIdentity(productType, { batchNumber, expiryDate }, field = 
   }
   return {
     batchNumber: batchNumber || `LOT-${randomCode()}`,
+    generated: !batchNumber,
     expiryDate: expiryDate || NO_EXPIRY_DATE,
   };
 }
 
-module.exports = { NO_EXPIRY_DATE, resolveBatchIdentity };
+const MAX_LOT_ATTEMPTS = 5;
+
+/**
+ * A generated LOT- number must be new for the product: reusing an existing
+ * lot would merge unrelated stock into it. Redraws on collision. Typed batch
+ * numbers are returned unchanged (reusing those is deliberate).
+ */
+async function ensureNewLot(client, medicineId, identity) {
+  if (!identity.generated) return identity.batchNumber;
+  let candidate = identity.batchNumber;
+  for (let attempt = 0; attempt < MAX_LOT_ATTEMPTS; attempt += 1) {
+    const { rowCount } = await query('SELECT 1 FROM batches WHERE medicine_id = $1 AND batch_number = $2', [medicineId, candidate], client);
+    if (rowCount === 0) return candidate;
+    candidate = `LOT-${randomCode()}`;
+  }
+  throw new Error('Could not allocate a unique lot number');
+}
+
+module.exports = { NO_EXPIRY_DATE, resolveBatchIdentity, ensureNewLot };

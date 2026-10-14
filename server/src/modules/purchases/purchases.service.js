@@ -1,5 +1,5 @@
 const AppError = require('../../errors/AppError');
-const { resolveBatchIdentity } = require('../inventory/batchIdentity');
+const { resolveBatchIdentity, ensureNewLot } = require('../inventory/batchIdentity');
 const { withTransaction } = require('../../database/db');
 const { recordAudit } = require('../audit/audit.recorder');
 const { runIdempotent } = require('../idempotency/idempotency');
@@ -123,8 +123,8 @@ function assertNotFuture(date, field) {
 // Queries
 // ---------------------------------------------------------------------------
 
-async function listPurchases(auth, query, fixed = {}) {
-  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'purchaseDate' });
+async function listPurchases(auth, query, fixed = {}, { exportLimit } = {}) {
+  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'purchaseDate', exportLimit });
   const { rows, total } = await repo.list({
     branchIds: resolveBranchScope(auth, query.branchId),
     supplierId: fixed.supplierId || query.supplierId,
@@ -378,7 +378,7 @@ async function receiveLines(client, auth, actor, id, input) {
 
     const { batch } = await ledger.findOrCreateBatch(client, {
       medicineId: item.medicine_id,
-      batchNumber: identities[index].batchNumber,
+      batchNumber: await ensureNewLot(client, item.medicine_id, identities[index]),
       manufacturingDate: line.manufacturingDate,
       expiryDate: identities[index].expiryDate,
       purchasePrice,

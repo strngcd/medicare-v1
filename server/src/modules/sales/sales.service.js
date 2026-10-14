@@ -60,8 +60,8 @@ async function loadVisibleSale(auth, id) {
 // Queries
 // ---------------------------------------------------------------------------
 
-async function listSales(auth, query, { ownOnly = false } = {}) {
-  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'completedAt' });
+async function listSales(auth, query, { ownOnly = false, exportLimit } = {}) {
+  const params = parseListParams(query, { sortable: SORTABLE, defaultSort: 'completedAt', exportLimit });
   const { rows, total } = await repo.list({
     branchIds: resolveBranchScope(auth, query.branchId),
     soldBy: ownOnly ? auth.userId : query.staffId,
