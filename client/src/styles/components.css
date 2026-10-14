@@ -275,6 +275,7 @@
     text-align: left;
   }
   .table.responsive td[data-label='']::before { content: none; }
+  .table.responsive td[data-label=''] { justify-content: flex-end; }
   /* Editable cells: keep the label next to its input instead of at opposite edges. */
   .table.responsive td:has(> .input) { justify-content: flex-start; align-items: center; }
   .table.responsive td:has(> .input)::before { flex: 0 0 96px; }
@@ -458,10 +459,11 @@
 /* ------------------------------------------------------------- Dropdown */
 .dropdown { position: relative; }
 .dropdown-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
+  position: fixed;
   min-width: 220px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
