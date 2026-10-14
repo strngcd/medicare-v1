@@ -38,7 +38,7 @@ function StockTab({ state, update, clear, hasFilters }) {
       can('INVENTORY_ADJUST') && { label: 'Adjust quantity', icon: SlidersHorizontal, run: () => setModal({ type: 'adjust', row: r }) },
       can('INVENTORY_ADJUST') && { label: 'Change minimum stock', run: () => setModal({ type: 'minimumStock', row: r }) },
       can('INVENTORY_ADJUST') && { label: 'Change selling price', run: () => setModal({ type: 'sellingPrice', row: r }) },
-      can('INVENTORY_DISPOSE') && r.quantity > 0 && ['EXPIRED', 'EXPIRING_SOON'].includes(r.status)
+      can('INVENTORY_DISPOSE') && r.quantity > 0
         && { label: 'Dispose of stock', icon: Trash2, run: () => setModal({ type: 'dispose', row: r }) },
       can('INVENTORY_BATCH_ARCHIVE') && r.quantity === 0 && { label: 'Archive batch', icon: Archive, run: () => setArchived(r, true) },
     ].filter(Boolean);

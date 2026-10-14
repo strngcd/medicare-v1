@@ -297,7 +297,7 @@ describe('inventory settings and FEFO preview', () => {
   });
 });
 
-describe('disposing of expired and expiring stock', () => {
+describe('disposing of stock', () => {
   const stockOf = (overrides) => createStock({ branch, medicine, user: pharmacistUser, purchasePrice: '4.00', ...overrides });
 
   test('writes off all remaining units as a loss and clears the alert', async () => {
@@ -316,12 +316,20 @@ describe('disposing of expired and expiring stock', () => {
     expect((await pharmacist.post(`/api/v1/inventory/${inventory.id}/dispose`).send({})).body.error.code).toBe('NOTHING_TO_DISPOSE');
   });
 
-  test('allows expiring-soon stock but not healthy stock, and is limited by permission', async () => {
+  test('allows expiring-soon stock, and in-date stock with a reason; limited by permission', async () => {
     const soon = await stockOf({ expiryDate: daysFromToday(10), quantity: 3 });
     const healthy = await stockOf({ expiryDate: daysFromToday(400), quantity: 3 });
     expect((await cashier.post(`/api/v1/inventory/${soon.inventory.id}/dispose`).send({})).status).toBe(403);
-    expect((await pharmacist.post(`/api/v1/inventory/${healthy.inventory.id}/dispose`).send({})).body.error.code).toBe('NOT_DISPOSABLE');
     expect((await admin.post(`/api/v1/inventory/${soon.inventory.id}/dispose`).send({})).status).toBe(201);
+
+    const noReason = await pharmacist.post(`/api/v1/inventory/${healthy.inventory.id}/dispose`).send({});
+    expect(noReason.status).toBe(422);
+    expect(noReason.body.error.details.fields.notes).toBeDefined();
+    const res = await pharmacist.post(`/api/v1/inventory/${healthy.inventory.id}/dispose`).send({ notes: 'Water damaged' });
+    expect(res.status).toBe(201);
+    expect(res.body.data).toMatchObject({ quantityDisposed: 3, lossValue: '12.00' });
+    const { rows } = await pool.query("SELECT description FROM audit_logs WHERE action = 'STOCK_DISPOSED' ORDER BY created_at DESC LIMIT 1");
+    expect(rows[0].description).toMatch(/\(in date\)$/);
   });
 
   test('can archive in the same step and shows up in the loss and profit reports', async () => {
