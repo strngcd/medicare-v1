@@ -24,8 +24,8 @@ async function list(filters) {
   if (filters.receiptNumber) w.add('s.receipt_number ILIKE ?', `%${filters.receiptNumber}%`);
   if (filters.minAmount) w.add('s.total >= ?::numeric', filters.minAmount);
   if (filters.maxAmount) w.add('s.total <= ?::numeric', filters.maxAmount);
-  if (filters.dateFrom) w.add('(s.completed_at AT TIME ZONE ?)::date >= ?::date', filters.timezone, filters.dateFrom);
-  if (filters.dateTo) w.add('(s.completed_at AT TIME ZONE ?)::date <= ?::date', filters.timezone, filters.dateTo);
+  if (filters.dateFrom) w.add('s.completed_at >= (?::date AT TIME ZONE ?)', filters.dateFrom, filters.timezone);
+  if (filters.dateTo) w.add('s.completed_at < ((?::date + 1) AT TIME ZONE ?)', filters.dateTo, filters.timezone);
   if (filters.paymentMethod) {
     w.add('EXISTS (SELECT 1 FROM sale_payments sp WHERE sp.sale_id = s.id AND sp.payment_method = ?)', filters.paymentMethod);
   }

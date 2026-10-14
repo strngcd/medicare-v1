@@ -19,8 +19,8 @@ async function list({ branchIds, supplierId, purchaseId, paymentMethod, dateFrom
   if (supplierId) w.add('sp.supplier_id = ?', supplierId);
   if (purchaseId) w.add('sp.purchase_id = ?', purchaseId);
   if (paymentMethod) w.add('sp.payment_method = ?', paymentMethod);
-  if (dateFrom) w.add('(sp.paid_at AT TIME ZONE ?)::date >= ?::date', timezone, dateFrom);
-  if (dateTo) w.add('(sp.paid_at AT TIME ZONE ?)::date <= ?::date', timezone, dateTo);
+  if (dateFrom) w.add('sp.paid_at >= (?::date AT TIME ZONE ?)', dateFrom, timezone);
+  if (dateTo) w.add('sp.paid_at < ((?::date + 1) AT TIME ZONE ?)', dateTo, timezone);
   const { rows } = await query(
     `SELECT ${COLUMNS}, count(*) OVER() AS total_count FROM ${FROM} ${w.sql}
       ORDER BY ${orderBy} LIMIT ${w.param(limit)} OFFSET ${w.param(offset)}`,

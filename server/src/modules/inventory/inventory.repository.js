@@ -7,11 +7,12 @@ const { medicineStockCte, rowStatusSql } = require('./inventoryStatus');
  * Params $1 = business date, $2 = expiry warning days.
  */
 async function listInventory({ today, warningDays, ids, branchIds, medicineId, categoryId, productType, statuses, search, archived = false, limit, offset, orderBy }) {
-  const w = whereBuilder([today, warningDays]);
+  // $3 is the branch scope, shared by the stock CTE and the row filter.
+  const w = whereBuilder([today, warningDays, branchIds || null]);
   if (ids) w.add('bi.id = ANY(?::uuid[])', ids);
   // Archived (empty, hidden) batch rows are listed only on request; lookups by id always find them.
   else w.add(archived ? 'bi.archived_at IS NOT NULL' : 'bi.archived_at IS NULL');
-  if (branchIds) w.add('bi.branch_id = ANY(?::uuid[])', branchIds);
+  if (branchIds) w.add('bi.branch_id = ANY($3::uuid[])');
   if (medicineId) w.add('b.medicine_id = ?', medicineId);
   if (categoryId) w.add('m.category_id = ?', categoryId);
   if (productType) w.add('m.product_type = ?', productType);
@@ -19,7 +20,7 @@ async function listInventory({ today, warningDays, ids, branchIds, medicineId, c
   if (statuses && statuses.length) w.add(`(${rowStatusSql('$1', '$2')}) = ANY(?::text[])`, statuses);
 
   const { rows } = await query(
-    `WITH ${medicineStockCte('$1')}
+    `WITH ${medicineStockCte('$1', '$3')}
      SELECT bi.id, bi.branch_id, br.name AS branch_name, br.code AS branch_code, br.status AS branch_status,
             bi.batch_id, b.batch_number, b.manufacturing_date, b.expiry_date, b.purchase_price,
             b.supplier_id, s.company_name AS supplier_name,
@@ -114,8 +115,8 @@ async function listMovements({ branchIds, batchId, medicineId, movementType, ref
   if (movementType) w.add('sm.movement_type = ?', movementType);
   if (referenceType) w.add('sm.reference_type = ?', referenceType);
   if (referenceId) w.add('sm.reference_id = ?', referenceId);
-  if (dateFrom) w.add('(sm.created_at AT TIME ZONE ?)::date >= ?::date', timezone, dateFrom);
-  if (dateTo) w.add('(sm.created_at AT TIME ZONE ?)::date <= ?::date', timezone, dateTo);
+  if (dateFrom) w.add('sm.created_at >= (?::date AT TIME ZONE ?)', dateFrom, timezone);
+  if (dateTo) w.add('sm.created_at < ((?::date + 1) AT TIME ZONE ?)', dateTo, timezone);
 
   const { rows } = await query(
     `SELECT sm.id, sm.branch_id, br.name AS branch_name, sm.batch_id, b.batch_number,
@@ -179,7 +180,7 @@ async function findSupplier(client, supplierId) {
 /** Status counts and totals for a branch (or the whole organization). */
 async function inventorySummary({ branchIds, today, warningDays }) {
   const { rows } = await query(
-    `WITH ${medicineStockCte('$1')},
+    `WITH ${medicineStockCte('$1', '$3')},
      scoped AS (
        SELECT ms.* FROM medicine_stock ms
          JOIN medicines m ON m.id = ms.medicine_id
@@ -211,15 +212,15 @@ async function inventorySummary({ branchIds, today, warningDays }) {
  * Archived medicines are excluded: they cannot be sold or restocked.
  */
 async function listStockLevels({ today, branchIds, level, medicineId, limit, offset }) {
-  const w = whereBuilder([today]);
+  const w = whereBuilder([today, branchIds || null]);
   w.add("m.status <> 'ARCHIVED'");
-  if (branchIds) w.add('ms.branch_id = ANY(?::uuid[])', branchIds);
+  if (branchIds) w.add('ms.branch_id = ANY($2::uuid[])');
   if (medicineId) w.add('ms.medicine_id = ?', medicineId);
   if (level === 'OUT_OF_STOCK') w.add('ms.sellable_quantity = 0');
   if (level === 'LOW_STOCK') w.add('ms.sellable_quantity > 0 AND ms.sellable_quantity <= ms.minimum_stock');
 
   const { rows } = await query(
-    `WITH ${medicineStockCte('$1')}
+    `WITH ${medicineStockCte('$1', '$2')}
      SELECT ms.branch_id, br.name AS branch_name, ms.medicine_id, m.name AS medicine_name,
             m.strength, m.dosage_form, m.package_size, c.name AS category_name,
             ms.sellable_quantity, ms.total_quantity, ms.minimum_stock,

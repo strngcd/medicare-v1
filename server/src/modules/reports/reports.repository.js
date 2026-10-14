@@ -51,12 +51,12 @@ function scopeCtes(salesWhere) {
     cs AS (
       SELECT s.* FROM sales s
        WHERE s.status = 'COMPLETED'
-         AND (s.completed_at AT TIME ZONE $1)::date BETWEEN $2::date AND $3::date
+         AND s.completed_at >= ($2::date AT TIME ZONE $1) AND s.completed_at < (($3::date + 1) AT TIME ZONE $1)
          AND ${salesWhere}
     ),
     rr AS (
       SELECT r.* FROM refunds r JOIN sales s ON s.id = r.sale_id
-       WHERE (r.created_at AT TIME ZONE $1)::date BETWEEN $2::date AND $3::date
+       WHERE r.created_at >= ($2::date AT TIME ZONE $1) AND r.created_at < (($3::date + 1) AT TIME ZONE $1)
          AND ${salesWhere}
     )`;
 }
@@ -94,10 +94,10 @@ async function salesSummary(filters) {
           JOIN rr ON rr.id = ri.refund_id
           JOIN sale_item_batch_allocations sa ON sa.sale_item_id = ri.sale_item_id AND sa.batch_id = ra.batch_id)::numeric(14,2) AS refunded_cogs,
        (SELECT count(*) FROM sales s
-         WHERE s.status = 'VOIDED' AND (s.completed_at AT TIME ZONE $1)::date BETWEEN $2::date AND $3::date
+         WHERE s.status = 'VOIDED' AND s.completed_at >= ($2::date AT TIME ZONE $1) AND s.completed_at < (($3::date + 1) AT TIME ZONE $1)
            AND ${salesWhere})::int AS voided_count,
        (SELECT COALESCE(sum(total), 0) FROM sales s
-         WHERE s.status = 'VOIDED' AND (s.completed_at AT TIME ZONE $1)::date BETWEEN $2::date AND $3::date
+         WHERE s.status = 'VOIDED' AND s.completed_at >= ($2::date AT TIME ZONE $1) AND s.completed_at < (($3::date + 1) AT TIME ZONE $1)
            AND ${salesWhere})::numeric(14,2) AS voided_total`,
     params,
   );
@@ -351,7 +351,7 @@ async function movementSummary({ timezone, dateFrom, dateTo, branchIds }) {
             COALESCE(sum(quantity_change) FILTER (WHERE quantity_change > 0), 0)::int AS units_in,
             COALESCE(-sum(quantity_change) FILTER (WHERE quantity_change < 0), 0)::int AS units_out
        FROM stock_movements
-      WHERE (created_at AT TIME ZONE $1)::date BETWEEN $2::date AND $3::date
+      WHERE created_at >= ($2::date AT TIME ZONE $1) AND created_at < (($3::date + 1) AT TIME ZONE $1)
         AND ($4::uuid[] IS NULL OR branch_id = ANY($4::uuid[]))
       GROUP BY movement_type ORDER BY movement_type`,
     [timezone, dateFrom, dateTo, branchIds],
@@ -368,7 +368,7 @@ function lossFilter({ timezone, dateFrom, dateTo, branchIds, movementType }) {
   const where = `sm.quantity_change < 0
       AND sm.counts_as_loss
       AND sm.movement_type = ANY($5::text[])
-      AND (sm.created_at AT TIME ZONE $1)::date BETWEEN $2::date AND $3::date
+      AND sm.created_at >= ($2::date AT TIME ZONE $1) AND sm.created_at < (($3::date + 1) AT TIME ZONE $1)
       AND ($4::uuid[] IS NULL OR sm.branch_id = ANY($4::uuid[]))`;
   return { params, where };
 }

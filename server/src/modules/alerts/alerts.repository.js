@@ -8,7 +8,7 @@ const { medicineStockCte } = require('../inventory/inventoryStatus');
  * $1 business date, $2 expiry warning days, $3 branch scope (uuid[] or null)
  */
 const ALERTS_SQL = `
-  WITH ${medicineStockCte('$1')},
+  WITH ${medicineStockCte('$1', '$3')},
   alerts AS (
     SELECT 'EXPIRED:' || bi.id AS id, 'EXPIRED' AS type, 'CRITICAL' AS severity, 1 AS severity_rank,
            bi.branch_id, b.medicine_id, b.id AS batch_id, b.batch_number, b.expiry_date,

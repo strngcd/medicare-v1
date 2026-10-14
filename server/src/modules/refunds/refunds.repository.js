@@ -19,8 +19,8 @@ function buildWhere({ branchIds, saleId, processedBy, reason, dateFrom, dateTo, 
   if (processedBy) w.add('r.processed_by = ?', processedBy);
   if (reason) w.add('r.reason = ?', reason);
   if (search) w.add('(r.refund_number ILIKE ? OR s.receipt_number ILIKE ?)', `%${search}%`, `%${search}%`);
-  if (dateFrom) w.add('(r.created_at AT TIME ZONE ?)::date >= ?::date', timezone, dateFrom);
-  if (dateTo) w.add('(r.created_at AT TIME ZONE ?)::date <= ?::date', timezone, dateTo);
+  if (dateFrom) w.add('r.created_at >= (?::date AT TIME ZONE ?)', dateFrom, timezone);
+  if (dateTo) w.add('r.created_at < ((?::date + 1) AT TIME ZONE ?)', dateTo, timezone);
   if (minAmount) w.add('r.refund_total >= ?::numeric', minAmount);
   if (maxAmount) w.add('r.refund_total <= ?::numeric', maxAmount);
   return w;

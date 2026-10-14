@@ -12,9 +12,10 @@ const { query } = require('../../database/db');
  *   EXPIRED (row has expired stock) > OUT_OF_STOCK > LOW_STOCK > EXPIRING_SOON > AVAILABLE
  *
  * The caller supplies parameter placeholders for the business date and the
- * expiry warning window (days).
+ * expiry warning window (days), and optionally the branch scope (uuid[] or
+ * null) so only the branches being shown are aggregated.
  */
-function medicineStockCte(todayParam) {
+function medicineStockCte(todayParam, branchParam = null) {
   return `
     medicine_stock AS (
       SELECT bi.branch_id, b.medicine_id,
@@ -22,6 +23,7 @@ function medicineStockCte(todayParam) {
              COALESCE(sum(bi.quantity), 0)::int AS total_quantity,
              max(bi.minimum_stock)::int AS minimum_stock
         FROM branch_inventory bi JOIN batches b ON b.id = bi.batch_id
+       ${branchParam ? `WHERE (${branchParam}::uuid[] IS NULL OR bi.branch_id = ANY(${branchParam}::uuid[]))` : ''}
        GROUP BY bi.branch_id, b.medicine_id
     )`;
 }
