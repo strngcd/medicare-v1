@@ -8,6 +8,10 @@ const PG_CHECK_VIOLATION = '23514';
 const PG_SERIALIZATION_FAILURE = '40001';
 const PG_DEADLOCK_DETECTED = '40P01';
 const PG_INVALID_TEXT_REPRESENTATION = '22P02';
+// Raised by the pool's safety limits (see database/pool.js).
+const PG_QUERY_CANCELED = '57014'; // statement_timeout
+const PG_LOCK_NOT_AVAILABLE = '55P03'; // lock_timeout
+const PG_IDLE_IN_TRANSACTION_TIMEOUT = '25P03';
 
 function fromZodError(err) {
   const fields = {};
@@ -29,6 +33,11 @@ function fromPostgresError(err) {
     case PG_SERIALIZATION_FAILURE:
     case PG_DEADLOCK_DETECTED:
       return AppError.conflict('CONCURRENT_UPDATE', 'The record was changed by another operation. Please retry.');
+    case PG_LOCK_NOT_AVAILABLE:
+      return AppError.conflict('RECORD_BUSY', 'Another operation is using this record. Please retry in a moment.');
+    case PG_QUERY_CANCELED:
+    case PG_IDLE_IN_TRANSACTION_TIMEOUT:
+      return new AppError('SERVICE_BUSY', 'The system took too long to respond. Please retry; narrow the date range for large reports.', 503);
     case PG_INVALID_TEXT_REPRESENTATION:
       return AppError.badRequest('INVALID_IDENTIFIER', 'An identifier in the request is malformed.');
     default:
