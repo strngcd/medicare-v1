@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Cross, HelpCircle, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Search, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { NAVIGATION } from '../constants/navigation.js';
+import { preloadRoutes } from '../routes.jsx';
 import { api } from '../api/client.js';
 import { useApi, usePolling } from '../hooks/useApi.js';
 import { Dropdown, IconButton } from '../components/ui/index.js';
@@ -36,6 +37,8 @@ export function AppLayout() {
   usePolling(() => alerts.reload({ silent: true }), 120000);
 
   useEffect(() => setMobileOpen(false), [location.pathname]);
+  // Fetch page code in the background so later navigation is instant.
+  useEffect(() => preloadRoutes(canAny), [user.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleCollapsed = () => {
     setCollapsed((c) => {

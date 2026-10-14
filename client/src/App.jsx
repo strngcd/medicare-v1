@@ -30,7 +30,9 @@ export default function App() {
             key={route.path}
             path={route.path}
             element={(
-              <Suspense fallback={<PageLoader />}>
+              // Keyed per route: a new boundary shows its loader at once instead of
+              // React holding the previous page while this page's code downloads.
+              <Suspense key={route.path} fallback={<PageLoader />}>
                 {route.home ? (
                   <Home route={route} />
                 ) : route.any ? (

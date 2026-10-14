@@ -1,7 +1,10 @@
 import { lazy } from 'react';
 
-/** Route table: path, lazily loaded page and the permissions that open it. */
-const page = (loader) => lazy(loader);
+/**
+ * Route table: path, lazily loaded page and the permissions that open it.
+ * Each page keeps its loader so the shell can fetch page code ahead of time.
+ */
+const page = (loader) => Object.assign(lazy(loader), { preload: loader });
 
 export const APP_ROUTES = [
   { path: '/', element: page(() => import('./pages/dashboard/DashboardPage.jsx')), any: ['DASHBOARD_VIEW'], home: true },
@@ -40,3 +43,21 @@ export const APP_ROUTES = [
   { path: '/help', element: page(() => import('./pages/help/HelpCenterPage.jsx')) },
   { path: '/help/:slug', element: page(() => import('./pages/help/HelpArticlePage.jsx')) },
 ];
+
+/**
+ * Downloads the code of every page the user may open, one at a time and
+ * only when the browser is idle, so switching pages does not wait on the network.
+ */
+export function preloadRoutes(canAny) {
+  const loaders = [...new Set(APP_ROUTES.filter((r) => !r.any || canAny(...r.any)).map((r) => r.element.preload))];
+  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
+  let cancelled = false;
+  const next = () => {
+    if (cancelled || loaders.length === 0) return;
+    loaders.shift()().catch(() => {}).finally(() => idle(next));
+  };
+  idle(next);
+  return () => {
+    cancelled = true;
+  };
+}
