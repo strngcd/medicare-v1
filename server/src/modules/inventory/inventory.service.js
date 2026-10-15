@@ -79,6 +79,7 @@ async function listInventory(auth, query, forcedStatuses) {
     search: query.search,
     statuses,
     archived: Boolean(query.archived),
+    inStock: Boolean(query.inStock),
     ...params,
   });
   return { rows: presentInventory(auth, rows), total, page: params.page, limit: params.limit };

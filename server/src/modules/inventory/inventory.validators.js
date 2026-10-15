@@ -13,6 +13,7 @@ const listInventoryQuery = listQuery.extend({
   categoryId: uuid.optional(),
   status: z.enum(INVENTORY_STATUSES).optional(),
   archived: queryBoolean.optional(),
+  inStock: queryBoolean.optional(),
 });
 
 const branchScopedQuery = listQuery.extend({ branchId: uuid.optional() });

@@ -9,6 +9,7 @@ import {
   PageHeader, Panel, Button, StatusBadge, Steps, Details, DataTable, ErrorState, SkeletonRows, Modal, TextArea, InlineAlert, ConfirmDialog, LearnHow,
 } from '../../components/ui/index.js';
 import { formatDate, formatDateTime } from '../../utils/format.js';
+import { ProductName } from '../../components/ProductName.jsx';
 
 const STEPS = [
   { value: 'DRAFT', label: 'Draft' },
@@ -49,11 +50,11 @@ function StepModal({ transfer, stage, onClose, onDone }) {
       {stage === 'ship' && <InlineAlert tone="info">Shipping removes the stock from {transfer.sourceBranchName} now.</InlineAlert>}
       {stage === 'receive' && <InlineAlert tone="info">Only the quantity you receive enters {transfer.destinationBranchName}. Missing units are recorded as a discrepancy.</InlineAlert>}
       <table className="table responsive">
-        <thead><tr><th>Medicine</th><th>Batch</th><th className="num">Requested</th><th className="num">Approved</th><th className="num">Shipped</th><th className="num">{config.label}</th></tr></thead>
+        <thead><tr><th>Product</th><th>Batch</th><th className="num">Requested</th><th className="num">Approved</th><th className="num">Shipped</th><th className="num">{config.label}</th></tr></thead>
         <tbody>
           {transfer.items.map((i) => (
             <tr key={i.id}>
-              <td data-label="Medicine" className="cell-strong">{i.medicineName}</td>
+              <td data-label="Product"><ProductName row={i} /></td>
               <td data-label="Batch" className="mono">{i.batchNumber}</td>
               <td data-label="Requested" className="num">{i.requestedQuantity}</td>
               <td data-label="Approved" className="num">{i.approvedQuantity ?? '—'}</td>
@@ -133,7 +134,7 @@ export default function TransferDetailPage() {
       </Panel>
       <Panel title="Batches" flush>
         <DataTable rows={t.items} columns={[
-          { key: 'medicineName', label: 'Medicine', render: (i) => <span className="cell-strong">{i.medicineName}</span> },
+          { key: 'medicineName', label: 'Product', render: (i) => <ProductName row={i} /> },
           { key: 'batchNumber', label: 'Batch', render: (i) => <span className="mono">{i.batchNumber}</span> },
           { key: 'expiryDate', label: 'Expiry', render: (i) => formatDate(i.expiryDate) },
           { key: 'requestedQuantity', label: 'Requested', align: 'right' },

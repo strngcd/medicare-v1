@@ -6,7 +6,7 @@ const { medicineStockCte, rowStatusSql } = require('./inventoryStatus');
  * Inventory rows (branch x batch) with derived status.
  * Params $1 = business date, $2 = expiry warning days.
  */
-async function listInventory({ today, warningDays, ids, branchIds, medicineId, categoryId, productType, statuses, search, archived = false, limit, offset, orderBy }) {
+async function listInventory({ today, warningDays, ids, branchIds, medicineId, categoryId, productType, statuses, search, archived = false, inStock = false, limit, offset, orderBy }) {
   // $3 is the branch scope, shared by the stock CTE and the row filter.
   const w = whereBuilder([today, warningDays, branchIds || null]);
   if (ids) w.add('bi.id = ANY(?::uuid[])', ids);
@@ -16,6 +16,8 @@ async function listInventory({ today, warningDays, ids, branchIds, medicineId, c
   if (medicineId) w.add('b.medicine_id = ?', medicineId);
   if (categoryId) w.add('m.category_id = ?', categoryId);
   if (productType) w.add('m.product_type = ?', productType);
+  // Rows that still hold usable (non-expired) stock, e.g. what can be transferred.
+  if (inStock) w.add('bi.quantity > 0 AND (b.expiry_date IS NULL OR b.expiry_date >= $1::date)');
   if (search) w.add('(m.name ILIKE ? OR m.generic_name ILIKE ? OR b.batch_number ILIKE ? OR m.barcode = ?)', `%${search}%`, `%${search}%`, `%${search}%`, search);
   if (statuses && statuses.length) w.add(`(${rowStatusSql('$1', '$2')}) = ANY(?::text[])`, statuses);
 
