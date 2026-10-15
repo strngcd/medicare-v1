@@ -13,6 +13,36 @@ import { QuantityInput } from '../../components/sales/QuantityInput.jsx';
 import { estimateTotals, toCents, fromCents } from '../../utils/money.js';
 import { formatDate, formatMoney, formatNumber, PRODUCT_TYPE_OPTIONS } from '../../utils/format.js';
 
+/**
+ * Which batches this cart line will be sold from: the live FEFO plan, or the
+ * batches picked manually. Only a preview; the sale re-allocates under locks.
+ */
+function CartBatchPlan({ line, branchId }) {
+  const quantity = useDebouncedValue(line.quantity, 300);
+  const manual = Boolean(line.batchAllocations);
+  const preview = useApi(
+    () => api.post('/inventory/fefo-preview', { branchId, medicineId: line.medicineId, quantity }).then((r) => r.data),
+    [branchId, line.medicineId, quantity],
+    { enabled: !manual },
+  );
+  const plan = manual ? line.batchPlan || [] : (preview.data && preview.data.allocation) || [];
+  if (!manual && !preview.data) return <span className="small muted">Finding batches…</span>;
+  if (plan.length === 0) return null;
+  return (
+    <span className="small muted stack-sm" style={{ gap: 0 }}>
+      <span>{manual ? 'Chosen batches:' : 'FEFO — sell from:'}</span>
+      {plan.map((a) => (
+        <span key={a.batchId}>
+          <span className="mono">{a.batchNumber || 'Batch'}</span>
+          {a.expiryDate ? ` · exp ${formatDate(a.expiryDate)}` : ''} · <strong>{formatNumber(a.quantity)}</strong>
+          {line.priceVaries && a.sellingPrice ? ` × ${formatMoney(a.sellingPrice)}` : ''}
+        </span>
+      ))}
+      {!manual && preview.data && !preview.data.sufficient && <span className="warning-text">Only {formatNumber(preview.data.availableQuantity)} in stock now.</span>}
+    </span>
+  );
+}
+
 /** Optional FEFO override: pick exact batches with a reason (permission-gated). */
 function BatchOverrideModal({ line, branchId, onClose, onApply }) {
   const preview = useApi(() => api.post('/inventory/fefo-preview', { branchId, medicineId: line.medicineId, quantity: line.quantity }).then((r) => r.data), []);
@@ -26,10 +56,15 @@ function BatchOverrideModal({ line, branchId, onClose, onApply }) {
         <>
           {line.batchAllocations && <Button variant="ghost" onClick={() => onApply(null)}>Use FEFO again</Button>}
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button disabled={total !== line.quantity || !reason.trim()} onClick={() => onApply({
-            batchAllocations: Object.entries(picked).filter(([, q]) => Number(q) > 0).map(([batchId, q]) => ({ batchId, quantity: Number(q) })),
-            fefoOverrideReason: reason.trim(),
-          })}>Apply</Button>
+          <Button disabled={total !== line.quantity || !reason.trim()} onClick={() => {
+            const batchAllocations = Object.entries(picked).filter(([, q]) => Number(q) > 0).map(([batchId, q]) => ({ batchId, quantity: Number(q) }));
+            const byId = new Map(preview.data.sellableBatches.map((b) => [b.batchId, b]));
+            onApply({
+              batchAllocations,
+              batchPlan: batchAllocations.map((a) => ({ ...a, ...pick(byId.get(a.batchId)) })),
+              fefoOverrideReason: reason.trim(),
+            });
+          }}>Apply</Button>
         </>
       )}>
       <InlineAlert tone="warning">FEFO sells the batch that expires first. Overrides are recorded with your name and reason.</InlineAlert>
@@ -57,6 +92,8 @@ function BatchOverrideModal({ line, branchId, onClose, onApply }) {
     </Modal>
   );
 }
+
+const pick = (b) => (b ? { batchNumber: b.batchNumber, expiryDate: b.expiryDate, sellingPrice: b.sellingPrice } : {});
 
 export default function PosPage() {
   const { branchParam, selectedBranch, isAllBranches, pharmacy, can } = useAuth();
@@ -100,7 +137,7 @@ export default function PosPage() {
           toast.error(`Only ${m.sellableQuantity} unit(s) of ${m.name} available.`);
           return list;
         }
-        return list.map((l) => (l.medicineId === m.id ? { ...l, quantity: l.quantity + 1, batchAllocations: undefined } : l));
+        return list.map((l) => (l.medicineId === m.id ? { ...l, quantity: l.quantity + 1, batchAllocations: undefined, batchPlan: undefined } : l));
       }
       return [...list, {
         medicineId: m.id,
@@ -130,7 +167,7 @@ export default function PosPage() {
     setCart((list) => list.map((l) => {
       if (l.medicineId !== medicineId) return l;
       const q = Math.max(1, Math.min(l.available, Math.trunc(Number(value) || 1)));
-      return { ...l, quantity: q, batchAllocations: undefined, fefoOverrideReason: undefined };
+      return { ...l, quantity: q, batchAllocations: undefined, batchPlan: undefined, fefoOverrideReason: undefined };
     }));
   };
 
@@ -241,6 +278,7 @@ export default function PosPage() {
                     <span className="small muted">{l.detail}</span>
                     <span className="small">{formatMoney(l.unitPrice)} each{l.priceVaries ? ' (varies by batch)' : ''}</span>
                     {l.batchAllocations && <span className="small warning-text">Batches chosen manually</span>}
+                    <CartBatchPlan line={l} branchId={branchId} />
                   </div>
                   <IconButton icon={Trash2} label={`Remove ${l.name}`} onClick={() => setCart((list) => list.filter((x) => x.medicineId !== l.medicineId))} />
                   <div className="row">
@@ -303,7 +341,12 @@ export default function PosPage() {
       {overrideFor && (
         <BatchOverrideModal line={overrideFor} branchId={branchId} onClose={() => setOverrideFor(null)} onApply={(choice) => {
           setCart((list) => list.map((l) => (l.medicineId === overrideFor.medicineId
-            ? { ...l, batchAllocations: choice ? choice.batchAllocations : undefined, fefoOverrideReason: choice ? choice.fefoOverrideReason : undefined }
+            ? {
+              ...l,
+              batchAllocations: choice ? choice.batchAllocations : undefined,
+              batchPlan: choice ? choice.batchPlan : undefined,
+              fefoOverrideReason: choice ? choice.fefoOverrideReason : undefined,
+            }
             : l)));
           setOverrideFor(null);
         }} />
