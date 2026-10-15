@@ -41,5 +41,8 @@ Thumbs.db
 tmp/
 .tmp/
 
+# Supabase CLI local cache (project link, pooler URL)
+supabase/.temp/
+
 # Local demo credentials
 DEMO_USERS.md
