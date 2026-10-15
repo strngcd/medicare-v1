@@ -9,6 +9,7 @@ const COLUMNS = `
 
 async function list({ status, search, limit, offset, orderBy }) {
   const w = whereBuilder();
+  w.add('s.deleted_at IS NULL');
   if (status) w.add('s.status = ?', status);
   if (search) w.add('(s.company_name ILIKE ? OR s.contact_person ILIKE ? OR s.phone ILIKE ?)', `%${search}%`, `%${search}%`, `%${search}%`);
   const { rows } = await query(
@@ -23,7 +24,7 @@ async function list({ status, search, limit, offset, orderBy }) {
 
 async function findById(id, client, { forUpdate = false } = {}) {
   const { rows } = await query(
-    `SELECT ${COLUMNS} FROM suppliers s WHERE s.id = $1 ${forUpdate ? 'FOR UPDATE OF s' : ''}`,
+    `SELECT ${COLUMNS} FROM suppliers s WHERE s.id = $1 AND s.deleted_at IS NULL ${forUpdate ? 'FOR UPDATE OF s' : ''}`,
     [id],
     client,
   );
@@ -36,7 +37,7 @@ async function findSimilar(client, companyName, excludeId = null) {
     `SELECT s.id, s.company_name, s.phone, s.status
        FROM suppliers s
       WHERE ${NORMALIZED_NAME} = lower(regexp_replace(trim($1), '\\s+', ' ', 'g'))
-        AND ($2::uuid IS NULL OR s.id <> $2)`,
+        AND s.deleted_at IS NULL AND ($2::uuid IS NULL OR s.id <> $2)`,
     [companyName, excludeId],
     client,
   );
@@ -86,4 +87,29 @@ async function setStatus(client, id, status, actorId) {
   );
 }
 
-module.exports = { list, findById, findSimilar, insert, update, setStatus };
+/** True once a purchase, payment or received batch refers to the supplier. */
+async function hasActivity(id, client) {
+  const { rows } = await query(
+    `SELECT EXISTS (SELECT 1 FROM purchases WHERE supplier_id = $1)
+         OR EXISTS (SELECT 1 FROM supplier_payments WHERE supplier_id = $1)
+         OR EXISTS (SELECT 1 FROM batches WHERE supplier_id = $1) AS used`,
+    [id],
+    client,
+  );
+  return rows[0].used;
+}
+
+/** Soft delete: hidden everywhere from now on. */
+async function markDeleted(client, id, actorId) {
+  await query(
+    `UPDATE suppliers
+        SET status = 'ARCHIVED', updated_by = $2,
+            archived_at = COALESCE(archived_at, now()), archived_by = COALESCE(archived_by, $2),
+            deleted_at = now(), deleted_by = $2
+      WHERE id = $1`,
+    [id, actorId],
+    client,
+  );
+}
+
+module.exports = { list, findById, findSimilar, insert, update, setStatus, hasActivity, markDeleted };

@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
 import { PageHeader, Panel, Button, StatusBadge, Details, Kpi, DataTable, ErrorState, SkeletonRows, ConfirmDialog, InlineAlert, EmptyState } from '../../components/ui/index.js';
 import { BranchModal } from './BranchModal.jsx';
+import { DeleteRecordButton } from '../../components/DeleteRecordButton.jsx';
 import { formatDateTime, formatMoney, formatNumber } from '../../utils/format.js';
 
 export default function BranchDetailPage() {
@@ -43,6 +44,7 @@ export default function BranchDetailPage() {
             {b.status === 'ACTIVE'
               ? <Can permission="BRANCH_DEACTIVATE"><Button variant="ghost" icon={PowerOff} onClick={() => setModal('deactivate')}>Deactivate</Button></Can>
               : <Can permission="BRANCH_REACTIVATE"><Button variant="secondary" icon={Power} onClick={toggle} loading={action.running}>Reactivate</Button></Can>}
+            {b.canDelete && <Can permission="BRANCH_DEACTIVATE"><DeleteRecordButton path={`/branches/${id}`} name={b.name} what="branch" listPath="/branches" onDeleted={refresh} /></Can>}
           </>
         )}
       />

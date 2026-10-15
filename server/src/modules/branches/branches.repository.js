@@ -8,6 +8,7 @@ const BRANCH_COLUMNS = `
 
 async function list({ branchIds, status, search, limit, offset, orderBy }) {
   const w = whereBuilder();
+  w.add('b.deleted_at IS NULL');
   if (branchIds) w.add('b.id = ANY(?::uuid[])', branchIds);
   if (status) w.add('b.status = ?', status);
   if (search) w.add('(b.name ILIKE ? OR b.code ILIKE ? OR b.city ILIKE ?)', `%${search}%`, `%${search}%`, `%${search}%`);
@@ -30,7 +31,7 @@ async function findById(id, client, { forUpdate = false } = {}) {
   const { rows } = await query(
     `SELECT ${BRANCH_COLUMNS}
        FROM branches b LEFT JOIN users m ON m.id = b.manager_user_id
-      WHERE b.id = $1 ${forUpdate ? 'FOR UPDATE OF b' : ''}`,
+      WHERE b.id = $1 AND b.deleted_at IS NULL ${forUpdate ? 'FOR UPDATE OF b' : ''}`,
     [id],
     client,
   );
@@ -38,7 +39,7 @@ async function findById(id, client, { forUpdate = false } = {}) {
 }
 
 async function findByCode(code, client) {
-  const { rows } = await query('SELECT id FROM branches WHERE code = $1', [code], client);
+  const { rows } = await query('SELECT id FROM branches WHERE code = $1 AND deleted_at IS NULL', [code], client);
   return rows[0] || null;
 }
 
@@ -181,7 +182,45 @@ async function updateSettings(client, branchId, changes, actorId) {
   await query(`UPDATE branch_settings SET ${sets.join(', ')} WHERE branch_id = $1`, params, client);
 }
 
+/** True once any business record (stock, sales, purchases, transfers, money) refers to the branch. */
+async function hasActivity(id, client) {
+  const { rows } = await query(
+    `SELECT EXISTS (SELECT 1 FROM branch_inventory WHERE branch_id = $1)
+         OR EXISTS (SELECT 1 FROM stock_movements WHERE branch_id = $1)
+         OR EXISTS (SELECT 1 FROM sales WHERE branch_id = $1)
+         OR EXISTS (SELECT 1 FROM refunds WHERE branch_id = $1)
+         OR EXISTS (SELECT 1 FROM purchases WHERE branch_id = $1)
+         OR EXISTS (SELECT 1 FROM supplier_payments WHERE branch_id = $1)
+         OR EXISTS (SELECT 1 FROM inventory_adjustments WHERE branch_id = $1)
+         OR EXISTS (SELECT 1 FROM transfers WHERE source_branch_id = $1 OR destination_branch_id = $1) AS used`,
+    [id],
+    client,
+  );
+  return rows[0].used;
+}
+
+/** Soft delete: hidden everywhere from now on; staff lose the assignment. */
+async function markDeleted(client, id, actorId) {
+  await query('DELETE FROM user_branches WHERE branch_id = $1', [id], client);
+  await query(
+    'UPDATE users SET last_selected_branch_id = NULL WHERE last_selected_branch_id = $1 AND deleted_at IS NULL',
+    [id],
+    client,
+  );
+  await query(
+    `UPDATE branches
+        SET status = 'INACTIVE', manager_user_id = NULL,
+            deactivated_at = COALESCE(deactivated_at, now()), deactivated_by = COALESCE(deactivated_by, $2),
+            deleted_at = now(), deleted_by = $2
+      WHERE id = $1`,
+    [id, actorId],
+    client,
+  );
+}
+
 module.exports = {
+  hasActivity,
+  markDeleted,
   list,
   findById,
   findByCode,

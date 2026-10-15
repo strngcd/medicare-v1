@@ -26,6 +26,11 @@ module.exports = {
       message: 'Supplier archived.',
     });
   },
+  async remove(req, res) {
+    sendData(res, await service.deleteSupplier(req.auth, actorFromRequest(req), req.valid.params.id), {
+      message: 'Supplier deleted.',
+    });
+  },
   async restore(req, res) {
     sendData(res, await service.restoreSupplier(req.auth, actorFromRequest(req), req.valid.params.id), {
       message: 'Supplier restored.',

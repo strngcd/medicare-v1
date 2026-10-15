@@ -56,6 +56,7 @@ router.delete(
   validate({ params: v.permissionParams }),
   controller.clearPermission,
 );
+router.delete('/:id', requirePermission(P.STAFF_DEACTIVATE), validate({ params: idParam }), controller.remove);
 router.post('/:id/deactivate', requirePermission(P.STAFF_DEACTIVATE), validate({ params: idParam }), controller.deactivate);
 router.post('/:id/reactivate', requirePermission(P.STAFF_REACTIVATE), validate({ params: idParam }), controller.reactivate);
 router.get(

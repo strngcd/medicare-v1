@@ -22,6 +22,7 @@ router.patch(
   validate({ params: idParam, body: v.updateSupplierBody }),
   controller.update,
 );
+router.delete('/:id', requirePermission(P.SUPPLIER_ARCHIVE), validate({ params: idParam }), controller.remove);
 router.post('/:id/archive', requirePermission(P.SUPPLIER_ARCHIVE), validate({ params: idParam }), controller.archive);
 router.post('/:id/restore', requirePermission(P.SUPPLIER_RESTORE), validate({ params: idParam }), controller.restore);
 

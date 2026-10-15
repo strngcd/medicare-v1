@@ -26,7 +26,8 @@ async function listSuppliers(query) {
 async function getSupplier(id) {
   const row = await repo.findById(id);
   if (!row) throw AppError.notFound('Supplier not found.');
-  return toDto(row);
+  // Only a supplier nothing was ever bought from or paid may be deleted.
+  return { ...toDto(row), canDelete: !(await repo.hasActivity(id)) };
 }
 
 async function createSupplier(auth, actor, data) {
@@ -87,7 +88,31 @@ async function changeStatus(auth, actor, id, targetStatus) {
   });
 }
 
+/** Deletes a supplier created by mistake (soft delete, only while unused). */
+async function deleteSupplier(auth, actor, id) {
+  return withTransaction(async (client) => {
+    const existing = await repo.findById(id, client, { forUpdate: true });
+    if (!existing) throw AppError.notFound('Supplier not found.');
+    if (await repo.hasActivity(id, client)) {
+      throw AppError.conflict(
+        'RECORD_IN_USE',
+        'This supplier already has purchases or payments, so it cannot be deleted. Archive it instead.',
+      );
+    }
+    await repo.markDeleted(client, id, auth.userId);
+    await recordAudit(client, actor, {
+      action: 'SUPPLIER_DELETED',
+      entityType: 'SUPPLIER',
+      entityId: id,
+      description: `Supplier ${existing.company_name} deleted`,
+      previousValues: toDto(existing),
+    });
+    return { id };
+  });
+}
+
 module.exports = {
+  deleteSupplier,
   listSuppliers,
   getSupplier,
   createSupplier,

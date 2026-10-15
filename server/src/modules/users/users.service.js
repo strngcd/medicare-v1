@@ -116,8 +116,15 @@ async function listUsers(auth, query) {
   return { rows: rows.map(toDto), total, page: params.page, limit: params.limit };
 }
 
+function mayManage(auth, target) {
+  return auth.isOwner || target.role_rank > auth.roleRank;
+}
+
 async function getUser(auth, id) {
-  return toDto(await loadVisibleUser(auth, id));
+  const target = await loadVisibleUser(auth, id);
+  // Only an account that has not recorded anything yet may be deleted.
+  const canDelete = target.id !== auth.userId && mayManage(auth, target) && !(await repo.hasActivity(id));
+  return { ...toDto(target), canDelete };
 }
 
 async function getUserPermissions(auth, id) {
@@ -442,6 +449,39 @@ async function deactivateUser(auth, actor, id) {
   });
 }
 
+/**
+ * Deletes an account created by mistake. Allowed only while the user has not
+ * recorded any sale, purchase, stock change, transfer or payment. The row is
+ * kept (soft delete) so audit and login history still resolve.
+ */
+async function deleteUser(auth, actor, id) {
+  return withTransaction(async (client) => {
+    assertNotSelf(auth, id, 'account');
+    const target = await loadVisibleUser(auth, id, client, { forUpdate: true });
+    assertCanManage(auth, target);
+    if (await repo.hasActivity(id, client)) {
+      throw AppError.conflict(
+        'RECORD_IN_USE',
+        'This staff member has already recorded transactions, so the account cannot be deleted. Deactivate it instead.',
+      );
+    }
+    if (target.role_code === ROLES.OWNER && target.status === 'ACTIVE' && (await repo.countActiveOwners(client)) <= 1) {
+      throw AppError.conflict('LAST_OWNER', 'The organization must keep at least one active Owner.');
+    }
+
+    await repo.markDeleted(client, id, auth.userId);
+    await revokeUserSessions(client, id, 'ACCOUNT_DEACTIVATED');
+    await recordAudit(client, actor, {
+      action: 'DELETED',
+      entityType: 'USER',
+      entityId: id,
+      description: `Account of ${target.full_name} deleted`,
+      previousValues: toDto(target),
+    });
+    return { id };
+  });
+}
+
 async function reactivateUser(auth, actor, id) {
   return withTransaction(async (client) => {
     assertNotSelf(auth, id, 'account status');
@@ -578,6 +618,7 @@ module.exports = {
   setBranches,
   setPermissionOverride,
   deactivateUser,
+  deleteUser,
   reactivateUser,
   getMe,
   updateMe,

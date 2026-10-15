@@ -3,7 +3,7 @@ const { logoUrlSql } = require('../files/files');
 
 async function findUserForLogin(email, client) {
   const { rows } = await query(
-    'SELECT id, password_hash, status, last_selected_branch_id FROM users WHERE lower(email) = lower($1)',
+    'SELECT id, password_hash, status, last_selected_branch_id FROM users WHERE lower(email) = lower($1) AND deleted_at IS NULL',
     [email],
     client,
   );
@@ -70,7 +70,7 @@ async function markLoggedIn(client, userId, branchId) {
 async function listActiveBranchesForUser(userId, isOwner, client) {
   const { rows } = isOwner
     ? await query(
-        `SELECT id, name, code, status FROM branches ORDER BY status, name`,
+        `SELECT id, name, code, status FROM branches WHERE deleted_at IS NULL ORDER BY status, name`,
         [],
         client,
       )
@@ -130,7 +130,7 @@ async function claimPasswordToken(client, tokenHash) {
   const { rows } = await query(
     `SELECT t.id, t.user_id, t.purpose, u.status
        FROM password_tokens t JOIN users u ON u.id = t.user_id
-      WHERE t.token_hash = $1 AND t.used_at IS NULL AND t.expires_at > now()
+      WHERE t.token_hash = $1 AND t.used_at IS NULL AND t.expires_at > now() AND u.deleted_at IS NULL
       FOR UPDATE OF t`,
     [tokenHash],
     client,

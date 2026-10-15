@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { Can } from '../../permissions/Can.jsx';
 import { PageHeader, Panel, Button, StatusBadge, Details, Kpi, DataTable, ErrorState, SkeletonRows, EmptyState } from '../../components/ui/index.js';
 import { SupplierModal } from './SupplierModal.jsx';
+import { DeleteRecordButton } from '../../components/DeleteRecordButton.jsx';
 import { formatDate, formatMoney, formatNumber } from '../../utils/format.js';
 
 export default function SupplierDetailPage() {
@@ -43,6 +44,7 @@ export default function SupplierDetailPage() {
             {s.status === 'ACTIVE'
               ? <Can permission="SUPPLIER_ARCHIVE"><Button variant="ghost" icon={Archive} onClick={toggle} loading={action.running}>Archive</Button></Can>
               : <Can permission="SUPPLIER_RESTORE"><Button variant="secondary" icon={ArchiveRestore} onClick={toggle} loading={action.running}>Restore</Button></Can>}
+            {s.canDelete && <Can permission="SUPPLIER_ARCHIVE"><DeleteRecordButton path={`/suppliers/${id}`} name={s.companyName} what="supplier" listPath="/suppliers" /></Can>}
           </>
         )}
       />

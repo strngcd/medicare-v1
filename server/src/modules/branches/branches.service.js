@@ -29,7 +29,8 @@ async function getBranch(auth, id) {
   assertBranchAccess(auth, id);
   const branch = await repo.findById(id);
   if (!branch) throw AppError.notFound('Branch not found.');
-  return toDto(branch);
+  // Only a branch nothing has happened in yet may be deleted.
+  return { ...toDto(branch), canDelete: !(await repo.hasActivity(id)) };
 }
 
 /** Branches the user can pick in the header selector. */
@@ -184,6 +185,44 @@ async function reactivateBranch(auth, actor, id) {
   });
 }
 
+/**
+ * Deletes a branch created by mistake. Allowed only while it has no stock,
+ * sales, purchases, transfers or payments; the row is kept (soft delete) so
+ * audit and login history still resolve.
+ */
+async function deleteBranch(auth, actor, id) {
+  assertBranchAccess(auth, id);
+  return withTransaction(async (client) => {
+    const branch = await repo.findById(id, client, { forUpdate: true });
+    if (!branch) throw AppError.notFound('Branch not found.');
+    if (await repo.hasActivity(id, client)) {
+      throw AppError.conflict(
+        'RECORD_IN_USE',
+        'This branch already has stock or transactions, so it cannot be deleted. Deactivate it instead.',
+      );
+    }
+    const dependentStaff = await repo.findStaffDependingOnBranch(client, id);
+    if (dependentStaff.length > 0) {
+      throw AppError.conflict(
+        'BRANCH_HAS_DEPENDENT_STAFF',
+        'Some active staff have no other active branch. Reassign or deactivate them first.',
+        { staff: dependentStaff.map((s) => ({ id: s.id, fullName: s.full_name })) },
+      );
+    }
+
+    await repo.markDeleted(client, id, auth.userId);
+    await recordAudit(client, actor, {
+      action: 'BRANCH_DELETED',
+      entityType: 'BRANCH',
+      entityId: id,
+      branchId: id,
+      description: `Branch ${branch.name} (${branch.code}) deleted`,
+      previousValues: toDto(branch),
+    });
+    return { id };
+  });
+}
+
 async function listBranchUsers(auth, id) {
   await getBranch(auth, id);
   return camelize(await repo.listUsers(id));
@@ -228,6 +267,7 @@ module.exports = {
   updateBranch,
   deactivateBranch,
   reactivateBranch,
+  deleteBranch,
   listBranchUsers,
   getBranchSettings,
   updateBranchSettings,

@@ -22,6 +22,7 @@ const BRANCHES_JSON = `
  */
 async function list({ visibleBranchIds, search, roleCode, branchId, status, limit, offset, orderBy }) {
   const w = whereBuilder();
+  w.add('u.deleted_at IS NULL');
   if (visibleBranchIds) {
     w.add(
       `(r.code = 'OWNER' OR EXISTS (SELECT 1 FROM user_branches vb WHERE vb.user_id = u.id AND vb.branch_id = ANY(?::uuid[])))`,
@@ -55,7 +56,7 @@ async function findById(id, client, { forUpdate = false } = {}) {
   const { rows } = await query(
     `SELECT ${USER_COLUMNS}, ${BRANCHES_JSON}
        FROM users u JOIN roles r ON r.id = u.role_id
-      WHERE u.id = $1`,
+      WHERE u.id = $1 AND u.deleted_at IS NULL`,
     [id],
     client,
   );
@@ -70,9 +71,9 @@ async function findRoleByCode(code, client) {
 async function findConflicts(client, { email, employeeId, excludeUserId }) {
   const { rows } = await query(
     `SELECT
-       EXISTS (SELECT 1 FROM users WHERE lower(email) = lower($1) AND ($3::uuid IS NULL OR id <> $3)) AS email_taken,
+       EXISTS (SELECT 1 FROM users WHERE lower(email) = lower($1) AND deleted_at IS NULL AND ($3::uuid IS NULL OR id <> $3)) AS email_taken,
        ($2::text IS NOT NULL AND EXISTS (
-         SELECT 1 FROM users WHERE lower(employee_id) = lower($2) AND ($3::uuid IS NULL OR id <> $3)
+         SELECT 1 FROM users WHERE lower(employee_id) = lower($2) AND deleted_at IS NULL AND ($3::uuid IS NULL OR id <> $3)
        )) AS employee_id_taken`,
     [email || null, employeeId || null, excludeUserId || null],
     client,
@@ -138,7 +139,7 @@ async function countActiveOwners(client) {
 }
 
 async function findBranchesByIds(client, ids) {
-  const { rows } = await query('SELECT id, name, code, status FROM branches WHERE id = ANY($1::uuid[])', [ids], client);
+  const { rows } = await query('SELECT id, name, code, status FROM branches WHERE id = ANY($1::uuid[]) AND deleted_at IS NULL', [ids], client);
   return rows;
 }
 
@@ -263,7 +264,43 @@ async function findCvFileId(id, client) {
   return rows[0] ? rows[0].cv_file_id : null;
 }
 
+/** True once the user has recorded any business transaction (logins do not count). */
+async function hasActivity(id, client) {
+  const { rows } = await query(
+    `SELECT EXISTS (SELECT 1 FROM sales WHERE sold_by = $1 OR voided_by = $1)
+         OR EXISTS (SELECT 1 FROM stock_movements WHERE created_by = $1)
+         OR EXISTS (SELECT 1 FROM refunds WHERE processed_by = $1)
+         OR EXISTS (SELECT 1 FROM purchases WHERE created_by = $1 OR updated_by = $1 OR cancelled_by = $1)
+         OR EXISTS (SELECT 1 FROM purchase_receivings WHERE received_by = $1)
+         OR EXISTS (SELECT 1 FROM supplier_payments WHERE recorded_by = $1)
+         OR EXISTS (SELECT 1 FROM inventory_adjustments WHERE created_by = $1)
+         OR EXISTS (SELECT 1 FROM transfers
+                     WHERE $1 IN (created_by, requested_by, approved_by, shipped_by, received_by,
+                                  cancelled_by, discrepancy_recorded_by)) AS used`,
+    [id],
+    client,
+  );
+  return rows[0].used;
+}
+
+/** Soft delete: the account can no longer sign in and is hidden everywhere. */
+async function markDeleted(client, id, actorId) {
+  await query('DELETE FROM user_branches WHERE user_id = $1', [id], client);
+  await query('UPDATE branches SET manager_user_id = NULL WHERE manager_user_id = $1 AND deleted_at IS NULL', [id], client);
+  await query(
+    `UPDATE users
+        SET status = 'INACTIVE',
+            deactivated_at = COALESCE(deactivated_at, now()), deactivated_by = COALESCE(deactivated_by, $2),
+            deleted_at = now(), deleted_by = $2
+      WHERE id = $1`,
+    [id, actorId],
+    client,
+  );
+}
+
 module.exports = {
+  hasActivity,
+  markDeleted,
   setCv,
   findCvFileId,
   list,

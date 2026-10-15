@@ -236,7 +236,7 @@ async function branchComparison(filters) {
                        JOIN sale_item_batch_allocations sa ON sa.sale_item_id = ri.sale_item_id AND sa.batch_id = ra.batch_id
                        WHERE rr.branch_id = b.id), 0)::numeric(14,2) AS refunded_cogs
        FROM branches b
-      WHERE ($4::uuid[] IS NULL OR b.id = ANY($4::uuid[]))
+      WHERE b.deleted_at IS NULL AND ($4::uuid[] IS NULL OR b.id = ANY($4::uuid[]))
       ORDER BY gross_sales DESC, b.name`,
     params,
   );
@@ -449,7 +449,7 @@ async function supplierSummary({ dateFrom, dateTo, branchIds, search, limit, off
        LEFT JOIN purchases p ON p.supplier_id = s.id
             AND p.purchase_date BETWEEN $1::date AND $2::date
             AND ($3::uuid[] IS NULL OR p.branch_id = ANY($3::uuid[]))
-      WHERE ($4::text IS NULL OR s.company_name ILIKE '%' || $4 || '%')
+      WHERE s.deleted_at IS NULL AND ($4::text IS NULL OR s.company_name ILIKE '%' || $4 || '%')
       GROUP BY s.id
       ORDER BY total_purchased DESC, s.company_name
       LIMIT $5 OFFSET $6`,

@@ -64,6 +64,11 @@ module.exports = {
       message: 'Permission reset to role default.',
     });
   },
+  async remove(req, res) {
+    sendData(res, await service.deleteUser(req.auth, actorFromRequest(req), req.valid.params.id), {
+      message: 'Staff account deleted.',
+    });
+  },
   async deactivate(req, res) {
     sendData(res, await service.deactivateUser(req.auth, actorFromRequest(req), req.valid.params.id), {
       message: 'Account deactivated.',

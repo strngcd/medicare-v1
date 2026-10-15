@@ -173,7 +173,7 @@ async function findMedicineForStock(client, medicineId) {
 }
 
 async function findSupplier(client, supplierId) {
-  const { rows } = await query('SELECT id, company_name, status FROM suppliers WHERE id = $1', [supplierId], client);
+  const { rows } = await query('SELECT id, company_name, status FROM suppliers WHERE id = $1 AND deleted_at IS NULL', [supplierId], client);
   return rows[0] || null;
 }
 

@@ -35,7 +35,7 @@ function resolveBranchScope(auth, requestedBranchId) {
  */
 async function loadAccessibleBranch(auth, branchId, { requireActive = false, client } = {}) {
   assertBranchAccess(auth, branchId);
-  const { rows } = await query('SELECT id, name, code, status FROM branches WHERE id = $1', [branchId], client);
+  const { rows } = await query('SELECT id, name, code, status FROM branches WHERE id = $1 AND deleted_at IS NULL', [branchId], client);
   const branch = rows[0];
   if (!branch) throw AppError.notFound('Branch not found.');
   if (requireActive && branch.status !== 'ACTIVE') {

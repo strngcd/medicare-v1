@@ -20,6 +20,7 @@ router.get('/:id', requirePermission(P.BRANCH_VIEW), validate({ params: idParam 
 router.patch('/:id', requirePermission(P.BRANCH_EDIT), validate({ params: idParam, body: v.updateBranchBody }), controller.update);
 router.post('/:id/deactivate', requirePermission(P.BRANCH_DEACTIVATE), validate({ params: idParam }), controller.deactivate);
 router.post('/:id/reactivate', requirePermission(P.BRANCH_REACTIVATE), validate({ params: idParam }), controller.reactivate);
+router.delete('/:id', requirePermission(P.BRANCH_DEACTIVATE), validate({ params: idParam }), controller.remove);
 router.get('/:id/users', requirePermission(P.BRANCH_VIEW, P.STAFF_VIEW), validate({ params: idParam }), controller.users);
 router.get(
   '/:id/inventory-summary',

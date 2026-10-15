@@ -10,6 +10,7 @@ import {
   TextInput, Checkbox, InlineAlert, ConfirmDialog, Badge, LearnHow, FileInput, formatFileSize,
 } from '../../components/ui/index.js';
 import { assignableRoles, SetupLinkNotice } from './StaffPage.jsx';
+import { DeleteRecordButton } from '../../components/DeleteRecordButton.jsx';
 import { formatDate, formatDateTime, humanize } from '../../utils/format.js';
 
 const CV_MAX_BYTES = 5 * 1024 * 1024;
@@ -273,6 +274,7 @@ export default function StaffDetailPage() {
             {!s.hasPassword && s.status === 'ACTIVE' && can('STAFF_CREATE') && <Button variant="secondary" icon={Link2} onClick={resendLink} loading={action.running}>New setup link</Button>}
             {s.status === 'ACTIVE' && can('STAFF_DEACTIVATE') && <Button variant="ghost" icon={UserX} onClick={() => setConfirm('deactivate')}>Deactivate</Button>}
             {s.status === 'INACTIVE' && can('STAFF_REACTIVATE') && <Button variant="secondary" icon={UserCheck} onClick={toggleStatus} loading={action.running}>Reactivate</Button>}
+            {s.canDelete && can('STAFF_DEACTIVATE') && <DeleteRecordButton path={`/users/${id}`} name={s.fullName} what="staff account" listPath="/staff" />}
           </>
         )}
       />

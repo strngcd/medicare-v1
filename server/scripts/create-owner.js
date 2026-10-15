@@ -60,7 +60,7 @@ async function main() {
     const role = await client.query("SELECT id FROM roles WHERE code = 'OWNER'");
     if (!role.rows[0]) throw new Error('Roles are not seeded. Run "npm run seed" first.');
 
-    const existing = await client.query('SELECT 1 FROM users WHERE lower(email) = $1', [email]);
+    const existing = await client.query('SELECT 1 FROM users WHERE lower(email) = $1 AND deleted_at IS NULL', [email]);
     if (existing.rows[0]) throw new Error('A user with this email already exists.');
 
     const { rows } = await client.query(

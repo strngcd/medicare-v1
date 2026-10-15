@@ -30,6 +30,11 @@ module.exports = {
       message: 'Branch reactivated.',
     });
   },
+  async remove(req, res) {
+    sendData(res, await service.deleteBranch(req.auth, actorFromRequest(req), req.valid.params.id), {
+      message: 'Branch deleted.',
+    });
+  },
   async users(req, res) {
     sendData(res, await service.listBranchUsers(req.auth, req.valid.params.id));
   },
