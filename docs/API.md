@@ -99,7 +99,8 @@ Permission codes are listed per endpoint ("any of" where noted).
 | --- | --- | --- | --- |
 | GET | `/users` | STAFF_VIEW | Filters: `search, role, status, branchId`. Non-Owners see staff sharing a branch (and Owners). |
 | POST | `/users` | STAFF_CREATE | `{ fullName, email, roleCode, branchIds, phone?, employeeId?, jobTitle?, hireDate? }`. Returns `setupLink`. |
-| GET | `/users/:id` | STAFF_VIEW | |
+| GET | `/users/:id` | STAFF_VIEW | Includes `canDelete` (no transactions yet, not yourself, lower role). |
+| DELETE | `/users/:id` | STAFF_DEACTIVATE | Soft delete of an account that has recorded no sale, purchase, stock change, transfer or payment (logins don't count). `RECORD_IN_USE` otherwise. Hidden everywhere, signed out; email and employee ID become reusable. |
 | PATCH | `/users/:id` | STAFF_EDIT | Profile fields. Not for yourself. |
 | PATCH | `/users/:id/role` | STAFF_CHANGE_ROLE | `{ roleCode }`. Non-Owners assign only roles below their own. |
 | PATCH | `/users/:id/branches` | STAFF_MANAGE_BRANCHES | `{ branchIds }`. Non-Owners change only their own branches' assignments. |
@@ -124,7 +125,8 @@ Users can never change their own role, permissions, branches, status or employee
 | GET | `/branches/context` | signed in | Branches for the selector; `transferDestinations` for transfer creators. |
 | GET | `/branches` | BRANCH_VIEW | |
 | POST | `/branches` | BRANCH_CREATE | `code` is normalized to upper case and immutable. |
-| GET, PATCH | `/branches/:id` | BRANCH_VIEW / BRANCH_EDIT | |
+| GET, PATCH | `/branches/:id` | BRANCH_VIEW / BRANCH_EDIT | GET includes `canDelete` (no stock or transactions yet). |
+| DELETE | `/branches/:id` | BRANCH_DEACTIVATE | Soft delete of an unused branch: `RECORD_IN_USE`, `BRANCH_HAS_DEPENDENT_STAFF`. Assignments are removed; the code becomes reusable. |
 | POST | `/branches/:id/deactivate` | BRANCH_DEACTIVATE | `BRANCH_HAS_DEPENDENT_STAFF`, `BRANCH_HAS_TRANSFERS_IN_TRANSIT`. |
 | POST | `/branches/:id/reactivate` | BRANCH_REACTIVATE | |
 | GET | `/branches/:id/users` | BRANCH_VIEW + STAFF_VIEW | |
@@ -159,7 +161,7 @@ meaning no expiry: never expiring, sold after dated stock). Medicines always nee
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
-| GET | `/inventory` | INVENTORY_VIEW | Rows per branch × batch with derived `status`; filter `productType`. Batch details need INVENTORY_VIEW_BATCHES. |
+| GET | `/inventory` | INVENTORY_VIEW | Rows per branch × batch with derived `status`; filters `productType, categoryId, status, archived, inStock` (`inStock=true`: rows with non-expired stock, e.g. transferable). Batch details need INVENTORY_VIEW_BATCHES. |
 | GET | `/inventory/:id` | INVENTORY_VIEW | |
 | GET | `/inventory/expired` · `/expiring-soon` | INVENTORY_VIEW | Per batch row. |
 | GET | `/inventory/low-stock` · `/out-of-stock` | INVENTORY_VIEW | Per medicine and branch (sellable = non-expired stock). |
@@ -169,6 +171,7 @@ meaning no expiry: never expiring, sold after dated stock). Medicines always nee
 | PATCH | `/inventory/:id/minimum-stock` · `/selling-price` | INVENTORY_ADJUST | Audited. |
 | POST | `/inventory/:id/dispose` | INVENTORY_DISPOSE | `{ quantity?, notes?, archive?, recordAsLoss? }`. Removes `quantity` units (default: all remaining; STK number); `archive` applies only when the row ends up empty; counted as a loss unless `recordAsLoss: false`. Expired or expiring batches need no reason; in-date batches require `notes`. Idempotent. |
 | POST | `/inventory/fefo-preview` | SALES_CREATE or INVENTORY_VIEW | Non-binding allocation preview. |
+| GET | `/inventory/disposals` | INVENTORY_VIEW | Write-offs, newest first: product, batch, quantity, `notes`, `countsAsLoss`, `lossValue` (cost; 0 when not a loss). Filters `branchId, productType, search, countsAsLoss, dateFrom, dateTo`; `totals: { quantity, totalLossValue }`. |
 | GET | `/inventory/movements[/:id]` | INVENTORY_VIEW_MOVEMENTS | Immutable ledger; filters `batchId, medicineId, movementType, referenceType, referenceId, dateFrom, dateTo`. |
 | GET | `/batches[/:id]` | INVENTORY_VIEW_BATCHES | |
 | GET | `/batches/:id/movements` | INVENTORY_VIEW_MOVEMENTS | |
@@ -181,7 +184,8 @@ LOST→LOST, FOUND→CORRECTION, CORRECTION→CORRECTION, OTHER→ADJUSTMENT.
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
 | GET, POST | `/suppliers` | SUPPLIER_VIEW / SUPPLIER_CREATE | Similar names return `warnings.similarSuppliers`. |
-| GET, PATCH | `/suppliers/:id` | SUPPLIER_VIEW / SUPPLIER_EDIT | |
+| GET, PATCH | `/suppliers/:id` | SUPPLIER_VIEW / SUPPLIER_EDIT | GET includes `canDelete` (no purchases, payments or batches yet). |
+| DELETE | `/suppliers/:id` | SUPPLIER_ARCHIVE | Soft delete of an unused supplier; `RECORD_IN_USE` otherwise. |
 | POST | `/suppliers/:id/archive` · `/restore` | SUPPLIER_ARCHIVE · SUPPLIER_RESTORE | |
 | GET | `/suppliers/:id/purchases` | PURCHASE_VIEW | |
 | GET | `/suppliers/:id/balance` | SUPPLIER_PAYMENT_VIEW | Derived per branch. |
@@ -282,7 +286,7 @@ General: `VALIDATION_ERROR`, `RESOURCE_NOT_FOUND`, `ROUTE_NOT_FOUND`, `MALFORMED
 `RECORD_BUSY` (409, another operation holds the record; retry), `SERVICE_BUSY` (503, a query exceeded the
 database time limit; retry or narrow a report), `EXPORT_TOO_LARGE` (422, export over `EXPORT_MAX_ROWS`; narrow the filters).
 
-Domain: `DUPLICATE_EMAIL`, `DUPLICATE_EMPLOYEE_ID`, `DUPLICATE_BARCODE`,
+Domain: `RECORD_IN_USE` (409, the branch, staff member or supplier already has activity, so it cannot be deleted), `DUPLICATE_EMAIL`, `DUPLICATE_EMPLOYEE_ID`, `DUPLICATE_BARCODE`,
 `DUPLICATE_CATEGORY`, `DUPLICATE_BRANCH_CODE`, `BRANCH_INACTIVE`, `BRANCH_REQUIRED`,
 `BRANCH_HAS_DEPENDENT_STAFF`, `BRANCH_HAS_TRANSFERS_IN_TRANSIT`, `CATEGORY_ARCHIVED`,
 `MEDICINE_ARCHIVED`, `MEDICINE_NOT_ACTIVE`, `SUPPLIER_ARCHIVED`, `BATCH_EXPIRED`,

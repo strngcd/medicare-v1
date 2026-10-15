@@ -177,6 +177,10 @@ with `TRUST_PROXY=1`).
   transaction with row locks.
 - Critical POSTs accept an `Idempotency-Key` header; retries never duplicate
   business transactions.
+- A branch, staff member or supplier created by mistake can be deleted only
+  while nothing refers to it (no stock, sale, purchase, transfer, payment or
+  stock change). Deletion is soft: the row stays for the audit trail but is
+  hidden, inactive and frozen.
 - Document numbers (`SAL-7K3QX9`, `PUR-`, `REF-`, `TRF-`, `STK-`) are a prefix
   plus a random 6-character code: non-sequential, unique and never reused.
 
