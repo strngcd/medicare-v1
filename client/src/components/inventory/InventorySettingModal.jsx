@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { api } from '../../api/client.js';
 import { useAction } from '../../hooks/useAction.js';
 import { Modal, Button, TextInput, InlineAlert } from '../ui/index.js';
+import { productLabel } from '../ProductName.jsx';
 
 /** Edits minimum stock or selling price of one branch inventory record. */
 export function InventorySettingModal({ open, onClose, inventory, field, onSaved }) {
@@ -24,7 +25,7 @@ export function InventorySettingModal({ open, onClose, inventory, field, onSaved
   return (
     <Modal open={open} onClose={onClose} title={isPrice ? 'Change selling price' : 'Change minimum stock'} closeDisabled={action.running}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button onClick={save} loading={action.running}>Save</Button></>}>
-      <p className="muted">{inventory.medicineName} · batch {inventory.batchNumber || '—'} · {inventory.branchName}</p>
+      <p className="muted">{productLabel(inventory)} · batch {inventory.batchNumber || '—'} · {inventory.branchName}</p>
       <TextInput label={isPrice ? 'Selling price (per unit)' : 'Minimum stock (units)'} inputMode={isPrice ? 'decimal' : 'numeric'}
         value={value} onChange={(e) => setValue(e.target.value)} error={action.fieldErrors[field]} autoFocus />
       <InlineAlert tone="info">

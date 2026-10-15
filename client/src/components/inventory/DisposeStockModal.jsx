@@ -4,6 +4,7 @@ import { useAction } from '../../hooks/useAction.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { ConfirmDialog, TextArea, TextInput, Checkbox, Details } from '../ui/index.js';
 import { formatDate, formatMoney, formatNumber } from '../../utils/format.js';
+import { productLabel } from '../ProductName.jsx';
 
 /**
  * Writes off units of a batch row: all of them by default, or fewer if the
@@ -55,7 +56,7 @@ export function DisposeStockModal({ item, onClose, onDone }) {
         The batch stays in history{!inDate && all ? ' and its alert clears' : ''}.
       </p>
       <Details items={[
-        { label: 'Product', value: item.medicineName },
+        { label: 'Product', value: productLabel(item) },
         { label: 'Batch', value: item.batchNumber },
         { label: 'Expiry', value: formatDate(item.expiryDate) },
         { label: 'In stock', value: formatNumber(item.quantity) },

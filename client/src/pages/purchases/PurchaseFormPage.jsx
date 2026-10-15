@@ -8,11 +8,39 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { useSuppliers, toOptions } from '../../hooks/useLookups.js';
 import { PageHeader, Panel, Button, SelectInput, TextInput, TextArea, IconButton, InlineAlert, ErrorState, SkeletonRows, EmptyState, LearnHow, Checkbox } from '../../components/ui/index.js';
 import { MedicinePicker } from '../../components/MedicinePicker.jsx';
+import { ProductName } from '../../components/ProductName.jsx';
 import { formatDateTime, formatMoney, todayIso } from '../../utils/format.js';
-import { toCents, fromCents, suggestedSellingPrice } from '../../utils/money.js';
+import { toCents, fromCents, percentOfCents, suggestedSellingPrice } from '../../utils/money.js';
 
-function lineTotal(item) {
-  return toCents(item.unitPurchasePrice || '0') * (Number(item.orderedQuantity) || 0) - toCents(item.discount || '0') + toCents(item.tax || '0');
+/**
+ * Line amounts in cents. Discount and tax are each entered as an amount or a
+ * percent (discount of the line cost, tax of the cost after discount); only
+ * the resulting amounts are sent to the server.
+ */
+function lineAmounts(item) {
+  const base = toCents(item.unitPurchasePrice || '0') * (Number(item.orderedQuantity) || 0);
+  const discount = item.discountMode === 'PERCENT' ? percentOfCents(base, Math.min(Number(item.discount) || 0, 100)) : toCents(item.discount || '0');
+  const tax = item.taxMode === 'PERCENT' ? percentOfCents(base - discount, item.tax) : toCents(item.tax || '0');
+  return { base, discount, tax, total: base - discount + tax };
+}
+const lineTotal = (item) => lineAmounts(item).total;
+
+const MODE_OPTIONS = [['AMOUNT', 'Amt'], ['PERCENT', '%']];
+
+/** Discount or tax input with an amount / percent switch. */
+function AmountOrPercent({ label, value, mode, amountCents, invalid, onValue, onMode }) {
+  return (
+    <span className="stack-sm" style={{ gap: 2, alignItems: 'flex-end' }}>
+      <span className="row" style={{ gap: 4, justifyContent: 'flex-end' }}>
+        <select className="select" style={{ width: 64 }} value={mode || 'AMOUNT'} onChange={(e) => onMode(e.target.value)} aria-label={`${label} type`}>
+          {MODE_OPTIONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+        </select>
+        <input className="input" style={{ width: 80 }} inputMode="decimal" value={value} placeholder={mode === 'PERCENT' ? '0' : '0.00'} aria-label={label}
+          aria-invalid={invalid ? 'true' : undefined} onChange={(e) => onValue(e.target.value)} />
+      </span>
+      {mode === 'PERCENT' && Number(value) > 0 && <span className="small muted">= {formatMoney(fromCents(amountCents))}</span>}
+    </span>
+  );
 }
 
 const EMPTY_PAYMENT = { enabled: false, amount: '', paymentMethod: 'BANK_TRANSFER', referenceNumber: '' };
@@ -72,7 +100,8 @@ export default function PurchaseFormPage() {
     const p = existing.data;
     setForm({ supplierId: p.supplierId, branchId: p.branchId, purchaseDate: p.purchaseDate, expectedDate: p.expectedDate || '', notes: p.notes || '' });
     setItems(p.items.map((i) => ({
-      medicineId: i.medicineId, medicineName: i.medicineName, productType: i.productType, orderedQuantity: String(i.orderedQuantity),
+      medicineId: i.medicineId, medicineName: i.medicineName, strength: i.strength, dosageForm: i.dosageForm, packageSize: i.packageSize,
+      productType: i.productType, orderedQuantity: String(i.orderedQuantity),
       unitPurchasePrice: i.unitPurchasePrice, discount: i.discount, tax: i.tax, notes: i.notes || '',
     })));
   }, [existing.data]);
@@ -113,14 +142,17 @@ export default function PurchaseFormPage() {
       expectedDate: form.expectedDate || null,
       notes: form.notes || null,
       status,
-      items: items.map((i) => ({
-        medicineId: i.medicineId,
-        orderedQuantity: Number(i.orderedQuantity),
-        unitPurchasePrice: i.unitPurchasePrice,
-        discount: i.discount || '0',
-        tax: i.tax || '0',
-        notes: i.notes || null,
-      })),
+      items: items.map((i) => {
+        const amounts = lineAmounts(i);
+        return {
+          medicineId: i.medicineId,
+          orderedQuantity: Number(i.orderedQuantity),
+          unitPurchasePrice: i.unitPurchasePrice,
+          discount: fromCents(amounts.discount),
+          tax: fromCents(amounts.tax),
+          notes: i.notes || null,
+        };
+      }),
     };
     if (receivingLines.length > 0) {
       payload.receive = {
@@ -185,9 +217,10 @@ export default function PurchaseFormPage() {
         </div>
       </Panel>
 
-      <Panel title="Medicines" flush footer={<div className="spread"><span className="muted">Estimated total (the server calculates the final amount)</span><strong>{formatMoney(fromCents(totalCents))}</strong></div>}>
-        <div className="panel-body"><MedicinePicker exclude={items.map((i) => i.medicineId)} onSelect={(m) => setItems((list) => [...list, {
-          medicineId: m.id, medicineName: `${m.name}${m.strength ? ` ${m.strength}` : ''}`, productType: m.productType, orderedQuantity: '', unitPurchasePrice: '', discount: '', tax: '', notes: '',
+      <Panel title="Products" flush footer={<div className="spread"><span className="muted">Estimated total (the server calculates the final amount)</span><strong>{formatMoney(fromCents(totalCents))}</strong></div>}>
+        <div className="panel-body"><MedicinePicker withFilters exclude={items.map((i) => i.medicineId)} onSelect={(m) => setItems((list) => [...list, {
+          medicineId: m.id, medicineName: m.name, strength: m.strength, dosageForm: m.dosageForm, packageSize: m.packageSize, brandName: m.brandName,
+          productType: m.productType, orderedQuantity: '', unitPurchasePrice: '', discount: '', tax: '', notes: '',
         }])} /></div>
         {items.length === 0 ? (
           <EmptyState title="No medicines added" message="Search above to add the medicines you are ordering. Only active medicines can be purchased." />
@@ -195,20 +228,24 @@ export default function PurchaseFormPage() {
           <div className="table-wrap">
             <table className="table responsive">
               <thead>
-                <tr><th>Medicine</th><th className="num">Quantity</th><th className="num">Unit cost</th><th className="num">Discount</th><th className="num">Tax</th><th className="num">Line total</th><th /></tr>
+                <tr><th>Product</th><th className="num">Quantity</th><th className="num">Unit cost</th><th className="num">Discount</th><th className="num">Tax</th><th className="num">Line total</th><th /></tr>
               </thead>
               <tbody>
                 {items.map((item, index) => (
                   <tr key={item.medicineId}>
-                    <td data-label="Medicine" className="cell-strong">{item.medicineName}</td>
+                    <td data-label="Product"><ProductName row={item} /></td>
                     <td data-label="Quantity" className="num"><input className="input" style={{ width: 90 }} type="number" min="1" value={item.orderedQuantity} aria-label="Quantity"
                       aria-invalid={errors[`items.${index}.orderedQuantity`] ? 'true' : undefined} onChange={(e) => setItem(index, 'orderedQuantity', e.target.value)} /></td>
                     <td data-label="Unit cost" className="num"><input className="input" style={{ width: 100 }} inputMode="decimal" value={item.unitPurchasePrice} aria-label="Unit cost"
                       aria-invalid={errors[`items.${index}.unitPurchasePrice`] ? 'true' : undefined} onChange={(e) => setItem(index, 'unitPurchasePrice', e.target.value)} /></td>
-                    <td data-label="Discount" className="num"><input className="input" style={{ width: 90 }} inputMode="decimal" value={item.discount} placeholder="0.00" aria-label="Discount"
-                      aria-invalid={errors[`items.${index}.discount`] ? 'true' : undefined} onChange={(e) => setItem(index, 'discount', e.target.value)} /></td>
-                    <td data-label="Tax" className="num"><input className="input" style={{ width: 90 }} inputMode="decimal" value={item.tax} placeholder="0.00" aria-label="Tax"
-                      onChange={(e) => setItem(index, 'tax', e.target.value)} /></td>
+                    <td data-label="Discount" className="num">
+                      <AmountOrPercent label="Discount" value={item.discount} mode={item.discountMode} amountCents={lineAmounts(item).discount}
+                        invalid={errors[`items.${index}.discount`]} onValue={(v) => setItem(index, 'discount', v)} onMode={(v) => setItem(index, 'discountMode', v)} />
+                    </td>
+                    <td data-label="Tax" className="num">
+                      <AmountOrPercent label="Tax" value={item.tax} mode={item.taxMode} amountCents={lineAmounts(item).tax}
+                        invalid={errors[`items.${index}.tax`]} onValue={(v) => setItem(index, 'tax', v)} onMode={(v) => setItem(index, 'taxMode', v)} />
+                    </td>
                     <td data-label="Line total" className="num">{formatMoney(fromCents(lineTotal(item)))}</td>
                     <td data-label=""><IconButton icon={Trash2} label="Remove" onClick={() => setItems((list) => list.filter((_, i) => i !== index))} /></td>
                   </tr>
@@ -228,7 +265,7 @@ export default function PurchaseFormPage() {
               <p className="muted small">Set quantity to 0 to skip an item. Selling price starts at unit cost + {Number(markup ?? 15)}% and can be changed.</p>
               {items.map((item, index) => (
                 <div key={item.medicineId} className="stack-sm">
-                  <strong>{item.medicineName}</strong>
+                  <ProductName row={item} as="strong" />
                   <div className="grid-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', alignItems: 'start' }}>
                     <TextInput label="Batch number" value={item.batchNumber || ''} onChange={(e) => setItem(index, 'batchNumber', e.target.value)} error={receiveError(item, 'batchNumber')}
                       placeholder={item.productType === 'COSMETIC' ? 'Auto' : undefined} />

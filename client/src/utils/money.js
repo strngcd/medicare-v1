@@ -21,6 +21,12 @@ function roundCents(value) {
   return Math.sign(value) * Math.round(Math.abs(value) + 1e-9);
 }
 
+/** `percent` % of an amount in cents, rounded half-up to the cent. */
+export function percentOfCents(cents, percent) {
+  const rate = Number(percent);
+  return Number.isFinite(rate) && rate > 0 ? roundCents((cents * rate) / 100) : 0;
+}
+
 /**
  * Mirrors the server's pricing rules for a live estimate:
  * sale discount prorated by line, tax per line (included or added on top).

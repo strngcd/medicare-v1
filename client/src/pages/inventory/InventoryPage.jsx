@@ -11,6 +11,7 @@ import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, Sele
 import { AdjustStockModal } from '../../components/inventory/AdjustStockModal.jsx';
 import { InventorySettingModal } from '../../components/inventory/InventorySettingModal.jsx';
 import { DisposeStockModal } from '../../components/inventory/DisposeStockModal.jsx';
+import { ProductName } from '../../components/ProductName.jsx';
 import { formatDate, formatDateTime, formatMoney, formatNumber, humanize, PRODUCT_TYPE_OPTIONS } from '../../utils/format.js';
 
 const STATUSES = ['AVAILABLE', 'LOW_STOCK', 'OUT_OF_STOCK', 'EXPIRING_SOON', 'EXPIRED'].map((s) => ({ value: s, label: humanize(s) }));
@@ -46,7 +47,7 @@ function StockTab({ state, update, clear, hasFilters }) {
   const hasActions = ['INVENTORY_ADJUST', 'INVENTORY_DISPOSE', 'INVENTORY_BATCH_ARCHIVE', 'INVENTORY_BATCH_RESTORE'].some((p) => can(p));
 
   const columns = [
-    { key: 'medicineName', label: 'Product', sortable: true, render: (r) => <span className="cell-strong">{r.medicineName}{r.productType === 'COSMETIC' && <span className="small muted"> · Cosmetic</span>}</span> },
+    { key: 'medicineName', label: 'Product', sortable: true, render: (r) => <ProductName row={r} /> },
     { key: 'branchName', label: 'Branch', sortable: true },
     can('INVENTORY_VIEW_BATCHES') && { key: 'batchNumber', label: 'Batch', render: (r) => <span className="mono">{r.batchNumber}</span> },
     { key: 'expiryDate', label: 'Expiry', sortable: true, render: (r) => formatDate(r.expiryDate) },
@@ -114,7 +115,7 @@ function LevelTab({ level, state, update }) {
       <DataTable rowKey="medicineId" rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
         onRowClick={(r) => navigate(`/medicines/${r.medicineId}`)}
         columns={[
-          { key: 'medicineName', label: 'Medicine', render: (r) => <span className="cell-strong">{r.medicineName}</span> },
+          { key: 'medicineName', label: 'Product', render: (r) => <ProductName row={r} /> },
           { key: 'categoryName', label: 'Category', render: (r) => r.categoryName || '—' },
           { key: 'branchName', label: 'Branch' },
           { key: 'sellableQuantity', label: 'Sellable', align: 'right', render: (r) => formatNumber(r.sellableQuantity) },
@@ -142,7 +143,7 @@ function MovementsTab({ state, update, clear, hasFilters }) {
         sort={state} onSort={update} filtered={hasFilters} onClearFilters={clear}
         columns={[
           { key: 'createdAt', label: 'When', sortable: true, render: (r) => <span className="nowrap small">{formatDateTime(r.createdAt)}</span> },
-          { key: 'medicineName', label: 'Medicine', render: (r) => <span className="cell-strong">{r.medicineName}</span> },
+          { key: 'medicineName', label: 'Product', render: (r) => <ProductName row={r} /> },
           { key: 'batchNumber', label: 'Batch', render: (r) => <span className="mono">{r.batchNumber}</span> },
           { key: 'branchName', label: 'Branch' },
           { key: 'movementType', label: 'Type', sortable: true, render: (r) => humanize(r.movementType) },

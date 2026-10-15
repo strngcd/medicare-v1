@@ -12,6 +12,7 @@ import {
 } from '../../components/ui/index.js';
 import { formatDate, formatDateTime, formatMoney, formatNumber, humanize, todayIso } from '../../utils/format.js';
 import { suggestedSellingPrice } from '../../utils/money.js';
+import { ProductName } from '../../components/ProductName.jsx';
 
 function newLine(item, markupPercent) {
   return {
@@ -75,7 +76,7 @@ function ReceiveModal({ purchase, onClose, onDone }) {
       {outstanding.map((item) => (
         <div key={item.id} className="panel">
           <div className="panel-header">
-            <h3>{item.medicineName}</h3>
+            <ProductName row={item} as="h3" />
             <span className="small muted">
               Ordered {item.orderedQuantity} · received {item.receivedQuantity} · remaining {item.remainingQuantity}
               {showCost && <> · unit cost <strong>{formatMoney(item.unitPurchasePrice)}</strong></>}
@@ -205,7 +206,7 @@ export default function PurchaseDetailPage() {
 
       <Panel title="Items" flush>
         <DataTable rows={p.items} columns={[
-          { key: 'medicineName', label: 'Medicine', render: (i) => <span className="cell-strong">{i.medicineName}</span> },
+          { key: 'medicineName', label: 'Product', render: (i) => <ProductName row={i} /> },
           { key: 'orderedQuantity', label: 'Ordered', align: 'right', render: (i) => formatNumber(i.orderedQuantity) },
           { key: 'receivedQuantity', label: 'Received', align: 'right', render: (i) => formatNumber(i.receivedQuantity) },
           { key: 'remainingQuantity', label: 'Remaining', align: 'right', render: (i) => <span className={i.remainingQuantity > 0 && p.status !== 'CANCELLED' ? 'warning-text' : undefined}>{formatNumber(i.remainingQuantity)}</span> },
@@ -266,7 +267,7 @@ function ReceivingModal({ id, showCost, onClose }) {
             { label: 'Received', value: formatDateTime(r.receivedAt) },
           ]} />
           <DataTable rows={r.items} columns={[
-            { key: 'medicineName', label: 'Medicine' },
+            { key: 'medicineName', label: 'Product', render: (i) => <ProductName row={i} /> },
             { key: 'batchNumber', label: 'Batch', render: (i) => <span className="mono">{i.batchNumber}</span> },
             { key: 'expiryDate', label: 'Expiry', render: (i) => formatDate(i.expiryDate) },
             { key: 'quantity', label: 'Qty', align: 'right' },

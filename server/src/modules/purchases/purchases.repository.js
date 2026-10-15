@@ -213,7 +213,8 @@ async function findReceiving(id) {
   );
   if (!rows[0]) return null;
   const items = await query(
-    `SELECT ri.id, ri.purchase_item_id, pi.medicine_id, m.name AS medicine_name, ri.batch_id, b.batch_number,
+    `SELECT ri.id, ri.purchase_item_id, pi.medicine_id, m.name AS medicine_name, m.strength, m.dosage_form,
+            m.package_size, ri.batch_id, b.batch_number,
             b.manufacturing_date, b.expiry_date, ri.quantity, ri.purchase_price, ri.selling_price, ri.notes
        FROM purchase_receiving_items ri
        JOIN purchase_items pi ON pi.id = ri.purchase_item_id

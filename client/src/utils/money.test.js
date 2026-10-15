@@ -1,4 +1,4 @@
-import { estimateTotals, toCents, fromCents, suggestedSellingPrice } from './money.js';
+import { estimateTotals, toCents, fromCents, percentOfCents, suggestedSellingPrice } from './money.js';
 
 test('cent conversion is exact', () => {
   expect(toCents('12.5')).toBe(1250);
@@ -21,4 +21,11 @@ test('suggested selling price adds the markup to the unit cost', () => {
   expect(suggestedSellingPrice('2.50', '15')).toBe('2.88');
   expect(suggestedSellingPrice('10', undefined)).toBe('11.50');
   expect(suggestedSellingPrice('', '15')).toBe('');
+});
+
+test('percent of an amount rounds half-up to the cent', () => {
+  expect(percentOfCents(10000, '15')).toBe(1500);
+  expect(percentOfCents(333, '2.5')).toBe(8);
+  expect(percentOfCents(1000, '')).toBe(0);
+  expect(percentOfCents(1000, 'abc')).toBe(0);
 });

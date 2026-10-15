@@ -24,7 +24,7 @@ async function listInventory({ today, warningDays, ids, branchIds, medicineId, c
      SELECT bi.id, bi.branch_id, br.name AS branch_name, br.code AS branch_code, br.status AS branch_status,
             bi.batch_id, b.batch_number, b.manufacturing_date, b.expiry_date, b.purchase_price,
             b.supplier_id, s.company_name AS supplier_name,
-            b.medicine_id, m.name AS medicine_name, m.product_type, m.strength, m.dosage_form, m.package_size,
+            b.medicine_id, m.name AS medicine_name, m.product_type, m.brand_name, m.strength, m.dosage_form, m.package_size,
             m.status AS medicine_status, m.category_id, c.name AS category_name,
             bi.quantity, bi.minimum_stock, bi.selling_price,
             ms.sellable_quantity AS medicine_sellable_quantity, ms.minimum_stock AS medicine_minimum_stock,
@@ -64,7 +64,8 @@ async function listBatches({ branchIds, medicineId, supplierId, search, expiredO
            SELECT 1 FROM branch_inventory x WHERE x.batch_id = b.id AND x.branch_id = ANY($1::uuid[])))`);
 
   const { rows } = await query(
-    `SELECT b.id, b.medicine_id, m.name AS medicine_name, b.batch_number, b.manufacturing_date, b.expiry_date,
+    `SELECT b.id, b.medicine_id, m.name AS medicine_name, m.strength, m.dosage_form, m.package_size,
+            b.batch_number, b.manufacturing_date, b.expiry_date,
             b.purchase_price, b.supplier_id, s.company_name AS supplier_name, b.created_at,
             (b.expiry_date < $2::date) AS is_expired,
             COALESCE((SELECT sum(x.quantity) FROM branch_inventory x
@@ -120,7 +121,8 @@ async function listMovements({ branchIds, batchId, medicineId, movementType, ref
 
   const { rows } = await query(
     `SELECT sm.id, sm.branch_id, br.name AS branch_name, sm.batch_id, b.batch_number,
-            b.medicine_id, m.name AS medicine_name, sm.movement_type, sm.quantity_change,
+            b.medicine_id, m.name AS medicine_name, m.strength, m.dosage_form, m.package_size,
+            sm.movement_type, sm.quantity_change,
             sm.quantity_before, sm.quantity_after, sm.reference_type, sm.reference_id, sm.reason,
             sm.created_by, u.full_name AS created_by_name, sm.created_at,
             count(*) OVER() AS total_count
@@ -240,7 +242,8 @@ async function listStockLevels({ today, branchIds, level, medicineId, limit, off
 async function findMovement(id) {
   const { rows } = await query(
     `SELECT sm.id, sm.branch_id, br.name AS branch_name, sm.batch_id, b.batch_number,
-            b.medicine_id, m.name AS medicine_name, sm.movement_type, sm.quantity_change,
+            b.medicine_id, m.name AS medicine_name, m.strength, m.dosage_form, m.package_size,
+            sm.movement_type, sm.quantity_change,
             sm.quantity_before, sm.quantity_after, sm.reference_type, sm.reference_id, sm.reason,
             sm.created_by, u.full_name AS created_by_name, sm.created_at
        FROM stock_movements sm

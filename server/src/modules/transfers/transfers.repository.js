@@ -49,7 +49,8 @@ async function findById(id, client, { forUpdate = false } = {}) {
 
 async function listItems(transferId, client) {
   const { rows } = await query(
-    `SELECT ti.id, ti.transfer_id, ti.medicine_id, m.name AS medicine_name, m.status AS medicine_status,
+    `SELECT ti.id, ti.transfer_id, ti.medicine_id, m.name AS medicine_name, m.strength, m.dosage_form,
+            m.package_size, m.status AS medicine_status,
             ti.batch_id, b.batch_number, b.expiry_date, ti.requested_quantity, ti.approved_quantity,
             ti.shipped_quantity, ti.received_quantity,
             CASE WHEN ti.received_quantity IS NOT NULL THEN ti.shipped_quantity - ti.received_quantity END AS discrepancy_quantity,

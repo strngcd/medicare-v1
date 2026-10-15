@@ -3,6 +3,7 @@ import { api, newIdempotencyKey } from '../../api/client.js';
 import { useAction } from '../../hooks/useAction.js';
 import { Modal, Button, TextInput, SelectInput, TextArea, InlineAlert, Details, LearnHow } from '../ui/index.js';
 import { formatNumber, humanize } from '../../utils/format.js';
+import { productLabel } from '../ProductName.jsx';
 
 const REASONS = [
   { value: 'DAMAGED', label: 'Damaged', direction: -1 },
@@ -64,7 +65,7 @@ export function AdjustStockModal({ open, onClose, inventory, onSaved }) {
         </>
       )}>
       <Details items={[
-        { label: 'Medicine', value: inventory.medicineName },
+        { label: 'Product', value: productLabel(inventory) },
         { label: 'Batch', value: inventory.batchNumber },
         { label: 'Branch', value: inventory.branchName },
         { label: 'Current quantity', value: formatNumber(inventory.quantity) },
