@@ -36,6 +36,14 @@ const listMovementsQuery = listQuery.extend({
   dateTo: isoDate.optional(),
 });
 
+const listDisposalsQuery = listQuery.extend({
+  branchId: uuid.optional(),
+  productType: z.enum(['MEDICINE', 'COSMETIC']).optional(),
+  countsAsLoss: queryBoolean.optional(),
+  dateFrom: isoDate.optional(),
+  dateTo: isoDate.optional(),
+});
+
 const addStockBody = z.object({
   branchId: uuid,
   medicineId: uuid,
@@ -82,6 +90,7 @@ module.exports = {
   branchScopedQuery,
   listBatchesQuery,
   listMovementsQuery,
+  listDisposalsQuery,
   addStockBody,
   adjustmentPreviewBody,
   adjustmentBody,

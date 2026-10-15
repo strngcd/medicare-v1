@@ -110,6 +110,49 @@ async function listBatchStock(batchId, branchIds) {
   return rows;
 }
 
+/**
+ * Disposals (write-offs) with their batch, product and loss value at cost.
+ * Each disposal is one inventory adjustment plus its DISPOSED ledger movement.
+ */
+async function listDisposals({ branchIds, productType, search, countsAsLoss, dateFrom, dateTo, timezone, limit, offset, orderBy }) {
+  const w = whereBuilder();
+  w.add("ia.reason = 'DISPOSED'");
+  if (branchIds) w.add('ia.branch_id = ANY(?::uuid[])', branchIds);
+  if (productType) w.add('m.product_type = ?', productType);
+  if (search) w.add('(m.name ILIKE ? OR m.generic_name ILIKE ? OR b.batch_number ILIKE ? OR ia.adjustment_number ILIKE ?)', `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
+  if (countsAsLoss !== undefined) w.add('sm.counts_as_loss = ?', countsAsLoss);
+  if (dateFrom) w.add('ia.created_at >= (?::date AT TIME ZONE ?)', dateFrom, timezone);
+  if (dateTo) w.add('ia.created_at < ((?::date + 1) AT TIME ZONE ?)', dateTo, timezone);
+
+  const { rows } = await query(
+    `SELECT ia.id, ia.adjustment_number, ia.created_at, ia.branch_id, br.name AS branch_name,
+            ia.batch_id, b.batch_number, b.expiry_date, b.medicine_id, m.name AS medicine_name, m.product_type,
+            m.brand_name, m.strength, m.dosage_form, m.package_size,
+            -ia.quantity_change AS quantity, ia.quantity_after, ia.notes, sm.counts_as_loss,
+            (CASE WHEN sm.counts_as_loss THEN -ia.quantity_change * b.purchase_price ELSE 0 END)::numeric(14,2) AS loss_value,
+            ia.created_by, u.full_name AS created_by_name,
+            count(*) OVER() AS total_count,
+            sum(-ia.quantity_change) OVER()::int AS total_quantity,
+            COALESCE(sum(-ia.quantity_change * b.purchase_price) FILTER (WHERE sm.counts_as_loss) OVER(), 0)::numeric(14,2) AS total_loss_value
+       FROM inventory_adjustments ia
+       JOIN stock_movements sm ON sm.reference_id = ia.id AND sm.reference_type = 'INVENTORY_ADJUSTMENT' AND sm.movement_type = 'DISPOSED'
+       JOIN batches b ON b.id = ia.batch_id
+       JOIN medicines m ON m.id = b.medicine_id
+       JOIN branches br ON br.id = ia.branch_id
+       JOIN users u ON u.id = ia.created_by
+       ${w.sql}
+      ORDER BY ${orderBy}
+      LIMIT ${w.param(limit)} OFFSET ${w.param(offset)}`,
+    w.params,
+  );
+  const first = rows[0];
+  return {
+    rows,
+    total: first ? first.total_count : 0,
+    totals: { quantity: first ? first.total_quantity : 0, lossValue: first ? first.total_loss_value : '0.00' },
+  };
+}
+
 async function listMovements({ branchIds, batchId, medicineId, movementType, referenceType, referenceId, dateFrom, dateTo, timezone, limit, offset, orderBy }) {
   const w = whereBuilder();
   if (branchIds) w.add('sm.branch_id = ANY(?::uuid[])', branchIds);
@@ -278,6 +321,7 @@ async function listSellableBatches({ branchId, medicineId, today }) {
 }
 
 module.exports = {
+  listDisposals,
   findMovement,
   listSellableBatches,
   listStockLevels,

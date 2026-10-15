@@ -154,6 +154,38 @@ async function listMovements(auth, query, fixed = {}) {
   return { rows: rows.map(stripTotal), total, page: params.page, limit: params.limit };
 }
 
+const DISPOSAL_SORTABLE = { createdAt: 'ia.created_at', medicineName: 'm.name', quantity: '-ia.quantity_change', branchName: 'br.name' };
+
+/** Disposed (written-off) stock, newest first; cost fields follow financial visibility. */
+async function listDisposals(auth, query) {
+  const params = parseListParams(query, { sortable: DISPOSAL_SORTABLE, defaultSort: 'createdAt' });
+  const { rows, total, totals } = await repo.listDisposals({
+    branchIds: resolveBranchScope(auth, query.branchId),
+    productType: query.productType,
+    search: query.search,
+    countsAsLoss: query.countsAsLoss,
+    dateFrom: query.dateFrom,
+    dateTo: query.dateTo,
+    timezone: config.businessTimezone,
+    ...params,
+  });
+  const canSeeBatches = auth.permissions.has(P.INVENTORY_VIEW_BATCHES);
+  const dtos = rows.map((row) => {
+    const dto = stripTotal(row);
+    delete dto.totalQuantity;
+    delete dto.totalLossValue;
+    if (!canSeeBatches) for (const field of BATCH_DETAIL_FIELDS) delete dto[field];
+    return dto;
+  });
+  return {
+    rows: filterFinancialFields(dtos, auth),
+    total,
+    page: params.page,
+    limit: params.limit,
+    totals: filterFinancialFields({ quantity: totals.quantity, totalLossValue: totals.lossValue }, auth),
+  };
+}
+
 async function getMovement(auth, id) {
   const movement = await repo.findMovement(id);
   if (!movement) throw AppError.notFound('Stock movement not found.');
@@ -545,6 +577,7 @@ async function medicineInventory(auth, medicineId, branchId) {
 }
 
 module.exports = {
+  listDisposals,
   disposeStock,
   setInventoryArchived,
   listInventory,

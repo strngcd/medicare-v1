@@ -399,3 +399,47 @@ describe('archiving batches', () => {
     expect(rows[0]).toEqual({ quantity: 4, archived_at: null });
   });
 });
+
+describe('disposed stock list', () => {
+  test('lists disposals newest first with loss value and totals; cost is hidden without permission', async () => {
+    const strong = await createMedicine({ name: 'Paracetamol', strength: '1 g' });
+    const expired = await createStock({ branch, medicine, user: pharmacistUser, purchasePrice: '4.00', expiryDate: daysFromToday(-2), quantity: 6 });
+    const healthy = await createStock({ branch, medicine: strong, user: pharmacistUser, purchasePrice: '2.50', expiryDate: daysFromToday(400), quantity: 4 });
+    await pharmacist.post(`/api/v1/inventory/${expired.inventory.id}/dispose`).send({ notes: 'Sent for destruction' });
+    await pharmacist.post(`/api/v1/inventory/${healthy.inventory.id}/dispose`).send({ quantity: 2, notes: 'Returned', recordAsLoss: false });
+
+    const res = await pharmacist.get(`/api/v1/inventory/disposals?branchId=${branch.id}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(2);
+    expect(res.body.data[0]).toMatchObject({ medicineName: 'Paracetamol', strength: '1 g', quantity: 2, countsAsLoss: false, notes: 'Returned', lossValue: '0.00' });
+    expect(res.body.data[1]).toMatchObject({ medicineName: 'Amoxicillin', quantity: 6, countsAsLoss: true, lossValue: '24.00' });
+    expect(res.body.data[0].adjustmentNumber).toMatch(/^STK-/);
+    // Only disposals that count as a loss add to the loss total.
+    expect(res.body.totals).toEqual({ quantity: 8, totalLossValue: '24.00' });
+
+    const lossesOnly = await pharmacist.get(`/api/v1/inventory/disposals?branchId=${branch.id}&countsAsLoss=true`);
+    expect(lossesOnly.body.data.map((r) => r.medicineName)).toEqual(['Amoxicillin']);
+
+    const asCashier = await cashier.get(`/api/v1/inventory/disposals?branchId=${branch.id}`);
+    expect(asCashier.status).toBe(200);
+    expect(asCashier.body.data[0].lossValue).toBeUndefined();
+    expect(asCashier.body.totals.totalLossValue).toBeUndefined();
+  });
+
+  test('is limited to the caller\'s branches', async () => {
+    const elsewhere = await createStock({ branch: otherBranch, medicine, user: pharmacistUser, expiryDate: daysFromToday(-1), quantity: 2 });
+    await admin.post(`/api/v1/inventory/${elsewhere.inventory.id}/dispose`).send({});
+    expect((await pharmacist.get('/api/v1/inventory/disposals')).body.data).toHaveLength(0);
+    expect((await pharmacist.get(`/api/v1/inventory/disposals?branchId=${otherBranch.id}`)).status).toBe(403);
+  });
+});
+
+describe('transferable stock filter', () => {
+  test('inStock lists only rows with non-expired stock', async () => {
+    await createStock({ branch, medicine, user: pharmacistUser, batchNumber: 'OK', expiryDate: daysFromToday(100), quantity: 5 });
+    await createStock({ branch, medicine, user: pharmacistUser, batchNumber: 'OLD', expiryDate: daysFromToday(-1), quantity: 5 });
+    await createStock({ branch, medicine, user: pharmacistUser, batchNumber: 'EMPTY', expiryDate: daysFromToday(100), quantity: 0 });
+    const res = await pharmacist.get(`/api/v1/inventory?branchId=${branch.id}&inStock=true`);
+    expect(res.body.data.map((r) => r.batchNumber)).toEqual(['OK']);
+  });
+});

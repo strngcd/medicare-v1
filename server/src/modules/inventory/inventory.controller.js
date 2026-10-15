@@ -43,6 +43,10 @@ module.exports = {
   async restore(req, res) {
     sendData(res, await service.setInventoryArchived(req.auth, actorFromRequest(req), req.valid.params.id, false), { message: 'Batch restored.' });
   },
+  async disposals(req, res) {
+    const result = await service.listDisposals(req.auth, req.valid.query);
+    sendPage(res, result, { totals: result.totals });
+  },
   async movements(req, res) {
     sendPage(res, await service.listMovements(req.auth, req.valid.query));
   },

@@ -16,6 +16,7 @@ inventoryRouter.get('/expired', requirePermission(P.INVENTORY_VIEW), validate({ 
 inventoryRouter.get('/expiring-soon', requirePermission(P.INVENTORY_VIEW), validate({ query: v.listInventoryQuery }), controller.expiringSoon);
 inventoryRouter.get('/low-stock', requirePermission(P.INVENTORY_VIEW), validate({ query: v.branchScopedQuery }), controller.lowStock);
 inventoryRouter.get('/out-of-stock', requirePermission(P.INVENTORY_VIEW), validate({ query: v.branchScopedQuery }), controller.outOfStock);
+inventoryRouter.get('/disposals', requirePermission(P.INVENTORY_VIEW), validate({ query: v.listDisposalsQuery }), controller.disposals);
 inventoryRouter.get('/movements', requirePermission(P.INVENTORY_VIEW_MOVEMENTS), validate({ query: v.listMovementsQuery }), controller.movements);
 inventoryRouter.get('/movements/:id', requirePermission(P.INVENTORY_VIEW_MOVEMENTS), validate({ params: idParam }), controller.movement);
 inventoryRouter.post('/stock', requirePermission(P.INVENTORY_ADD_STOCK), validate({ body: v.addStockBody }), controller.addStock);

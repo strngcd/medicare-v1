@@ -7,7 +7,7 @@ import { useAction } from '../../hooks/useAction.js';
 import { useListState } from '../../hooks/useListState.js';
 import { useCategories, toOptions } from '../../hooks/useLookups.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PageHeader, Panel, DataTable, Pagination, StatusBadge, EmptyState, SelectInput, Tabs, Dropdown, IconButton, LearnHow, FilterToolbar, Checkbox } from '../../components/ui/index.js';
+import { PageHeader, Panel, DataTable, Pagination, StatusBadge, Badge, EmptyState, SelectInput, Tabs, Dropdown, IconButton, LearnHow, FilterToolbar, Checkbox } from '../../components/ui/index.js';
 import { AdjustStockModal } from '../../components/inventory/AdjustStockModal.jsx';
 import { InventorySettingModal } from '../../components/inventory/InventorySettingModal.jsx';
 import { DisposeStockModal } from '../../components/inventory/DisposeStockModal.jsx';
@@ -128,6 +128,57 @@ function LevelTab({ level, state, update }) {
   );
 }
 
+const LOSS_OPTIONS = [{ value: 'true', label: 'Recorded as loss' }, { value: 'false', label: 'Not a loss' }];
+
+/** Every disposal (write-off): what left stock, from which batch, why, and its loss at cost. */
+function DisposedTab({ state, update, clear, hasFilters }) {
+  const { branchParam, can } = useAuth();
+  const params = { ...state, tab: undefined, branchId: branchParam };
+  const list = useApi(() => api.get('/inventory/disposals', params), [JSON.stringify(params)]);
+  const totals = list.data && list.data.totals;
+  const showCost = can('FINANCIAL_VIEW_PURCHASE_COST');
+  return (
+    <>
+      <FilterToolbar>
+        <div className="field search-field">
+          <span className="field-label">Search</span>
+          <div className="input-with-icon">
+            <Search aria-hidden="true" />
+            <input className="input" type="search" placeholder="Product, batch or STK number" defaultValue={state.search || ''} onChange={(e) => update({ search: e.target.value })} aria-label="Search disposals" />
+          </div>
+        </div>
+        <SelectInput label="Type" value={state.productType || ''} placeholder="All products" options={PRODUCT_TYPE_OPTIONS} onChange={(e) => update({ productType: e.target.value })} />
+        <SelectInput label="Loss" value={state.countsAsLoss || ''} placeholder="All disposals" options={LOSS_OPTIONS} onChange={(e) => update({ countsAsLoss: e.target.value })} />
+        <div className="field"><span className="field-label">From</span><input className="input" type="date" value={state.dateFrom || ''} onChange={(e) => update({ dateFrom: e.target.value })} /></div>
+        <div className="field"><span className="field-label">To</span><input className="input" type="date" value={state.dateTo || ''} onChange={(e) => update({ dateTo: e.target.value })} /></div>
+      </FilterToolbar>
+      {totals && list.data.pagination.total > 0 && (
+        <div className="panel-body small muted">
+          {formatNumber(list.data.pagination.total)} disposal(s) · {formatNumber(totals.quantity)} units
+          {showCost && totals.totalLossValue !== undefined && <> · loss at cost <strong>{formatMoney(totals.totalLossValue)}</strong></>}
+        </div>
+      )}
+      <DataTable rows={list.data && list.data.data} loading={list.loading} error={list.error} onRetry={list.reload}
+        sort={state} onSort={update} filtered={hasFilters} isSearch={Boolean(state.search)} onClearFilters={clear}
+        columns={[
+          { key: 'createdAt', label: 'When', sortable: true, render: (r) => <span className="nowrap small">{formatDateTime(r.createdAt)}</span> },
+          { key: 'adjustmentNumber', label: 'Number', render: (r) => <span className="mono small">{r.adjustmentNumber}</span> },
+          { key: 'medicineName', label: 'Product', sortable: true, render: (r) => <ProductName row={r} /> },
+          can('INVENTORY_VIEW_BATCHES') && { key: 'batchNumber', label: 'Batch', render: (r) => <span className="mono">{r.batchNumber}</span> },
+          { key: 'expiryDate', label: 'Expiry', render: (r) => formatDate(r.expiryDate) },
+          { key: 'branchName', label: 'Branch', sortable: true },
+          { key: 'quantity', label: 'Qty', align: 'right', sortable: true, render: (r) => formatNumber(r.quantity) },
+          showCost && { key: 'lossValue', label: 'Loss (cost)', align: 'right', render: (r) => formatMoney(r.lossValue) },
+          { key: 'countsAsLoss', label: 'Loss', render: (r) => (r.countsAsLoss ? <Badge tone="danger">Loss</Badge> : <Badge>Not a loss</Badge>) },
+          { key: 'notes', label: 'Reason', render: (r) => r.notes || '—' },
+          { key: 'createdByName', label: 'By' },
+        ].filter(Boolean)}
+        empty={<EmptyState icon={Trash2} title="Nothing disposed of yet" message="Stock written off with “Dispose of stock” is listed here, with its reason and loss." />} />
+      <Pagination pagination={list.data && list.data.pagination} onChange={(page) => update({ page }, { resetPage: false })} />
+    </>
+  );
+}
+
 function MovementsTab({ state, update, clear, hasFilters }) {
   const { branchParam } = useAuth();
   const params = { ...state, tab: undefined, branchId: branchParam };
@@ -165,6 +216,7 @@ export default function InventoryPage() {
     { value: 'stock', label: 'Stock' },
     { value: 'low', label: 'Low stock' },
     { value: 'out', label: 'Out of stock' },
+    { value: 'disposed', label: 'Disposed' },
     can('INVENTORY_VIEW_MOVEMENTS') && { value: 'movements', label: 'Movement ledger' },
   ].filter(Boolean);
 
@@ -176,6 +228,7 @@ export default function InventoryPage() {
         {tab === 'stock' && <StockTab {...listState} />}
         {tab === 'low' && <LevelTab level="LOW_STOCK" {...listState} />}
         {tab === 'out' && <LevelTab level="OUT_OF_STOCK" {...listState} />}
+        {tab === 'disposed' && <DisposedTab {...listState} />}
         {tab === 'movements' && <MovementsTab {...listState} />}
       </Panel>
     </div>
