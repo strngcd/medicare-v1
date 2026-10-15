@@ -137,3 +137,67 @@ describe('deleting unused suppliers', () => {
     expect(res.body.error.code).toBe('RECORD_IN_USE');
   });
 });
+
+describe('deleting while the record is being used', () => {
+  test('a purchase racing a supplier delete does not land on the deleted supplier', async () => {
+    const session = await loginAs(owner);
+    const supplier = await createSupplier(session);
+    const medicine = await createMedicine();
+
+    // Hold the delete open (row locked and marked deleted, not yet committed).
+    const deleter = await pool.connect();
+    try {
+      await deleter.query('BEGIN');
+      await deleter.query('SELECT id FROM suppliers WHERE id = $1 FOR UPDATE', [supplier.id]);
+      await deleter.query(
+        "UPDATE suppliers SET status = 'ARCHIVED', archived_at = now(), deleted_at = now() WHERE id = $1",
+        [supplier.id],
+      );
+
+      const purchase = session.post('/api/v1/purchases').send({
+        supplierId: supplier.id, branchId: branch.id, status: 'DRAFT',
+        items: [{ medicineId: medicine.id, orderedQuantity: 1, unitPurchasePrice: '1.00' }],
+      }).then((res) => res);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await deleter.query('COMMIT');
+
+      const res = await purchase;
+      expect(res.status).toBe(422);
+    } finally {
+      deleter.release();
+    }
+    const { rowCount } = await pool.query('SELECT 1 FROM purchases WHERE supplier_id = $1', [supplier.id]);
+    expect(rowCount).toBe(0);
+  });
+
+  test('a purchase racing a branch delete does not land on the deleted branch', async () => {
+    const session = await loginAs(owner);
+    const supplier = await createSupplier(session);
+    const medicine = await createMedicine();
+    const spare = await createBranch({ name: 'Typo branch', code: 'TYPO' });
+
+    const deleter = await pool.connect();
+    try {
+      await deleter.query('BEGIN');
+      await deleter.query('SELECT id FROM branches WHERE id = $1 FOR UPDATE', [spare.id]);
+      await deleter.query(
+        "UPDATE branches SET status = 'INACTIVE', deleted_at = now() WHERE id = $1",
+        [spare.id],
+      );
+
+      const purchase = session.post('/api/v1/purchases').send({
+        supplierId: supplier.id, branchId: spare.id, status: 'DRAFT',
+        items: [{ medicineId: medicine.id, orderedQuantity: 1, unitPurchasePrice: '1.00' }],
+      }).then((res) => res);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await deleter.query('COMMIT');
+
+      const res = await purchase;
+      expect(res.status).toBe(404);
+    } finally {
+      deleter.release();
+    }
+    const { rowCount } = await pool.query('SELECT 1 FROM purchases WHERE branch_id = $1', [spare.id]);
+    expect(rowCount).toBe(0);
+  });
+});

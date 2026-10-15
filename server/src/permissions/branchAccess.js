@@ -35,7 +35,13 @@ function resolveBranchScope(auth, requestedBranchId) {
  */
 async function loadAccessibleBranch(auth, branchId, { requireActive = false, client } = {}) {
   assertBranchAccess(auth, branchId);
-  const { rows } = await query('SELECT id, name, code, status FROM branches WHERE id = $1 AND deleted_at IS NULL', [branchId], client);
+  // Inside a transaction, KEY SHARE makes a concurrent delete wait for us (or
+  // us for it, and then the deleted row no longer matches).
+  const { rows } = await query(
+    `SELECT id, name, code, status FROM branches WHERE id = $1 AND deleted_at IS NULL ${client ? 'FOR KEY SHARE' : ''}`,
+    [branchId],
+    client,
+  );
   const branch = rows[0];
   if (!branch) throw AppError.notFound('Branch not found.');
   if (requireActive && branch.status !== 'ACTIVE') {

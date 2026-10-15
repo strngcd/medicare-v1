@@ -132,7 +132,7 @@ async function setItemQuantity(client, itemId, column, quantity) {
 }
 
 async function findBranch(client, branchId) {
-  const { rows } = await query('SELECT id, name, code, status FROM branches WHERE id = $1 AND deleted_at IS NULL', [branchId], client);
+  const { rows } = await query('SELECT id, name, code, status FROM branches WHERE id = $1 AND deleted_at IS NULL FOR KEY SHARE', [branchId], client);
   return rows[0] || null;
 }
 
