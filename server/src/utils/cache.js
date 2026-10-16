@@ -6,10 +6,9 @@
  * authorization boundary.
  *
  * Every successful write moves the data version on. By default an entry
- * computed before the latest write is never served (reports stay exact).
- * Callers may accept a short staleness window (`maxStaleMs`): the dashboard
- * then recomputes at most once per window during busy selling instead of
- * after every single sale.
+ * computed before the latest write is never served, so reports and the
+ * dashboard reflect a sale or refund on the very next read. Callers may opt
+ * into a short staleness window (`maxStaleMs`) where exactness matters less.
  */
 const MAX_ENTRIES = 500;
 const TTL_MS = 60 * 1000;

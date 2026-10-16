@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar,
@@ -8,12 +8,14 @@ import {
   Wallet, Percent, Landmark, Coins, Scale, Trash2,
 } from 'lucide-react';
 import { api } from '../../api/client.js';
-import { useApi } from '../../hooks/useApi.js';
+import { useApi, usePolling } from '../../hooks/useApi.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { PageHeader, Panel, Kpi, ErrorState, EmptyState, SelectInput, Skeleton, StatusBadge } from '../../components/ui/index.js';
 import { formatMoney, formatNumber, humanize } from '../../utils/format.js';
 import { chartColors, shortPeriodLabel } from '../../components/charts/ChartTheme.js';
 import { DateRangePicker, useDateRange } from '../../components/DateRangePicker.jsx';
+
+const DASHBOARD_REFRESH_MS = 30000;
 
 function SalesTrendChart({ data }) {
   const colors = chartColors();
@@ -88,6 +90,19 @@ export default function DashboardPage() {
     () => (isAllBranches ? api.get('/analytics/branch-comparison', range.params).then((r) => r.data) : Promise.resolve(null)),
     [key, isAllBranches],
   );
+
+  // Keep today's figures current while the dashboard stays open: refresh in
+  // the background and again whenever the tab comes back into view.
+  const refresh = () => [dashboard, trend, top, categories, branches].forEach((r) => r.reload({ silent: true }));
+  usePolling(refresh, DASHBOARD_REFRESH_MS);
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, isAllBranches]);
 
   const d = dashboard.data;
   const f = d && d.financials;

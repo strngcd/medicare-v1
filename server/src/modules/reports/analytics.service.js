@@ -13,11 +13,6 @@ const { shapeSalesSummary, cacheScope } = require('./reports.service');
 const repo = require('./reports.repository');
 
 // stockLosses is also a cost field, so it additionally needs FINANCIAL_VIEW_PURCHASE_COST.
-// Dashboard figures may lag the latest sale by up to this long; during busy
-// selling they are then recomputed at most this often instead of after every write.
-const DASHBOARD_MAX_STALE_MS = 15000;
-const LIVE = { maxStaleMs: DASHBOARD_MAX_STALE_MS };
-
 const FINANCIAL_KPIS = ['revenue', 'discounts', 'tax', 'netSales', 'inventoryValue', 'refunds', 'stockLosses', 'stockLossUnits'];
 const PROFIT_KPIS = ['cogs', 'grossProfit', 'grossMargin'];
 
@@ -89,13 +84,13 @@ async function dashboard(auth, query) {
         grossMargin: s.grossMargin,
       },
     };
-  }, LIVE);
+  });
   return applyDashboardVisibility(auth, data);
 }
 
 async function salesTrend(auth, query) {
   const { range, filters } = baseFilters(auth, query);
-  const series = await cached(['trend', cacheScope(auth, filters.branchIds), filters], () => repo.salesSeries(filters, range.granularity), LIVE);
+  const series = await cached(['trend', cacheScope(auth, filters.branchIds), filters], () => repo.salesSeries(filters, range.granularity));
   return { period: range, granularity: range.granularity, series: camelize(series) };
 }
 
@@ -103,7 +98,7 @@ async function topMedicines(auth, query) {
   const { range, filters } = baseFilters(auth, query);
   const orderBy = query.by === 'revenue' ? 'net_revenue' : 'net_quantity';
   const rows = await cached(['top', cacheScope(auth, filters.branchIds), filters, orderBy, query.limit], () =>
-    repo.medicinePerformance(filters, { orderBy, limit: query.limit || 10 }), LIVE);
+    repo.medicinePerformance(filters, { orderBy, limit: query.limit || 10 }));
   return applyDashboardVisibility(auth, {
     period: range,
     items: camelize(rows).map(({ netRevenue, ...rest }) => ({ ...rest, revenue: netRevenue })),
@@ -112,7 +107,7 @@ async function topMedicines(auth, query) {
 
 async function salesByCategory(auth, query) {
   const { range, filters } = baseFilters(auth, query);
-  const rows = await cached(['by-category', cacheScope(auth, filters.branchIds), filters], () => repo.categoryPerformance(filters), LIVE);
+  const rows = await cached(['by-category', cacheScope(auth, filters.branchIds), filters], () => repo.categoryPerformance(filters));
   return applyDashboardVisibility(auth, {
     period: range,
     categories: camelize(rows).map(({ netRevenue, ...rest }) => ({ ...rest, revenue: netRevenue })),
@@ -136,13 +131,13 @@ async function inventoryAnalytics(auth, query) {
       expiryBuckets: camelize(distribution.expiry),
       categories: camelize(distribution.categories),
     };
-  }, LIVE);
+  });
   return applyDashboardVisibility(auth, data);
 }
 
 async function branchComparison(auth, query) {
   const { range, filters } = baseFilters(auth, { ...query, branchId: undefined });
-  const rows = await cached(['branches', cacheScope(auth, filters.branchIds), filters], () => repo.branchComparison(filters), LIVE);
+  const rows = await cached(['branches', cacheScope(auth, filters.branchIds), filters], () => repo.branchComparison(filters));
   return applyDashboardVisibility(auth, {
     period: range,
     branches: rows.map((r) => {

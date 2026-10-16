@@ -135,6 +135,22 @@ describe('branch scoping and financial protection', () => {
     expect(JSON.stringify(cashierDash.body.data)).not.toMatch(/stockLoss/);
   });
 
+  test('dashboard reflects a sale and a refund on the very next read', async () => {
+    const sale = await sell(cashier, branch.id, med.id, 2);
+    const first = await admin.get('/api/v1/analytics/dashboard?range=TODAY');
+    expect(first.body.data.sales).toMatchObject({ totalSales: '20.00', transactionCount: 1 });
+
+    await sell(cashier, branch.id, med.id, 3);
+    const afterSale = await admin.get('/api/v1/analytics/dashboard?range=TODAY');
+    expect(afterSale.body.data.sales).toMatchObject({ totalSales: '50.00', transactionCount: 2 });
+    const trend = await admin.get('/api/v1/analytics/sales-trend?range=TODAY');
+    expect(trend.body.data.series.reduce((sum, p) => sum + Number(p.sales), 0)).toBe(50);
+
+    await admin.post('/api/v1/refunds').send({ saleId: sale.id, reason: 'CUSTOMER_RETURN', items: [{ saleItemId: sale.items[0].id, quantity: 1 }] });
+    const afterRefund = await admin.get('/api/v1/analytics/dashboard?range=TODAY');
+    expect(afterRefund.body.data.financials).toMatchObject({ refunds: '10.00', netSales: '40.00' });
+  });
+
   test('cashier dashboard has no financial or profit KPIs, even right after an admin read (cache isolation)', async () => {
     await sell(cashier, branch.id, med.id, 2);
     const adminDash = await admin.get('/api/v1/analytics/dashboard');
