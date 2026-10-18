@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useDebouncedValue } from '../../hooks/useApi.js';
+import { IconButton } from '../ui/index.js';
 
 const ROUTES = {
   MEDICINE: (id) => `/medicines/${id}`,
@@ -23,6 +24,18 @@ export function GlobalSearch({ mobileVisible, onClose }) {
   const [state, setState] = useState({ loading: false, groups: [], error: null });
   const debounced = useDebouncedValue(term.trim(), 250);
   const ref = useRef(null);
+  const inputRef = useRef(null);
+
+  // Opening the phone search focuses the field so the keyboard comes up at once.
+  useEffect(() => {
+    if (mobileVisible && inputRef.current) inputRef.current.focus();
+  }, [mobileVisible]);
+
+  const close = () => {
+    setOpen(false);
+    setTerm('');
+    if (onClose) onClose();
+  };
 
   useEffect(() => {
     if (debounced.length < 2) {
@@ -57,6 +70,7 @@ export function GlobalSearch({ mobileVisible, onClose }) {
       <div className="input-with-icon">
         <Search aria-hidden="true" />
         <input
+          ref={inputRef}
           className="input"
           type="search"
           placeholder="Search medicines, receipts, suppliers, staff…"
@@ -67,9 +81,10 @@ export function GlobalSearch({ mobileVisible, onClose }) {
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          onKeyDown={(e) => e.key === 'Escape' && (setOpen(false), onClose && onClose())}
+          onKeyDown={(e) => e.key === 'Escape' && close()}
         />
       </div>
+      {onClose && <IconButton className="mobile-search-close" icon={X} label="Close search" onClick={close} />}
       {open && debounced.length >= 2 && (
         <div className="search-results" role="listbox">
           {state.loading && state.groups.length === 0 && <div className="search-result muted">Searching…</div>}

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Download, FileText, Printer } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { api } from '../../api/client.js';
+import { toCents, fromCents } from '../../utils/money.js';
 import { useApi } from '../../hooks/useApi.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -37,6 +38,26 @@ function formatCell(key, value) {
   if (typeof value === 'number') return formatNumber(value);
   if (/^[A-Z_]+$/.test(String(value))) return humanize(value);
   return String(value);
+}
+
+/**
+ * Totals row for the visible rows of the columns the server marks as summable
+ * (rows such as voided sales are excluded, as in the export). With several
+ * pages it totals the current page only; exports total every row.
+ */
+function tableTotals(d) {
+  const columns = d.columns.filter((c) => c.total);
+  if (columns.length === 0 || d.rows.length === 0) return null;
+  const exclude = d.totalsExclude;
+  const rows = exclude ? d.rows.filter((r) => !exclude.values.includes(r[exclude.key])) : d.rows;
+  const values = {};
+  for (const c of columns) {
+    if (c.total === 'money') values[c.key] = formatMoney(fromCents(rows.reduce((sum, r) => sum + toCents(r[c.key]), 0)));
+    else values[c.key] = formatNumber(rows.reduce((sum, r) => sum + Number(r[c.key] || 0), 0));
+  }
+  const paged = d.pagination && d.pagination.totalPages > 1;
+  const note = exclude && rows.length !== d.rows.length ? ` (${exclude.note})` : '';
+  return { label: `${paged ? 'Page total' : 'Total'}${note}`, values };
 }
 
 function SummaryTiles({ summary }) {
@@ -163,6 +184,7 @@ function ReportView({ report }) {
               rows={d.rows}
               loading={data.loading}
               columns={d.columns.map((c) => ({ key: c.key, label: c.label, render: (row) => formatCell(c.key, row[c.key]) }))}
+              footer={tableTotals({ ...d, pagination: data.data.pagination })}
               empty={<EmptyState title="No records for this period" message="Try a wider date range or another branch." />}
             />
             {data.data.pagination && <Pagination pagination={data.data.pagination} onChange={setPage} />}

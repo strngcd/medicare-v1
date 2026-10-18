@@ -8,6 +8,8 @@ import { Button } from './Button.jsx';
  * genuine empty vs filtered/search empty, and stacked cards on phones.
  *
  * columns: [{ key, label, render?, sortable?, align?, width? }]
+ * footer: optional { label, values: { [columnKey]: text } } shown as a totals row;
+ * the label goes in the first column without a value.
  */
 export function DataTable({
   columns,
@@ -23,6 +25,7 @@ export function DataTable({
   filtered,
   onClearFilters,
   isSearch,
+  footer,
 }) {
   if (error && !rows) return <ErrorState error={error} onRetry={onRetry} />;
   if (loading && !rows) return <SkeletonRows columns={Math.min(columns.length, 5)} />;
@@ -75,6 +78,21 @@ export function DataTable({
             </tr>
           ))}
         </tbody>
+        {footer && (
+          <tfoot>
+            <tr className="total-row">
+              {columns.map((c, i) => {
+                const labelAt = columns.findIndex((col) => !(col.key in footer.values));
+                const has = c.key in footer.values;
+                return (
+                  <td key={c.key} data-label={has ? c.label : ''} className={c.align === 'right' ? 'num' : undefined}>
+                    {has ? footer.values[c.key] : i === labelAt ? footer.label : null}
+                  </td>
+                );
+              })}
+            </tr>
+          </tfoot>
+        )}
       </table>
     </div>
   );
