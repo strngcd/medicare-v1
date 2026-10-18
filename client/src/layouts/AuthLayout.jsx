@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Cross, ShieldCheck, Boxes, Receipt, BarChart3 } from 'lucide-react';
+import { ShieldCheck, Boxes, Receipt, BarChart3 } from 'lucide-react';
 import { api } from '../api/client.js';
+import { BrandMark, useBrandFavicon } from '../components/shell/BrandMark.jsx';
 
 /** Pharmacy name and logo for the signed-out pages. */
 function useBranding() {
@@ -13,11 +14,12 @@ function useBranding() {
 
 export function AuthLayout({ children }) {
   const branding = useBranding();
+  useBrandFavicon(branding.logoUrl);
   return (
     <div className="auth-page">
       <aside className="auth-aside">
         <div className="row" style={{ gap: 10, color: '#fff', fontWeight: 600 }}>
-          <span className="brand-mark"><Cross aria-hidden="true" /></span>
+          <BrandMark logoUrl={branding.logoUrl} />
           {branding.pharmacyName}
         </div>
         <div>
@@ -43,7 +45,7 @@ export function AuthBrand({ title, subtitle }) {
   return (
     <div className="stack-sm">
       <div className="brand-row">
-        {branding.logoUrl ? <img src={branding.logoUrl} alt="" /> : <span className="brand-mark"><Cross aria-hidden="true" /></span>}
+        <BrandMark logoUrl={branding.logoUrl} />
         {branding.pharmacyName}
       </div>
       <h1 style={{ fontSize: 22 }}>{title}</h1>

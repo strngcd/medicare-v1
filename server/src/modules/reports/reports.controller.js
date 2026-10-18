@@ -1,6 +1,7 @@
 const service = require('./reports.service');
 const analytics = require('./analytics.service');
 const { toCsv, toPdf } = require('./exporter');
+const { describeFilters, slug } = require('./exportFilters');
 const { recordAudit, actorFromRequest } = require('../audit/audit.recorder');
 const repo = require('./reports.repository');
 const { sendData } = require('../../utils/response');
@@ -25,8 +26,11 @@ function exportHandler(name) {
   return async (req, res) => {
     const { format, ...filters } = req.valid.query;
     const report = await REPORTS[name](req.auth, filters, { exportAll: true });
+    const filterLines = await describeFilters(req.auth, filters);
+    const branch = filters.branchId ? slug(filterLines[0].value) : '';
     const stamp = new Date().toISOString().slice(0, 10);
-    const filename = `${name}-report-${stamp}.${format}`;
+    const filename = `${name}-report${branch ? `-${branch}` : ''}-${stamp}.${format}`;
+    const meta = { pharmacyName: await repo.pharmacyName(), generatedBy: req.auth.fullName, filters: filterLines };
 
     // Exports are logged in the audit trail (who exported what, with which filters).
     await recordAudit(undefined, actorFromRequest(req), {
@@ -40,12 +44,9 @@ function exportHandler(name) {
     if (format === 'csv') {
       res.set('Content-Type', 'text/csv; charset=utf-8');
       res.set('Content-Disposition', `attachment; filename="${filename}"`);
-      return res.send(toCsv(report));
+      return res.send(toCsv(report, meta));
     }
-    const pdf = await toPdf(report, {
-      pharmacyName: await repo.pharmacyName(),
-      generatedBy: req.auth.fullName,
-    });
+    const pdf = await toPdf(report, meta);
     res.set('Content-Type', 'application/pdf');
     res.set('Content-Disposition', `attachment; filename="${filename}"`);
     return res.send(pdf);

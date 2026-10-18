@@ -78,7 +78,7 @@ function LogoSection({ settings, onSaved }) {
           typeLabel="PNG, JPG or WebP image"
           showName={false}
           maxBytes={2 * 1024 * 1024}
-          hint="PNG, JPG or WebP, up to 2 MB. Shown on the sign-in page and receipts."
+          hint="PNG, JPG or WebP, up to 2 MB. Replaces the default mark in the sidebar, sign-in page, browser tab and receipts."
           error={error || (upload.error && upload.error.message)}
           buttonLabel={upload.running ? 'Uploading…' : settings.logoUrl ? 'Replace logo' : 'Upload logo'}
           disabled={!editable || upload.running || remove.running}

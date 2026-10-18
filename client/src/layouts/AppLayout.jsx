@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Cross, HelpCircle, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Search, UserRound } from 'lucide-react';
+import { HelpCircle, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Search, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { NAVIGATION } from '../constants/navigation.js';
 import { preloadRoutes } from '../routes.jsx';
@@ -10,6 +10,7 @@ import { Dropdown, IconButton } from '../components/ui/index.js';
 import { BranchSelector } from '../components/shell/BranchSelector.jsx';
 import { GlobalSearch } from '../components/shell/GlobalSearch.jsx';
 import { NotificationsMenu } from '../components/shell/NotificationsMenu.jsx';
+import { BrandMark, useBrandFavicon } from '../components/shell/BrandMark.jsx';
 import { initials } from '../utils/format.js';
 
 const COLLAPSE_KEY = 'medicar.sidebarCollapsed';
@@ -36,7 +37,11 @@ export function AppLayout() {
   );
   usePolling(() => alerts.reload({ silent: true }), 120000);
 
-  useEffect(() => setMobileOpen(false), [location.pathname]);
+  useBrandFavicon(pharmacy && pharmacy.logoUrl);
+  useEffect(() => {
+    setMobileOpen(false);
+    setMobileSearch(false);
+  }, [location.pathname]);
   // Fetch page code in the background so later navigation is instant.
   useEffect(() => preloadRoutes(canAny), [user.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -60,7 +65,7 @@ export function AppLayout() {
     <div className="app-shell">
       <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`} aria-label="Main navigation">
         <div className="sidebar-brand">
-          <span className="brand-mark"><Cross aria-hidden="true" /></span>
+          <BrandMark logoUrl={pharmacy && pharmacy.logoUrl} />
           <span className="brand-name">{(pharmacy && pharmacy.name) || 'Medicar'}</span>
         </div>
         <nav className="sidebar-nav">
@@ -91,7 +96,8 @@ export function AppLayout() {
       <div className={`mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
 
       <div className="main">
-        <header className="topbar no-print">
+        {/* On phones an open search takes over the whole bar (see .topbar.searching). */}
+        <header className={`topbar no-print ${mobileSearch ? 'searching' : ''}`}>
           <IconButton className="menu-toggle" icon={Menu} label="Open navigation" onClick={() => setMobileOpen(true)} />
           <IconButton
             className="collapse-toggle"
@@ -101,7 +107,7 @@ export function AppLayout() {
           />
           <GlobalSearch mobileVisible={mobileSearch} onClose={() => setMobileSearch(false)} />
           <div className="topbar-actions">
-            <IconButton className="mobile-search-toggle" icon={Search} label="Search" onClick={() => setMobileSearch((s) => !s)} />
+            <IconButton className="mobile-search-toggle" icon={Search} label="Search" onClick={() => setMobileSearch(true)} />
             <BranchSelector />
             {can('NOTIFICATION_VIEW') && <NotificationsMenu />}
             <IconButton icon={HelpCircle} label="Help" onClick={() => navigate('/help')} />

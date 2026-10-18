@@ -305,6 +305,13 @@
 }
 
 .table tbody tr:last-child td { border-bottom: none; }
+.table tfoot .total-row td {
+  font-weight: 600;
+  background: var(--surface-muted);
+  border-top: 1px solid var(--border);
+  border-bottom: none;
+  white-space: nowrap;
+}
 .table tbody tr.clickable { cursor: pointer; }
 .table tbody tr.clickable:hover td { background: var(--surface-muted); }
 .table td.num,
@@ -317,6 +324,7 @@
   .table.responsive thead { display: none; }
   .table.responsive,
   .table.responsive tbody,
+  .table.responsive tfoot,
   .table.responsive tr,
   .table.responsive td { display: block; width: 100%; }
   .table.responsive tr { padding: 10px 12px; border-bottom: 1px solid var(--border); }
@@ -336,6 +344,8 @@
   }
   .table.responsive td[data-label='']::before { content: none; }
   .table.responsive td[data-label=''] { justify-content: flex-end; }
+  .table.responsive .total-row td:empty { display: none; }
+  .table.responsive .total-row td[data-label=''] { justify-content: flex-start; }
   /* Editable cells: keep the label next to its input instead of at opposite edges. */
   .table.responsive td:has(> .input) { justify-content: flex-start; align-items: center; }
   .table.responsive td:has(> .input)::before { flex: 0 0 96px; }

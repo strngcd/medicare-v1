@@ -1,6 +1,7 @@
 // A small ceiling so the "too large" path can be exercised without huge data.
 process.env.EXPORT_MAX_ROWS = '10050';
 
+const { csvTable } = require('../helpers/csv');
 const { resetDatabase, pool } = require('../helpers/db');
 const { createBranch, createUser, createMedicine, createStock } = require('../helpers/factories');
 const { loginAs } = require('../helpers/session');
@@ -34,7 +35,8 @@ test('exports contain every row, beyond the old 10,000-row cut-off', async () =>
   await addLosses(10050);
   const res = await admin.get('/api/v1/reports/losses/export?format=csv&range=TODAY');
   expect(res.status).toBe(200);
-  expect(res.text.trim().split('\r\n')).toHaveLength(10050 + 1);
+  // header + rows + totals
+  expect(csvTable(res.text)).toHaveLength(10050 + 2);
 }, 60000);
 
 test('exports over the ceiling are refused with a clear message instead of being cut short', async () => {

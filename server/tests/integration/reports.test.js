@@ -3,6 +3,7 @@ const { createBranch, createUser, createMedicine, createStock } = require('../he
 const { loginAs } = require('../helpers/session');
 const { daysFromToday, today } = require('../helpers/dates');
 const { bumpVersion } = require('../../src/utils/cache');
+const { csvTable } = require('../helpers/csv');
 
 let branch;
 let otherBranch;
@@ -196,13 +197,42 @@ describe('exports', () => {
     const res = await admin.get('/api/v1/reports/sales/export?format=csv&minAmount=50');
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toMatch(/text\/csv/);
-    const lines = res.text.trim().split('\r\n');
+    const lines = csvTable(res.text);
     expect(lines[0]).toContain('Receipt');
-    expect(lines).toHaveLength(2);
+    expect(lines).toHaveLength(3);
     expect(lines[1]).toContain('70.00');
+    expect(lines[2]).toMatch(/^Total,/);
 
     const audit = await pool.query("SELECT new_values FROM audit_logs WHERE action = 'REPORT_EXPORTED'");
     expect(audit.rows[0].new_values).toMatchObject({ report: 'sales', format: 'csv' });
+  });
+
+  test('exports name the filters used and end with a totals row', async () => {
+    const staff = await createUser({ role: 'CASHIER', fullName: 'Hana Tesfaye', branches: [branch] });
+    const hana = await loginAs(staff);
+    await sell(hana, branch.id, med.id, 2); // 20.00
+    await sell(hana, branch.id, med.id, 3); // 30.00
+    const voided = await sell(hana, branch.id, med.id, 4); // 40.00, voided
+    await admin.post(`/api/v1/sales/${voided.id}/void`).send({ reason: 'Mistake' });
+    await sell(cashier, branch.id, med.id, 1); // another cashier: filtered out
+
+    const res = await admin.get(`/api/v1/reports/sales/export?format=csv&branchId=${branch.id}&staffId=${staff.id}&productType=MEDICINE&range=TODAY`);
+    expect(res.status).toBe(200);
+    expect(res.headers['content-disposition']).toMatch(/sales-report-bole-\d{4}-\d{2}-\d{2}\.csv/);
+    const info = res.text.split('\r\n\r\n')[0];
+    expect(info).toContain('Branch,Bole');
+    expect(info).toContain('Staff,Hana Tesfaye');
+    expect(info).toContain('Products,Medicines');
+    expect(info).not.toContain(staff.id);
+
+    const lines = csvTable(res.text);
+    expect(lines).toHaveLength(1 + 3 + 1);
+    const header = lines[0].split(',');
+    const totals = lines[4].split(',');
+    expect(totals[0]).toBe('Total (excludes voided)');
+    expect(totals[header.indexOf('Total')]).toBe('50.00');
+    expect(totals[header.indexOf('Items')]).toBe('5');
+    expect(totals[header.indexOf('Branch')]).toBe('');
   });
 
   test('PDF export renders', async () => {
@@ -237,7 +267,7 @@ describe('exports', () => {
     expect(report.body.data.summary.orderedValue).toBeUndefined();
     const csv = await session.get('/api/v1/reports/purchases/export?format=csv');
     expect(csv.status).toBe(200);
-    expect(csv.text.split('\r\n')[0]).not.toMatch(/Total|Paid|Balance/);
+    expect(csvTable(csv.text)[0]).not.toMatch(/Total|Paid|Balance/);
     expect(csv.text).not.toContain('60.00');
   });
 });
@@ -261,9 +291,10 @@ describe('refund filters and export', () => {
     expect(report.body.data.summary).toMatchObject({ refundCount: 1, totalRefunded: '50.00' });
 
     const csv = await admin.get('/api/v1/reports/refunds/export?format=csv&reason=CUSTOMER_RETURN&maxAmount=20');
-    const lines = csv.text.trim().split('\r\n');
-    expect(lines).toHaveLength(2);
+    const lines = csvTable(csv.text);
+    expect(lines).toHaveLength(3);
     expect(lines[1]).toContain(small.refundNumber);
+    expect(csv.text).toContain('Reason,Customer return');
 
     const pdf = await admin.get('/api/v1/reports/refunds/export?format=pdf').buffer(true).parse((r, cb) => {
       const chunks = [];
