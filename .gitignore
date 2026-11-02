@@ -36,6 +36,7 @@ Thumbs.db
 *.swp
 *.swo
 *~
+CLAUDE.md
 
 # Local scratch
 tmp/
